@@ -1,14 +1,13 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Rat.Api.Observability
+namespace Rat.Api.Observability.Health
 {
     /// <summary>
     /// Basic health check implementation.
     /// </summary>
-    public class BasicHealthCheck : IHealthCheck
+    public class ReadyHealthCheck : IHealthCheck
     {
         /// <summary>
         /// Executes the health check logic
@@ -18,14 +17,9 @@ namespace Rat.Api.Observability
         /// <returns>An instance of <see cref="HealthCheckResult"/>.</returns>
         public Task<HealthCheckResult> CheckHealthAsync(
             HealthCheckContext context,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
-            var shoredinger = new Random().Next();
-
-            return
-                shoredinger % 2 == 0
-                    ? Task.FromResult(HealthCheckResult.Healthy("Alive."))
-                    : Task.FromResult(HealthCheckResult.Unhealthy("Dead"));
+            return Task.FromResult(HealthCheckResult.Healthy("Not ready"));
         }
     }
 }

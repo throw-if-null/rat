@@ -4,8 +4,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Rat.Api.Observability.Health.Responses;
 
-namespace Rat.Api.Observability
+namespace Rat.Api.Observability.Health
 {
     /// <summary>
     /// Contains utility methods for configuring health checks
@@ -25,28 +26,24 @@ namespace Rat.Api.Observability
 
             httpContext.Response.ContentType = "application/json";
 
-            var payload = new
+            var response = new HealthCheckResponse
             {
                 Status = Enum.GetName(result.Status),
-                HealthChecks = result.Entries.Select(pair => new
+                HealthChecks = result.Entries.Select(pair => new HealthCheckInfo
                 {
                     Name = pair.Key,
-                    Report = new
+                    Report = new HealthCheckData
                     {
                         Status = Enum.GetName(pair.Value.Status),
-                        Descriptions = pair.Value.Description,
+                        Description = pair.Value.Description,
                         ElapsedMilliseconds = pair.Value.Duration.TotalMilliseconds,
                         Tags = pair.Value.Tags,
-                        Data = pair.Value.Data.Select(kvp => new
-                        {
-                            Key = kvp.Key,
-                            Value = kvp.Value
-                        })
+                        Data = pair.Value.Data
                     }
                 })
             };
 
-            return httpContext.Response.WriteAsync(JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true }));
+            return httpContext.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true }));
         }
     }
 }

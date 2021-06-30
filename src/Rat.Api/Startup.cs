@@ -1,17 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Rat.Api.Configuration;
-using Rat.Api.Observability;
-using Rat.Api.Services;
+using Rat.Api.Observability.Health;
 
 namespace Rat.Api
 {
@@ -45,31 +43,19 @@ namespace Rat.Api
                     .AddEnvironmentVariables()
                     .Build();
 
-            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"));
-
             services.AddLogging(x => x.AddConsole());
 
-            services.AddHealthChecks().AddCheck<BasicHealthCheck>("basic", tags: new[] { "ready", "live" });
+            var healthCheckTimeout = configuration.GetValue<int>("HealthCheckOptions:TimeoutMs");
+            healthCheckTimeout = healthCheckTimeout == default ? 30 : healthCheckTimeout;
 
-            // Register your types
-            services.AddTransient<IFooService, FooService>();
+            services
+                .AddHealthChecks()
+                .AddCheck<ReadyHealthCheck>("Readiness probe", tags: new[] { "ready" }, timeout: TimeSpan.FromSeconds(healthCheckTimeout))
+                .AddCheck<LiveHealthCheck>("Liveness probe", tags: new[] { "live" }, timeout: TimeSpan.FromSeconds(healthCheckTimeout));
 
             services.AddCors(options => { options.AddPolicy("AllowAllPolicy", BuildCorsPolicy); });
 
-            services
-                .AddMvc(
-                    options =>
-                    {
-                        // Refer to this article for more details on how to properly set the caching for your needs
-                        // https://docs.microsoft.com/en-us/aspnet/core/performance/caching/response
-                        options.CacheProfiles.Add(
-                            "default",
-                            new CacheProfile
-                            {
-                                Duration = 600,
-                                Location = ResponseCacheLocation.None
-                            });
-                    });
+            services.AddMvc();
 
             services.AddSwaggerGen(c =>
             {
@@ -125,7 +111,7 @@ namespace Rat.Api
                 endpoints.MapHealthChecks("/health/live", new HealthCheckOptions()
                 {
                     AllowCachingResponses = false,
-                    Predicate = (check) => check.Tags.Contains("ready"),
+                    Predicate = (check) => check.Tags.Contains("live"),
                     ResponseWriter = HealthReportWriter.WriteResponse
                 });
             });
