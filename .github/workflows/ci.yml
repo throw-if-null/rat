@@ -62,7 +62,6 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
    
       - name: Sonar Begin
-        if: ${{ env.USE_SONAR == true }}
         shell: pwsh
         run: >
           ./.sonar/scanner/dotnet-sonarscanner begin
@@ -88,7 +87,6 @@ jobs:
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }} 
 
       - name: Sonar End
-        if: ${{ env.USE_SONAR == true }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
