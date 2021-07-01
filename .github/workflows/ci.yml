@@ -11,21 +11,11 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      USE_SONAR: true
-      # Sonar Begin
-      SONAR_OPENCOVER_REPORTS_PATH: ./_TMP/*/coverage.opencover.xml
-      SONAR_COVERAGE_EXCLUSIONS: "**Test*.cs"
       # Run Tests
       TEST_PROJECT_PATH: ./src/Rat.sln
       TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
       
     steps:
-      - name: Set up JDK 11
-        if: ${{ env.USE_SONAR == true }}
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.11
-
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.1
         with:
@@ -37,46 +27,11 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Cache SonarCloud packages
-        if: ${{ env.USE_SONAR == true }}
-        uses: actions/cache@v1
-        with:
-          path: ~/sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache SonarCloud scanner
-        if: ${{ env.USE_SONAR == true }}
-        id: cache-sonar-scanner
-        uses: actions/cache@v1
-        with:
-          path: ./.sonar/scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-
-      - name: Install SonarCloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          New-Item -Path ./.sonar/scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
           languages: 'csharp'
 
-      - name: Sonar Begin
-        shell: pwsh
-        run: >
-          ./.sonar/scanner/dotnet-sonarscanner begin
-          /k:"throw-if-null_rat.api"
-          /o:"throw-if-null"
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-          /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.cs.opencover.reportsPaths=${{ env.SONAR_OPENCOVER_REPORTS_PATH }}
-          /d:sonar.coverage.exclusions=${{ env.SONAR_COVERAGE_EXCLUSIONS }}
-      
       - name: Run Tests
         uses: rocklan/dotnet-tests-report@master
         with:
@@ -90,12 +45,6 @@ jobs:
           set_check_status_from_test_outcome: true
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }} 
-
-      - name: Sonar End
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
