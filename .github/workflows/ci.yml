@@ -60,7 +60,12 @@ jobs:
         run: |
           New-Item -Path ./.sonar/scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-   
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: 'csharp'
+
       - name: Sonar Begin
         shell: pwsh
         run: >
@@ -71,7 +76,7 @@ jobs:
           /d:sonar.host.url="https://sonarcloud.io"
           /d:sonar.cs.opencover.reportsPaths=${{ env.SONAR_OPENCOVER_REPORTS_PATH }}
           /d:sonar.coverage.exclusions=${{ env.SONAR_COVERAGE_EXCLUSIONS }}
-          
+      
       - name: Run Tests
         uses: rocklan/dotnet-tests-report@master
         with:
@@ -92,6 +97,9 @@ jobs:
         shell: pwsh
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+        
   docker: 
     needs: build
     runs-on: ubuntu-latest
