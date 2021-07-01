@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [ branch0 ]
+  pull_request:
+    branches: [ branch0 ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      USE_SONAR: true
+      # Sonar Begin
+      SONAR_OPENCOVER_REPORTS_PATH: Path to OpenCover reports
+      SONAR_COVERAGE_EXCLUSIONS: "**Test*.cs"
+      # Run Tests
+      TEST_PROJECT_PATH: ./src/Rat.sln
+      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+      
+    steps:
+      - name: Set up JDK 11
+        if: ${{ env.USE_SONAR == true }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Cache SonarCloud packages
+        if: ${{ env.USE_SONAR == true }}
+        uses: actions/cache@v1
+        with:
+          path: ~/sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarCloud scanner
+        if: ${{ env.USE_SONAR == true }}
+        id: cache-sonar-scanner
+        uses: actions/cache@v1
+        with:
+          path: ./.sonar/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarCloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          New-Item -Path ./.sonar/scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+   
+      - name: Sonar Begin
+        if: ${{ env.USE_SONAR == true }}
+        shell: pwsh
+        run: >
+          ./.sonar/scanner/dotnet-sonarscanner begin
+          /k:"throw-if-null_rat.api"
+          /o:"throw-if-null"
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.cs.opencover.reportsPaths=${{ env.SONAR_OPENCOVER_REPORTS_PATH }}
+          /d:sonar.coverage.exclusions=${{ env.SONAR_COVERAGE_EXCLUSIONS }}
+          
+      - name: Run Tests
+        uses: rocklan/dotnet-tests-report@master
+        with:
+          project_path: ${{ env.TEST_PROJECT_PATH }}
+          report_name: Test report
+          report_title: ${{ env.GITHUB_REPOSITORY }} test results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gist_name: test_run.md
+          gist_badge_label: 'Tests passed: %Counters_passed%/%Counters_total%'
+          gist_token: ${{ secrets.GIST_TOKEN }}
+          set_check_status_from_test_outcome: true
+          fail_build_on_failed_tests: true
+          extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }} 
+
+      - name: Sonar End
+        if: ${{ env.USE_SONAR == true }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+  docker: 
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      ENABLED: false
+      TYPE: 'all' # 'all', 'nuget', 'github'
+    
+    if: ${{ env.ENABLED == true }}
+    
+    steps:  
+      - name: Print info
+        run: |
+          echo Not implemented. 
