@@ -92,12 +92,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      ENABLED: false
-      TYPE: 'all' # 'all', 'nuget', 'github'
-    
-    if: ${{ env.ENABLED == true }}
+      TYPE: 'all' # 'all', 'docker', 'github'
     
     steps:  
       - name: Print info
         run: |
-          echo Not implemented. 
+          echo ${{ env.TYPE }} 
