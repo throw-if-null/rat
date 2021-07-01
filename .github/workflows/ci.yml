@@ -13,7 +13,7 @@ jobs:
     env:
       USE_SONAR: true
       # Sonar Begin
-      SONAR_OPENCOVER_REPORTS_PATH: Path to OpenCover reports
+      SONAR_OPENCOVER_REPORTS_PATH: ./_TMP/*/coverage.opencover.xml
       SONAR_COVERAGE_EXCLUSIONS: "**Test*.cs"
       # Run Tests
       TEST_PROJECT_PATH: ./src/Rat.sln
