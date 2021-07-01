@@ -1,0 +1,28 @@
+version: "2.4"
+
+# Templates:
+x-base: &base-service-template
+  init: true
+  networks:
+    local:
+
+services:
+
+  rat-api:
+    <<: *base-service-template
+    container_name: rat-api
+    build:
+      context: .
+      dockerfile: Rat.Api/Dockerfile
+    healthcheck:
+      test: curl --max-time "5" --no-buffer --fail http://rat-api/health/ready || exit 1
+      interval: 2s
+      timeout: 2s
+      retries: 3
+      start_period: 1s
+    ports:
+      - "8485:80"
+
+networks:
+  local:
+    name: local

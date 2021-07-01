@@ -1,0 +1,17 @@
+﻿{
+  "Status": "Healthy",
+  "HealthChecks": [
+    {
+      "Name": "Readiness probe",
+      "Report": {
+        "Status": "Healthy",
+        "Description": "Not ready",
+        "ElapsedMilliseconds": 1.0969,
+        "Tags": [
+          "ready"
+        ],
+        "Data": {}
+      }
+    }
+  ]
+}
