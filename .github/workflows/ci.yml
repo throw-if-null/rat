@@ -46,6 +46,11 @@ jobs:
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }} 
 
+      - name: Calculate code coverage
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          path-to-lcov: "./_TMP/*/coverage.opencover.lcov"
+          base-path: ./src
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
