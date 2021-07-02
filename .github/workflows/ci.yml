@@ -13,7 +13,7 @@ jobs:
     env:
       # Run Tests
       TEST_PROJECT_PATH: ./src/Rat.sln
-      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml /p:CollectCoverage=true /p:CoverletOutput="${{ env.GITHUB_WORKSPACE }}/coverage/lcov.info" /p:CoverletOutputFormat=lcov
+      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
     steps:
       - name: Setup .NET Core SDK
@@ -51,9 +51,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ${{ env.GITHUB_WORKSPACE }}/coverage/lcov.info
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
 
   docker:
     needs: build
