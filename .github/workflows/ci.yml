@@ -13,7 +13,7 @@ jobs:
     env:
       # Run Tests
       TEST_PROJECT_PATH: ./src/Rat.sln
-      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml /p:CollectCoverage=true /p:CoverletOutput="${{ GITHUB_WORKSPACE }}/coverage/lcov.info" /p:CoverletOutputFormat=lcov
 
     steps:
       - name: Setup .NET Core SDK
@@ -50,7 +50,7 @@ jobs:
         uses: coverallsapp/github-action@v1.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: "./_TMP/*/coverage.info"
+          path-to-lcov: ${{ GITHUB_WORKSPACE }}/coverage/lcov.info
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
