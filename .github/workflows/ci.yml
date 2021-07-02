@@ -46,11 +46,8 @@ jobs:
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
 
-      - name: Calculate code coverage
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ${{ env.GITHUB_WORKSPACE }}/coverage/lcov.info
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
 
   docker:
     needs: build
