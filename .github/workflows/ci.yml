@@ -50,7 +50,7 @@ jobs:
         uses: coverallsapp/github-action@v1.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ${{ GITHUB_WORKSPACE }}/coverage/lcov.info
+          path-to-lcov: ${{ env.GITHUB_WORKSPACE }}/coverage/lcov.info
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
