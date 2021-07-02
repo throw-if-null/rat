@@ -51,6 +51,8 @@ jobs:
         with:
           path-to-lcov: "./_TMP/*/coverage.opencover.lcov"
           base-path: ./src
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
