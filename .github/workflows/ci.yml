@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [ branch0 ]
+  pull_request:
+    branches: [ branch0 ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      # Run Tests
+      TEST_PROJECT_PATH: ./src/Rat.sln
+      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+
+    steps:
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.1
+        with:
+          dotnet-version: '5.0.x'
+          include-prerelease: false
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: 'csharp'
+
+      - name: Run Tests
+        uses: rocklan/dotnet-tests-report@master
+        with:
+          project_path: ${{ env.TEST_PROJECT_PATH }}
+          report_name: Test report
+          report_title: ${{ env.GITHUB_REPOSITORY }} test results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gist_name: test_run.md
+          gist_badge_label: 'Tests passed: %Counters_passed%/%Counters_total%'
+          gist_token: ${{ secrets.GIST_TOKEN }}
+          set_check_status_from_test_outcome: true
+          fail_build_on_failed_tests: true
+          extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1.5.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./_TMP/*/coverage.opencover.xml
+          name: Rat.Api Code Coverage
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      TYPE: 'all' # 'all', 'docker', 'github'
+
+    steps:
+      - name: Print info
+        run: |
+          echo ${{ env.TYPE }}
