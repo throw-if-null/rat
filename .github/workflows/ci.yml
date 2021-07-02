@@ -48,14 +48,14 @@ jobs:
 
       - name: Codecov
         uses: codecov/codecov-action@v1.5.2
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
         with:
           files: ./_TMP/*/coverage.opencover.xml
           name: Rat.Api Code Coverage
           fail_ci_if_error: true
           verbose: true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
 
   docker:
     needs: build
