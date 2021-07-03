@@ -77,5 +77,5 @@ jobs:
 
       - name: Build docker image
         run: |
-          docker build -f ./src/Rat.Api/Dockerfile ./src
-          docker ps
+          docker build -f ./src/Rat.Api/Dockerfile -t rat.api:latest ./src
+          docker images ps -a
