@@ -77,4 +77,5 @@ jobs:
 
       - name: Build docker image
         run: |
-          echo $(docker build -f ./src/Rat.Api/Dockerfile ./src)
+          docker build -f ./src/Rat.Api/Dockerfile ./src
+          docker ps
