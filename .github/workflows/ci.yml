@@ -85,7 +85,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ${{ github.workspace }}/src/Rat.Api/Dockerfile
+          context: ${{ github.workspace }}/src
           push: true
           tags: throw-if-null/rat.api:latest
 
