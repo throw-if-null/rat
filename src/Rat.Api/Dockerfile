@@ -1,11 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS base
+ADD Rat.Api/VERSION .
 WORKDIR /app
 EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
 WORKDIR /src
-
-ADD VERSION .
 
 COPY ["Rat.Api/Rat.Api.csproj", "Rat.Api/"]
 RUN dotnet restore "Rat.Api/Rat.Api.csproj"
