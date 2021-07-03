@@ -61,10 +61,11 @@ jobs:
   docker:
     needs: build
     runs-on: ubuntu-latest
-    env:
-      TYPE: 'all' # 'all', 'docker', 'github'
 
     steps:
-      - name: Print info
-        run: |
-          echo ${{ env.TYPE }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: MirzaMerdovic
+          password: ${{ secrets.GITHUB_TOKEN }}
