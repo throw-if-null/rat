@@ -79,10 +79,10 @@ jobs:
         run: |
           docker build -f ./src/Rat.Api/Dockerfile -t ghcr.io/throw-if-null/rat.api:latest ./src
           docker push ghcr.io/throw-if-null/rat.api:latest
-          IMAGE_ID="$(docker images -q latest)"
-          echo "Image: $IMAGE_ID"
-          CONTAINER_ID="$(docker create ${IMAGE_ID})"
-          docker cp $CONTAINER_ID:VERSION ./version
-          docker rm $CONTAINER_ID
-          VERSION_VALUE="$(cat version)"
-          echo $VERSION_VALUE
+          echo "::set-env name=IMAGE_ID::$(docker images -q latest)"
+          echo "Image: ${{ env.IMAGE_ID }}"
+          #CONTAINER_ID="$(docker create ${{ env.IMAGE_ID }})"
+          #docker cp $CONTAINER_ID:VERSION ./version
+          #docker rm $CONTAINER_ID
+          #VERSION_VALUE="$(cat version)"
+          #echo $VERSION_VALUE
