@@ -65,8 +65,8 @@ jobs:
     steps:
       - name: Print home directory
         run: |
-          pwd
-          cat $GITHUB_WORKSPACE/src/Rat.Api/Dockerfile
+          # /home/runner/work/rat.api/rat.api/src/Rat.sln
+          cat $GITHUB_WORKSPACE/src/Rat.sln
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
