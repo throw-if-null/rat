@@ -5,6 +5,8 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
 WORKDIR /src
 
+ADD VERSION .
+
 COPY ["Rat.Api/Rat.Api.csproj", "Rat.Api/"]
 RUN dotnet restore "Rat.Api/Rat.Api.csproj"
 
