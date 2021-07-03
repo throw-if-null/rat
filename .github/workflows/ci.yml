@@ -78,7 +78,7 @@ jobs:
       - name: Build docker image
         run: |
           docker build -f ./src/Rat.Api/Dockerfile -t rat-api:latest ./src
-          docker push throw-if-null/rat.api:latest
+          docker push ghcr.io/throw-if-null/rat.api:latest
           IMAGE_ID="$(docker images -q latest)"
           CONTAINER_ID="$(docker create ${IMAGE_ID})"
           docker cp $CONTAINER_ID:VERSION ./version
