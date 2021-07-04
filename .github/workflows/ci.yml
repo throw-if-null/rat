@@ -79,7 +79,7 @@ jobs:
 
       - name: Get release version
         run: |
-          echo "RELEASE_VERSION=$(echo ${{ GITHUB_REF:10 }})" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
 
       - name: Build and publish Docker container to GitHub
         uses: elgohr/Publish-Docker-Github-Action@master
