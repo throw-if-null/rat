@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS base
-ADD Rat.Api/VERSION .
 WORKDIR /app
 EXPOSE 80
 
