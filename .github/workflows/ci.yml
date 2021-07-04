@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      
+
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.1
         with:
@@ -49,7 +49,7 @@ jobs:
         run: |
           New-Item -Path ./.sonar/scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-          
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
@@ -68,7 +68,7 @@ jobs:
           /d:sonar.host.url="https://sonarcloud.io"
           /d:sonar.cs.opencover.reportsPaths=${{ env.OPENCOVER_REPORTS_PATH }}
           /d:sonar.coverage.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
-          
+
       - name: Run Tests
         uses: rocklan/dotnet-tests-report@master
         env:
@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-        
+
       - name: Codecov
         uses: codecov/codecov-action@v1.5.2
         env:
@@ -116,3 +116,26 @@ jobs:
           context: .
           dockerfile: ./Rat.Api/Dockerfile
           workdir: ./src
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: List web apps
+        run: |
+          az webapp list --query "[?state=='Running']"
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az logout
+            az cache purge
+            az account clear
