@@ -81,8 +81,8 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           registry: ghcr.io
-          name: ghcr.io/rat.api
-          username: throw-if-null/rat.api/rat-api
+          name: throw-if-null/rat.api/rat-api
+          username: MirzaMerdovic
           password: ${{ secrets.GITHUB_TOKEN }}
           context: .
           dockerfile: ./Rat.Api/Dockerfile
