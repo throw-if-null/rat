@@ -87,7 +87,7 @@ jobs:
           context: .
           dockerfile: ./Rat.Api/Dockerfile
           workdir: ./src
-          tags: "latest"
+          tag_semver: true
 
       #- name: Build docker image
       #  shell: pwsh
