@@ -79,8 +79,7 @@ jobs:
 
       - name: Get release version
         run: |
-          #echo "::set-env name=STATE_RELEASE_VERSION::$(echo ${GITHUB_REF:10})"
-          echo "STATE_RELEASE_VERSION=$(echo ${{ GITHUB_REF:10 }})" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$(echo ${{ GITHUB_REF:10 }})" >> $GITHUB_ENV
 
       - name: Build and publish Docker container to GitHub
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -92,4 +91,4 @@ jobs:
           context: .
           dockerfile: ./Rat.Api/Dockerfile
           workdir: ./src
-          tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
+          tags: "latest,${{ env.RELEASE_VERSION }}"
