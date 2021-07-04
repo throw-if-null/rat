@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  release:
+      types: [published]
   push:
     branches: [ branch0 ]
   pull_request:
@@ -58,13 +60,13 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
-  docker:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      TYPE: 'all' # 'all', 'docker', 'github'
-
-    steps:
-      - name: Print info
-        run: |
-          echo ${{ env.TYPE }}
+      - name: Build and publish Docker container to GitHub
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          registry: ghcr.io
+          name: throw-if-null/rat.api/rat-api
+          username: MirzaMerdovic
+          password: ${{ secrets.GITHUB_TOKEN }}
+          context: .
+          dockerfile: ./Rat.Api/Dockerfile
+          workdir: ./src
