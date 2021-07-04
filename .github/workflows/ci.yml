@@ -78,7 +78,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Registry
-        pre: echo ::save-state name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           registry: ghcr.io
@@ -88,7 +87,7 @@ jobs:
           context: .
           dockerfile: ./Rat.Api/Dockerfile
           workdir: ./src
-          tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
+          tags: "latest"
 
       #- name: Build docker image
       #  shell: pwsh
