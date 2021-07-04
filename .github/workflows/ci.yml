@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  release:
-      types: [published]
   push:
     branches: [ branch0 ]
   pull_request:
@@ -12,12 +10,13 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      # Run Tests
-      TEST_PROJECT_PATH: ./src/Rat.sln
-      TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
     steps:
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.8.1
         with:
@@ -29,13 +28,52 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarCloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v1
+        with:
+          path: ./.sonar/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarCloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          New-Item -Path ./.sonar/scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+          
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
           languages: 'csharp'
 
+      - name: Sonar Begin
+        env:
+          OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
+          COVERAGE_EXCLUSIONS: "**Test*.cs"
+        shell: pwsh
+        run: >
+          ./.sonar/scanner/dotnet-sonarscanner begin
+          /k:"throw-if-null_rat.api"
+          /o:"throw-if-null"
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.cs.opencover.reportsPaths=${{ env.OPENCOVER_REPORTS_PATH }}
+          /d:sonar.coverage.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
+          
       - name: Run Tests
         uses: rocklan/dotnet-tests-report@master
+        env:
+          TEST_PROJECT_PATH: ./src/Rat.sln
+          TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
         with:
           project_path: ${{ env.TEST_PROJECT_PATH }}
           report_name: Test report
@@ -48,11 +86,19 @@ jobs:
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
 
+      - name: Sonar End
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+        
       - name: Codecov
         uses: codecov/codecov-action@v1.5.2
+        env:
+          OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./_TMP/*/coverage.opencover.xml
+          files: ${{ env.OPENCOVER_REPORTS_PATH }}
           name: Rat.Api Code Coverage
           fail_ci_if_error: true
           verbose: true
