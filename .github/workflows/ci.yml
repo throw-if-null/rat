@@ -77,8 +77,11 @@ jobs:
           username: MirzaMerdovic
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get release version
+        run: |
+          echo "::set-env name=STATE_RELEASE_VERSION::$(echo ${GITHUB_REF:10})"
+
       - name: Build and publish Docker container to GitHub
-        pre: echo "::save-state name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})"
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           registry: ghcr.io
