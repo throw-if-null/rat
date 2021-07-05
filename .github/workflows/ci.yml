@@ -4,12 +4,14 @@ on:
   push:
     branches: [ branch0 ]
   pull_request:
-    branches: [ branch0 ]
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      DEFAULT_BRANCH: branch0
+      DEFAULT_DOCKER_IMAGE_TAG: latest
 
     steps:
       - name: Set up JDK 11
@@ -94,13 +96,6 @@ jobs:
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
 
-      - name: Run Sonar Analysis
-        id: sonar-run
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
       - name: Codecov
         id: codecov-run
         uses: codecov/codecov-action@v1.5.2
@@ -113,62 +108,45 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
+      - name: Run Sonar Analysis
+        id: sonar-run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
       - name: Run CodeQL Analysis
         id: codeql-run
         uses: github/codeql-action/analyze@v1
 
-      - name: Build and publish Docker container to GitHub
+      - name: Get branch Name
+        id: get-branch-name
+        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+
+      - name: Set default docker image tag
+        id: set-default-docker-image-tag
+        if: env.BRANCH != env.DEFAULT_BRANCH
+        run: echo "DEFAULT_DOCKER_IMAGE_TAG=$(echo $BRANCH)" >> $GITHUB_ENV
+
+      - name: Set unique docker image tag
+        id: set-unique-docker-image-tag
+        run: echo "DOCKER_TAG=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
+
+      - name: Build Docker image
         id: docker-build-publish
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@3.04
         with:
-          registry: ghcr.io
-          name: throw-if-null/rat.api/rat-api
-          username: MirzaMerdovic
-          password: ${{ secrets.GITHUB_TOKEN }}
+          name: throwifnull/rat-api
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
           context: .
           dockerfile: ./Rat.Api/Dockerfile
           workdir: ./src
+          tags: "${{ env.DOCKER_TAG }},${{env.DEFAULT_DOCKER_IMAGE_TAG}}"
 
-  deploy:
-    name: Deploy to Azure
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Login to Azure
-        id: azure-log-in
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Log in to registry
-        id: docker-log-ing
-        uses: docker/login-action@v1
-        with:
-          registry: https://ghcr.io/
-          username: MirzaMerdovic
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'rat-api'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_RAT_API_PUBLISH_PROFILE }}
-          images: 'ghcr.io/throw-if-null/rat.api/rat-api:latest'
-
-      - name: List web apps
-        id: list-web-apps
+      - name: Print published docker image tags
+        id: print-docker-image-tags
         run: |
-          az webapp list --query "[?state=='Running']"
-
-      - name: Azure CLI script
-        id: azure-log-out
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.0.72
-          inlineScript: |
-            az logout
-            az cache purge
-            az account clear
+          echo "Published Docker tags:"
+          echo $DEFAULT_DOCKER_IMAGE_TAG
+          echo $DOCKER_TAG
