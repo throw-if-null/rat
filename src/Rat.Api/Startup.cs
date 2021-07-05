@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -101,6 +102,8 @@ namespace Rat.Api
             {
                 endpoints.MapControllers();
 
+                endpoints.MapGet("/", ReturnOk);
+
                 endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
                 {
                     AllowCachingResponses = false,
@@ -121,6 +124,13 @@ namespace Rat.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rat Api V1");
             });
+        }
+
+        private static Task ReturnOk(HttpContext context)
+        {
+            context.Response.StatusCode = 200;
+
+            return Task.CompletedTask;
         }
     }
 }
