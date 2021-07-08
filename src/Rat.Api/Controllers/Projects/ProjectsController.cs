@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rat.Api.Controllers.Projects.Models;
 
@@ -9,8 +10,8 @@ namespace Rat.Api.Controllers.Projects
     [ApiController]
     public class ProjectsController : ControllerBase
     {
-
-        [HttpGet]
+        [HttpGet()]
+        [Authorize(Policy = "any")]
         public async Task<IActionResult> Get(CancellationToken cancellation)
         {
             var projects = new[] {
