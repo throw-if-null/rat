@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
@@ -9,7 +12,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 
 namespace Rat.Api
@@ -61,6 +66,7 @@ namespace Rat.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Rat Api", Version = "v1" });
+                c.DescribeAllParametersInCamelCase();
             });
 
             // Refer to this article if you require more information on CORS
@@ -73,6 +79,32 @@ namespace Rat.Api
                     .WithHeaders(CORS_ALLOW_ALL)
                     .Build();
             }
+
+            var domain = $"https://{configuration["Auth0:Domain"]}";
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = domain;
+                    options.Audience = $"https://{configuration["Auth0:Audience"]}";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = ClaimTypes.NameIdentifier
+                    };
+                });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("any", policy => policy.Requirements.Add(new HasScopeRequirement("any", domain)));
+            });
+
+            services.AddControllers();
+
+            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
 
         /// <summary>
@@ -94,9 +126,14 @@ namespace Rat.Api
                     });
             });
 
-            app.UseCors("AllowAllPolicy");
+            app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("AllowAllPolicy");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

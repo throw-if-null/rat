@@ -6,7 +6,7 @@
       "Report": {
         "Status": "Healthy",
         "Description": "Not ready",
-        "ElapsedMilliseconds": 1.0969,
+        "ElapsedMilliseconds": 0.9675,
         "Tags": [
           "ready"
         ],
