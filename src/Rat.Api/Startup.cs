@@ -61,6 +61,7 @@ namespace Rat.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Rat Api", Version = "v1" });
+                c.DescribeAllParametersInCamelCase();
             });
 
             // Refer to this article if you require more information on CORS

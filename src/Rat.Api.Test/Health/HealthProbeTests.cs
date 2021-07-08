@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -20,10 +21,13 @@ namespace Rat.Api.Test
             });
         }
 
-        [Fact]
-        public async Task Readiness_Should_Return_Unhealthy_Response()
+        [Theory]
+        [InlineData("ready", HttpStatusCode.OK)]
+        [InlineData("live", HttpStatusCode.ServiceUnavailable)]
+        public async Task Probe_Should_Return_Response(string path, HttpStatusCode httpStatusCode)
         {
-            var healthResponse = await _client.GetAsync("/health/ready");
+            var healthResponse = await _client.GetAsync($"/health/{path}");
+            Assert.Equal(httpStatusCode, healthResponse.StatusCode);
 
             using (var stream = await healthResponse.Content.ReadAsStreamAsync())
             {
@@ -31,6 +35,7 @@ namespace Rat.Api.Test
 
                 Snapshot.Match(
                     healthCheckResponse,
+                    $"{nameof(HealthProbeTests)}.{path}.{nameof(Probe_Should_Return_Response)}",
                     options => options.IgnoreField<double>("HealthChecks[*].Report.ElapsedMilliseconds"));
             }
         }
