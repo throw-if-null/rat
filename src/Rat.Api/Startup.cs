@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 
 namespace Rat.Api
@@ -83,10 +81,7 @@ namespace Rat.Api
             var domain = $"https://{configuration["Auth0:Domain"]}";
 
             services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.Authority = domain;
@@ -97,14 +92,9 @@ namespace Rat.Api
                     };
                 });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("any", policy => policy.Requirements.Add(new HasScopeRequirement("any", domain)));
-            });
-
             services.AddControllers();
 
-            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+            services.AddMvc(x => x.EnableEndpointRouting = false);
         }
 
         /// <summary>
@@ -135,6 +125,7 @@ namespace Rat.Api
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMvc();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

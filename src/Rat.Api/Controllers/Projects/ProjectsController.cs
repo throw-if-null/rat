@@ -11,7 +11,7 @@ namespace Rat.Api.Controllers.Projects
     public class ProjectsController : ControllerBase
     {
         [HttpGet()]
-        [Authorize(Policy = "any")]
+        [Authorize]
         public async Task<IActionResult> Get(CancellationToken cancellation)
         {
             var projects = new[] {
