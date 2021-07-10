@@ -8,5 +8,6 @@ namespace Rat.Core.Commands.Projects.DeleteProject
 {
     internal record DeleteProjectResponse
     {
+        public RatContext Context { get; init; }
     }
 }
