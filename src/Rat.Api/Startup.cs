@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rat.Api.Observability.Health;
+using Rat.Core;
 
 namespace Rat.Api
 {
@@ -95,6 +96,8 @@ namespace Rat.Api
             services.AddControllers();
 
             services.AddMvc(x => x.EnableEndpointRouting = false);
+
+            services.AddCommandsAndQueries();
         }
 
         /// <summary>
@@ -126,6 +129,7 @@ namespace Rat.Api
             app.UseAuthorization();
 
             app.UseMvc();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
