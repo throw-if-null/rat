@@ -1,0 +1,13 @@
+﻿{
+  "IsCompleted": true,
+  "IsCompletedSuccessfully": true,
+  "IsFaulted": false,
+  "IsCanceled": false,
+  "Result": {
+    "Id": 0,
+    "Name": null,
+    "Type": null,
+    "Entries": 0,
+    "Configurations": 0
+  }
+}
