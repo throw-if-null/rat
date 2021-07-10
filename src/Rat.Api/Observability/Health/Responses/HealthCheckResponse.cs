@@ -2,10 +2,10 @@
 
 namespace Rat.Api.Observability.Health.Responses
 {
-    public class HealthCheckResponse
+    public record HealthCheckResponse
     {
-        public string Status { get; set; }
+        public string Status { get; init; }
 
-        public IEnumerable<HealthCheckInfo> HealthChecks { get; set; }
+        public IEnumerable<HealthCheckInfo> HealthChecks { get; init; }
     }
 }

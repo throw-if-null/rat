@@ -1,9 +1,9 @@
 ﻿namespace Rat.Api.Observability.Health.Responses
 {
-    public class HealthCheckInfo
+    public record HealthCheckInfo
     {
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public HealthCheckData Report { get; set; }
+        public HealthCheckData Report { get; init; }
     }
 }

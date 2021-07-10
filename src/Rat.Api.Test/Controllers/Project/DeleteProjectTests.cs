@@ -11,7 +11,7 @@ namespace Rat.Api.Test.Controllers.Project
         }
 
         [Fact]
-        public async Task Should_Return_NotFount()
+        public async Task Should_Return_NotFound()
         {
             var projectId = 0.ToString();
 
