@@ -7,8 +7,8 @@ namespace Rat.Core
     {
         public IDictionary<string, string> ValidationErrors { get; init; } = (IDictionary<string, string>)Enumerable.Empty<KeyValuePair<string, string>>();
 
-        public bool Failed { get; init; }
+        public ProcessingStatus Status { get; set; }
 
-        public string FailureReason { get; init; }
+        public string FailureReason { get; set; }
     }
 }

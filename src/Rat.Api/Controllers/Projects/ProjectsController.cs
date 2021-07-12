@@ -1,10 +1,18 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rat.Api.Controllers.Projects.Models;
-using Microsoft.AspNetCore.Http;
-using System;
+using Rat.Core;
+using Rat.Core.Commands.Projects.CreateProject;
+using Rat.Core.Commands.Projects.DeleteProject;
+using Rat.Core.Commands.Projects.PatchProject;
+using Rat.Core.Queries.Projects.GetProjectById;
+using Rat.Core.Queries.Projects.GetProjectsForUser;
 
 namespace Rat.Api.Controllers.Projects
 {
@@ -13,56 +21,60 @@ namespace Rat.Api.Controllers.Projects
     [Authorize]
     public class ProjectsController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public ProjectsController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesDefaultResponseType]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Post(CreateProjectModel model, CancellationToken cancellation)
         {
-            await Task.CompletedTask;
+            var response = await _mediator.Send(new CreateProjectRequest { Name = model.Name }, cancellation);
 
-            model ??= new ();
-
-            if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(model.Type))
-                return BadRequest();
-
-            var project = new ProjectModel
+            switch (response.Context.Status)
             {
-                Id = 1,
-                Created = DateTimeOffset.UtcNow,
-                LastModified = DateTimeOffset.MinValue,
-                CreatedBy = 1,
-                ModifiedBy = 1,
-                Name = model.Name,
-                Type = model.Type
-            };
+                case ProcessingStatus.Ok:
+                    return CreatedAtRoute("GetById", new { id = response.Project.Id }, response.Project);
 
-            return CreatedAtRoute("GetById", new { id = project.Id }, project);
+                case ProcessingStatus.BadRequest:
+                    response.Context.ValidationErrors.ToList().ForEach(error => ModelState.AddModelError(error.Key, error.Value));
+                    return BadRequest(ModelState);
+
+                case ProcessingStatus.Error:
+                    return Problem(response.Context.FailureReason, null, 500, "Unexpected exception",null);
+
+                default:
+                    throw new ApplicationException("ProcessingStatus == None!");
+            }
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(CancellationToken cancellation)
         {
-            var projects = new[] {
-                new ProjectOverviewModel
-                {
-                    Id = 1,
-                    Name = "Rat",
-                    Configurations = 3,
-                    Entries = 21
-                },
-                new ProjectOverviewModel
-                {
-                    Id = 2,
-                    Name = "Cat",
-                    Configurations = 4,
-                    Entries = 32
-                }
-            };
+            // extract UserId from HttpContext
+            var response = await _mediator.Send(new GetProjectsForUserRequest { UserId = 1 }, cancellation);
 
-            await Task.CompletedTask;
+            switch (response.Context.Status)
+            {
+                case ProcessingStatus.Ok:
+                    return Ok(response.UserProjectStats);
 
-            return Ok(projects);
+                case ProcessingStatus.NotFound:
+                    return NotFound();
+
+                case ProcessingStatus.Error:
+                    return Problem(response.Context.FailureReason, null, 500, "Unexpected exception", null);
+
+                default:
+                    throw new ApplicationException("ProcessingStatus == None!");
+            }
         }
 
         [HttpGet("{id:int}", Name = "GetById")]
@@ -71,62 +83,81 @@ namespace Rat.Api.Controllers.Projects
         [ProducesDefaultResponseType]
         public async Task<IActionResult> Get(int id, CancellationToken cancellation)
         {
-            await Task.CompletedTask;
+            var response = await _mediator.Send(new GetProjectByIdRequest { Id = id }, cancellation);
 
-            if (id <= 0)
-                return NotFound();
-
-            return Ok(new ProjectModel
+            switch (response.Context.Status)
             {
-                Id = 1,
-                Name = "Rat",
-            Type = "js",
-            Created = DateTimeOffset.UtcNow.AddDays(-4),
-            CreatedBy = 1,
-            LastModified = DateTimeOffset.UtcNow.AddDays(-3),
-            ModifiedBy = 1
-            });
+                case ProcessingStatus.Ok:
+                    return Ok(response.Project);
+
+                case ProcessingStatus.BadRequest:
+                    response.Context.ValidationErrors.ToList().ForEach(error => ModelState.AddModelError(error.Key, error.Value));
+                    return BadRequest(ModelState);
+
+                case ProcessingStatus.NotFound:
+                    return NotFound();
+
+                case ProcessingStatus.Error:
+                    return Problem(response.Context.FailureReason, null, 500, "Unexpected exception", null);
+
+                default:
+                    throw new ApplicationException("ProcessingStatus == None!");
+            }
         }
 
-        [HttpPatch]
+        [HttpPatch("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> Patch(PatchProjectModel model)
+        public async Task<IActionResult> Patch(PatchProjectModel model, CancellationToken cancellation)
         {
-            await Task.CompletedTask;
+            var response = await _mediator.Send(new PatchProjectRequest { Id = model.Id, Name = model.Name }, cancellation);
 
-            model ??= new ();
-
-            if (model.Name != null && model.Name.Length == 0)
-                return BadRequest();
-
-            if (model.Type != null && model.Type.Length == 0)
-                return BadRequest();
-
-            if (model.Name == null && model.Type == null)
-                return NoContent();
-
-            return Ok(new ProjectModel
+            switch (response.Context.Status)
             {
-                Id = model.Id,
-                Name = model.Name,
-                Type = model.Type,
-                Created = DateTimeOffset.UtcNow.AddDays(-5),
-                LastModified = DateTimeOffset.UtcNow.AddDays(2),
-                CreatedBy = 1,
-                ModifiedBy = 2
-            });
+                case ProcessingStatus.Ok:
+                    return Ok(response.Project);
+
+                case ProcessingStatus.BadRequest:
+                    response.Context.ValidationErrors.ToList().ForEach(error => ModelState.AddModelError(error.Key, error.Value));
+                    return BadRequest(ModelState);
+
+                case ProcessingStatus.NotFound:
+                    return NotFound();
+
+                case ProcessingStatus.Error:
+                    return Problem(response.Context.FailureReason, null, 500, "Unexpected exception", null);
+
+                default:
+                    throw new ApplicationException("ProcessingStatus == None!");
+            }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellation)
         {
-            await Task.CompletedTask;
+            var response = await _mediator.Send(new DeleteProjectRequest { Id = id }, cancellation);
 
-            return id <= 0 ? NotFound() : Ok();
+            switch (response.Context.Status)
+            {
+                case ProcessingStatus.Ok:
+                    return Ok();
+
+                case ProcessingStatus.BadRequest:
+                    response.Context.ValidationErrors.ToList().ForEach(error => ModelState.AddModelError(error.Key, error.Value));
+                    return BadRequest(ModelState);
+
+                case ProcessingStatus.NotFound:
+                    return NotFound();
+
+                case ProcessingStatus.Error:
+                    return Problem(response.Context.FailureReason, null, 500, "Unexpected exception", null);
+
+                default:
+                    throw new ApplicationException("ProcessingStatus == None!");
+            }
         }
     }
 }

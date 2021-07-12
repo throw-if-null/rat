@@ -21,8 +21,7 @@ namespace Rat.Api.Test.Controllers.Project
         {
             var model = new CreateProjectModel
             {
-                Name = "Rat Api",
-                Type = "csharp"
+                Name = "Rat Api"
             };
 
             var response = await Client.PostAsync(
@@ -48,8 +47,7 @@ namespace Rat.Api.Test.Controllers.Project
         {
             var model = new CreateProjectModel
             {
-                Name = name,
-                Type = type
+                Name = name
             };
 
             var response = await Client.PostAsync(

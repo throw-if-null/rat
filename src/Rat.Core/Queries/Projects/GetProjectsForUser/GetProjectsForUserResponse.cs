@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Rat.Data.Views;
 
 namespace Rat.Core.Queries.Projects.GetProjectsForUser
 {
@@ -6,8 +6,6 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
     {
         public RatContext Context { get; init; }
 
-        public int UserId { get; init; }
-
-        public IEnumerable<GetProjectsForUserResponse> Projects { get; init; }
+        public UserProjectStats UserProjectStats { get; init; }
     }
 }

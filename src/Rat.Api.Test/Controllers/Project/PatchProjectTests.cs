@@ -24,11 +24,10 @@ namespace Rat.Api.Test.Controllers.Project
             var model = new PatchProjectModel
             {
                 Id = 1,
-                Name = "Test",
-                Type = "Test"
+                Name = "Test"
             };
 
-            var patchModel = model with { Name = name, Type = type };
+            var patchModel = model with { Name = name };
 
             var response = await Client.PatchAsync(
                 "api/projects/",
@@ -40,7 +39,6 @@ namespace Rat.Api.Test.Controllers.Project
             var content = await JsonSerializer.DeserializeAsync<ProjectModel>(contentStream);
 
             Assert.Equal(content.Name, model.Name);
-            Assert.Equal(content.Type, model.Type);
         }
 
         [Fact]
@@ -49,8 +47,7 @@ namespace Rat.Api.Test.Controllers.Project
             var model = new PatchProjectModel()
             {
                 Id = 1,
-                Name = null,
-                Type = null
+                Name = null
             };
 
             var response = await Client.PostAsync(
