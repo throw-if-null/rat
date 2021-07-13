@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess;
+using Rat.DataAccess.Projects;
 
 namespace Rat.Core.Commands.Projects.CreateProject
 {
@@ -21,13 +20,15 @@ namespace Rat.Core.Commands.Projects.CreateProject
         {
             Validate(request);
 
-            if (request.Context.Status == ProcessingStatus.Ok)
+            if (request.Context.Status == ProcessingStatus.BadRequest)
                 return new ()
                 {
                     Context = request.Context
                 };
 
             var project = await _repository.Create(new() { Name = request.Name }, cancellationToken);
+
+            request.Context.Status = ProcessingStatus.Ok;
 
             return new() { Project = project, Context = request.Context };
         }
@@ -39,7 +40,7 @@ namespace Rat.Core.Commands.Projects.CreateProject
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
                     "Cannot be null or empty");
 
-            if (request.Name.Length > 512)
+            if (request.Name?.Length > 512)
                 request.Context.ValidationErrors.Add(
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
                     $"Lenght: {request.Name.Length} cannot be longer then 512 characters");

@@ -10,13 +10,25 @@ namespace Rat.Api.Test.Controllers.Project
         {
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-323)]
+        public async Task Should_Return_BadRequest(int id)
+        {
+            var projectId = id.ToString();
+
+            var response = await Client.DeleteAsync($"/api/projects/{projectId}");
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+
         [Fact]
         public async Task Should_Return_NotFound()
         {
-            var projectId = 0.ToString();
+            var projectId = 100.ToString();
 
             var response = await Client.DeleteAsync($"/api/projects/{projectId}");
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]

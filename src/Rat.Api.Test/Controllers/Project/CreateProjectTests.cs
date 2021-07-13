@@ -31,19 +31,15 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<ProjectModel>(contentStream);
+            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.True(content.Id > 0);
         }
 
         [Theory]
-        [InlineData("", "js", "1")]
-        [InlineData("rat", "", "2")]
-        [InlineData("cat", null, "3")]
-        [InlineData(null, "csharp", "4")]
-        [InlineData(null, null, "5")]
-        [InlineData("", "", "6")]
-        public async Task Should_Return_BadRequest(string name, string type, string version)
+        [InlineData("", "1")]
+        [InlineData(null, "2")]
+        public async Task Should_Return_BadRequest(string name, string version)
         {
             var model = new CreateProjectModel
             {

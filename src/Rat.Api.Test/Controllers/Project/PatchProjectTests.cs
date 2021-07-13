@@ -30,13 +30,13 @@ namespace Rat.Api.Test.Controllers.Project
             var patchModel = model with { Name = name };
 
             var response = await Client.PatchAsync(
-                "api/projects/",
+                $"api/projects/{patchModel.Id}",
                 new StringContent(JsonSerializer.Serialize(patchModel), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<ProjectModel>(contentStream);
+            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream);
 
             Assert.Equal(content.Name, model.Name);
         }
@@ -51,7 +51,7 @@ namespace Rat.Api.Test.Controllers.Project
             };
 
             var response = await Client.PostAsync(
-                "/api/projects",
+                $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

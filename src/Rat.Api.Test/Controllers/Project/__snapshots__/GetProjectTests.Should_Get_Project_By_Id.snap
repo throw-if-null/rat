@@ -4,10 +4,7 @@
   "IsFaulted": false,
   "IsCanceled": false,
   "Result": {
-    "Id": 0,
-    "Name": null,
-    "Type": null,
-    "Entries": 0,
-    "Configurations": 0
+    "UserId": 0,
+    "ProjectStats": []
   }
 }

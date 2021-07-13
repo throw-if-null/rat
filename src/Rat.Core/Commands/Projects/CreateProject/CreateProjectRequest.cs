@@ -4,7 +4,7 @@ namespace Rat.Core.Commands.Projects.CreateProject
 {
     internal record CreateProjectRequest : IRequest<CreateProjectResponse>
     {
-        public RatContext Context { get; init; }
+        public RatContext Context { get; init; } = new();
 
         public int UserId { get; init; }
 

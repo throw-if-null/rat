@@ -4,8 +4,8 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
 {
     internal record GetProjectsForUserRequest : IRequest<GetProjectsForUserResponse>
     {
-        public RatContext Context { get; init; }
+        public RatContext Context { get; init; } = new();
 
-        public int UserId { get; init; }
+        public string UserId { get; init; }
     }
 }

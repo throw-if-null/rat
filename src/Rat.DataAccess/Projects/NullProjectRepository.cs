@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Rat.Data.Entities;
 using Rat.Data.Views;
 
-namespace Rat.DataAccess
+namespace Rat.DataAccess.Projects
 {
     public sealed class NullProjectRepository : IProjectRepository
     {

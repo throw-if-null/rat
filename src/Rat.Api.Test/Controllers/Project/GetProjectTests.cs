@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Rat.Api.Controllers.Projects.Models;
+using Rat.Data.Views;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -25,18 +25,20 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = JsonSerializer.DeserializeAsync<ProjectOverviewModel>(contentStream);
+            var content = JsonSerializer.DeserializeAsync<Data.Views.UserProjectStats>(contentStream);
 
             Snapshot.Match(content);
         }
 
-        [Fact]
-        public async Task Should_Return_NotFound()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-4)]
+        public async Task Should_Return_BadRequest(int id)
         {
-            var projectId = 0.ToString();
+            var projectId = id.ToString();
 
             var response = await Client.GetAsync($"/api/projects/{projectId}");
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
@@ -47,7 +49,10 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-                var projects = await JsonSerializer.DeserializeAsync<IEnumerable<ProjectOverviewModel>>(content);
+                UserProjectStats projects =
+                    await JsonSerializer.DeserializeAsync<UserProjectStats>(
+                        content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 Snapshot.Match(projects);
             }

@@ -16,6 +16,8 @@ using Microsoft.OpenApi.Models;
 using Rat.Api.Observability.Health;
 using Rat.Core;
 using Rat.DataAccess;
+using Rat.DataAccess.Projects;
+using Rat.DataAccess.Users;
 
 namespace Rat.Api
 {
@@ -99,6 +101,7 @@ namespace Rat.Api
             services.AddMvc(x => x.EnableEndpointRouting = false);
 
             services.AddTransient<IProjectRepository, NullProjectRepository>();
+            services.AddTransient<IUserRepository, NullUserRepository>();
 
             services.AddCommandsAndQueries();
         }
