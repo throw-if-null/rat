@@ -14,35 +14,28 @@ namespace Rat.Api.Test.Controllers.Project
         {
         }
 
-        [Theory]
-        [InlineData("rat", null)]
-        [InlineData(null, "js")]
-        [InlineData("rat", "js")]
-        public async Task Should_Patch_Only_Not_Null_Properties(string name, string type)
+        [Fact]
+        public async Task Should_Patch()
         {
-            // Seed and retrieve
-            var model = new PatchProjectModel
+            var model = new PatchProjectModel()
             {
                 Id = 1,
-                Name = "Test"
+                Name = "New test"
             };
 
-            var patchModel = model with { Name = name };
-
             var response = await Client.PatchAsync(
-                $"api/projects/{patchModel.Id}",
-                new StringContent(JsonSerializer.Serialize(patchModel), Encoding.UTF8, "application/json"));
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                $"/api/projects/{model.Id}",
+                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream);
+            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            Assert.Equal(content.Name, model.Name);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("New test", content.Name);
         }
 
         [Fact]
-        public async Task Should_Not_Do_Patch_And_Return_NoContent()
+        public async Task Should_Not_Patch()
         {
             var model = new PatchProjectModel()
             {
@@ -50,11 +43,31 @@ namespace Rat.Api.Test.Controllers.Project
                 Name = null
             };
 
-            var response = await Client.PostAsync(
+            var response = await Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            var contentStream = await response.Content.ReadAsStreamAsync();
+            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Test", content.Name);
+        }
+
+        [Fact]
+        public async Task Should_Return_NotFound()
+        {
+            var model = new PatchProjectModel()
+            {
+                Id = 100,
+                Name = "Rat"
+            };
+
+            var response = await Client.PatchAsync(
+                $"/api/projects/{model.Id}",
+                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
     }
 }

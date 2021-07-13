@@ -57,5 +57,13 @@ namespace Rat.Api.Test.Controllers.Project
                 Snapshot.Match(projects);
             }
         }
+
+        [Fact(Skip = "Need to fixup claims for this to work")]
+        public async Task Should_Return_NotFound_When_User_Is_Not_In_Database()
+        {
+            var response = await Client.GetAsync($"/api/projects");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
     }
 }

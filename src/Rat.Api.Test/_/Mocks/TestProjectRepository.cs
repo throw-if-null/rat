@@ -50,7 +50,7 @@ namespace Rat.Api.Test._.Mocks
         {
             await Task.CompletedTask;
 
-            return project;
+            return project with { Name = project.Name == null ? "Test" : project.Name };
         }
     }
 }

@@ -61,15 +61,17 @@ namespace Rat.Core.Commands.Projects.PatchProject
                     $"{nameof(PatchProjectRequest)}.{nameof(PatchProjectRequest.Id)}",
                     "Id must be larger then 0");
 
-            if (string.IsNullOrWhiteSpace(request.Name))
+            int length = request.Name == null ? -1 : request.Name.Length;
+
+            if (length == 0)
                 request.Context.ValidationErrors.Add(
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
                     "Cannot be null or empty");
 
-            if (request.Name?.Length > 512)
+            if (length > 512)
                 request.Context.ValidationErrors.Add(
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
-                    $"Lenght: {request.Name.Length} cannot be longer then 512 characters");
+                    $"Length: {length} cannot be longer then 512 characters");
 
             if (request.Context.ValidationErrors.Any())
             {
