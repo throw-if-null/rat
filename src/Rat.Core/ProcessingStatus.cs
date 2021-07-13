@@ -1,6 +1,6 @@
 ﻿namespace Rat.Core
 {
-    internal enum ProcessingStatus
+    public enum ProcessingStatus
     {
         None = 0,
         Ok = 1,

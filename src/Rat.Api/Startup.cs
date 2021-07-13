@@ -4,17 +4,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rat.Api.Observability.Health;
 using Rat.Core;
+using Rat.DataAccess;
 
 namespace Rat.Api
 {
@@ -97,6 +98,8 @@ namespace Rat.Api
 
             services.AddMvc(x => x.EnableEndpointRouting = false);
 
+            services.AddTransient<IProjectRepository, NullProjectRepository>();
+
             services.AddCommandsAndQueries();
         }
 
@@ -106,18 +109,14 @@ namespace Rat.Api
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app)
         {
-            app.UseExceptionHandler(builder =>
+            if (_env.IsDevelopment())
             {
-                builder.Run(
-                    context =>
-                    {
-                        var loggerFactory = context.RequestServices.GetService<ILoggerFactory>();
-                        var exceptionHandler = context.Features.Get<IExceptionHandlerFeature>();
-                        loggerFactory.CreateLogger("ExceptionHandler").LogError(exceptionHandler.Error, exceptionHandler.Error.Message, null);
-
-                        return Task.CompletedTask;
-                    });
-            });
+                app.UseExceptionHandler("/error-local");
+            }
+            else
+            {
+                app.UseExceptionHandler("/error");
+            }
 
             app.UseHttpsRedirection();
 
