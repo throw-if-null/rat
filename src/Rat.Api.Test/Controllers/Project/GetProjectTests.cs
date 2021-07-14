@@ -27,7 +27,7 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = JsonSerializer.DeserializeAsync<Data.Views.UserProjectStats>(contentStream);
+            var content = JsonSerializer.DeserializeAsync<Data.Views.UserProjectStatsView>(contentStream);
 
             Snapshot.Match(content);
         }
@@ -51,8 +51,8 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-                UserProjectStats projects =
-                    await JsonSerializer.DeserializeAsync<UserProjectStats>(
+                UserProjectStatsView projects =
+                    await JsonSerializer.DeserializeAsync<UserProjectStatsView>(
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -70,8 +70,8 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-                UserProjectStats projects =
-                    await JsonSerializer.DeserializeAsync<UserProjectStats>(
+                UserProjectStatsView projects =
+                    await JsonSerializer.DeserializeAsync<UserProjectStatsView>(
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

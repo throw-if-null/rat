@@ -9,5 +9,7 @@ namespace Rat.Core.Commands.Projects.CreateProject
         public int UserId { get; init; }
 
         public string Name { get; set; }
+
+        public int ProjectTypeId { get; set; }
     }
 }

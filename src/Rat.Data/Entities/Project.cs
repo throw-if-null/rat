@@ -1,9 +1,16 @@
-﻿namespace Rat.Data.Entities
-{
-    public record Project
-    {
-        public int Id { get; init; }
+﻿using System;
+using System.Collections.Generic;
 
-        public string Name { get; init; }
+namespace Rat.Data.Entities
+{
+    public class Project
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public ProjectType Type { get; set; }
+
+        public ICollection<User> Users { get; set; } = Array.Empty<User>();
     }
 }

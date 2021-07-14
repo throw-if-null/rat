@@ -1,20 +1,20 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess.Projects;
-using Rat.DataAccess.Users;
+using Microsoft.EntityFrameworkCore;
+using Rat.Data;
+using Rat.Data.Views;
 
 namespace Rat.Core.Queries.Projects.GetProjectsForUser
 {
     internal class GetProjectsForUserQuery : IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>
     {
-        private readonly IProjectRepository _projectRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly RatDbContext _context;
 
-        public GetProjectsForUserQuery(IProjectRepository repository, IUserRepository userRepository)
+        public GetProjectsForUserQuery(RatDbContext context)
         {
-            _projectRepository = repository;
-            _userRepository = userRepository;
+            _context = context;
         }
 
         public async Task<GetProjectsForUserResponse> Handle(GetProjectsForUserRequest request, CancellationToken cancellationToken)
@@ -30,18 +30,33 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 return new() { Context = request.Context };
             }
 
-            var user = await _userRepository.Retrieve(request.UserId, cancellationToken);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
 
             if (user == null)
             {
-                user = await _userRepository.Create(request.UserId, cancellationToken);
+                var userEntity = await _context.Users.AddAsync(new () {UserId = request.UserId }, cancellationToken);
+                user = userEntity.Entity;
             }
 
-            var userProjectStats = await _projectRepository.RetrieveUserProjectStats(user.Id, cancellationToken);
+            var projects = await _context.Projects.Where(x => x.Users.Contains(user)).ToListAsync(cancellationToken);
 
             request.Context.Status = ProcessingStatus.Ok;
 
-            return new() { Context = request.Context, UserProjectStats = userProjectStats };
+            return new()
+            {
+                Context = request.Context,
+                UserProjectStats = new()
+                {
+                    UserId = user.Id,
+                    ProjectStats = projects.Select(x => new ProjectStatsView
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        TotalConfigurationCount = 0,
+                        TotalEntryCount = 0
+                    })
+                }
+            };
         }
     }
 }

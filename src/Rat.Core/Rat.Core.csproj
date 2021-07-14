@@ -7,10 +7,10 @@
   <ItemGroup>
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rat.DataAccess\Rat.DataAccess.csproj" />
     <ProjectReference Include="..\Rat.Data\Rat.Data.csproj" />
   </ItemGroup>
 

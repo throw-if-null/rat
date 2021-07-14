@@ -2,18 +2,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess;
-using Rat.DataAccess.Projects;
+using Microsoft.EntityFrameworkCore;
+using Rat.Data;
+using Rat.Data.Exceptions;
 
 namespace Rat.Core.Commands.Projects.DeleteProject
 {
     internal class DeleteProjectCommand : IRequestHandler<DeleteProjectRequest, DeleteProjectResponse>
     {
-        private readonly IProjectRepository _repository;
+        private readonly RatDbContext _context;
 
-        public DeleteProjectCommand(IProjectRepository repository)
+        public DeleteProjectCommand(RatDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         public async Task<DeleteProjectResponse> Handle([NotNull] DeleteProjectRequest request, CancellationToken cancellationToken)
@@ -32,7 +33,7 @@ namespace Rat.Core.Commands.Projects.DeleteProject
                 };
             }
 
-            var project = _repository.Retrieve(request.Id, cancellationToken);
+            var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (project == null)
             {
@@ -44,7 +45,12 @@ namespace Rat.Core.Commands.Projects.DeleteProject
                 };
             }
 
-            await _repository.Delete(request.Id, cancellationToken);
+            _context.Projects.Remove(project);
+
+            var changes = await _context.SaveChangesAsync(cancellationToken);
+
+            if (changes != 1)
+                throw new RatDbException($"Number of changes: {changes} is not 1");
 
             request.Context.Status = ProcessingStatus.Ok;
 

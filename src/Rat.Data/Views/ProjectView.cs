@@ -1,7 +1,9 @@
-﻿namespace Rat.Api.Controllers.Projects.Models
+﻿namespace Rat.Data.Views
 {
-    public record CreateProjectModel
+    public record ProjectView
     {
+        public int Id { get; init; }
+
         public string Name { get; init; }
 
         public int TypeId { get; init; }

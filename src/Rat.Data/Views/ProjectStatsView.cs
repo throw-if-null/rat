@@ -1,6 +1,6 @@
 ﻿namespace Rat.Data.Views
 {
-    public record ProjectStats
+    public record ProjectStatsView
     {
         public int Id { get; init; }
 

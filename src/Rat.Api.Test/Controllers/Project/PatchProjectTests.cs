@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Rat.Api.Controllers.Projects.Models;
+using Rat.Data.Views;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
@@ -28,7 +29,7 @@ namespace Rat.Api.Test.Controllers.Project
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("New test", content.Name);
@@ -48,7 +49,7 @@ namespace Rat.Api.Test.Controllers.Project
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("Test", content.Name);

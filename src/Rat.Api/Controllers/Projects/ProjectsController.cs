@@ -35,7 +35,7 @@ namespace Rat.Api.Controllers.Projects
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Post(CreateProjectModel model, CancellationToken cancellation)
         {
-            var response = await _mediator.Send(new CreateProjectRequest { Name = model.Name }, cancellation);
+            var response = await _mediator.Send(new CreateProjectRequest { Name = model.Name, ProjectTypeId = model.TypeId }, cancellation);
 
             if (response.Context.Status != ProcessingStatus.Ok)
                 return HandleUnscusseful(response.Context);

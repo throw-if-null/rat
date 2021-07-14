@@ -1,17 +1,18 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess.Projects;
+using Microsoft.EntityFrameworkCore;
+using Rat.Data;
 
 namespace Rat.Core.Queries.Projects.GetProjectById
 {
     internal class GetProjectByIdQuery : IRequestHandler<GetProjectByIdRequest, GetProjectByIdResponse>
     {
-        private readonly IProjectRepository _repository;
+        private readonly RatDbContext _context;
 
-        public GetProjectByIdQuery(IProjectRepository repository)
+        public GetProjectByIdQuery(RatDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         public async Task<GetProjectByIdResponse> Handle(GetProjectByIdRequest request, CancellationToken cancellationToken)
@@ -27,7 +28,7 @@ namespace Rat.Core.Queries.Projects.GetProjectById
                 return new() { Context = request.Context };
             }
 
-            var project = await _repository.Retrieve(request.Id, cancellationToken);
+            var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (project == null)
             {
@@ -41,7 +42,7 @@ namespace Rat.Core.Queries.Projects.GetProjectById
             return new()
             {
                 Context = request.Context,
-                Project = project
+                Project = new() { Id = project.Id, Name = project.Name, TypeId = project.Type.Id }
             };
         }
     }

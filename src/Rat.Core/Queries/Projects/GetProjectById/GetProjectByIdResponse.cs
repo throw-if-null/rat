@@ -1,4 +1,4 @@
-﻿using Rat.Data.Entities;
+﻿using Rat.Data.Views;
 
 namespace Rat.Core.Queries.Projects.GetProjectById
 {
@@ -6,6 +6,6 @@ namespace Rat.Core.Queries.Projects.GetProjectById
     {
         public RatContext Context { get; init; }
 
-        public Project Project { get; init; }
+        public ProjectView Project { get; init; }
     }
 }

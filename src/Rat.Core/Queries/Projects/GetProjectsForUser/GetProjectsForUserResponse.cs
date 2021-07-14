@@ -6,6 +6,6 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
     {
         public RatContext Context { get; init; }
 
-        public UserProjectStats UserProjectStats { get; init; }
+        public UserProjectStatsView UserProjectStats { get; init; }
     }
 }

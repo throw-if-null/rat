@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Rat.Api.Controllers.Projects.Models;
+using Rat.Data.Views;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -21,7 +22,8 @@ namespace Rat.Api.Test.Controllers.Project
         {
             var model = new CreateProjectModel
             {
-                Name = "Rat Api"
+                Name = "Rat Api",
+                TypeId = 1
             };
 
             var response = await Client.PostAsync(
@@ -31,7 +33,7 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<Data.Entities.Project>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.True(content.Id > 0);
         }

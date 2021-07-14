@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -17,9 +17,7 @@ using Microsoft.OpenApi.Models;
 using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 using Rat.Core;
-using Rat.DataAccess;
-using Rat.DataAccess.Projects;
-using Rat.DataAccess.Users;
+using Rat.Data;
 
 namespace Rat.Api
 {
@@ -114,10 +112,9 @@ namespace Rat.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IUserProvider, UserProvider>();
 
-            services.AddTransient<IProjectRepository, NullProjectRepository>();
-            services.AddTransient<IUserRepository, NullUserRepository>();
-
             services.AddCommandsAndQueries();
+
+            services.AddDbContext<RatDbContext>(options => options.UseInMemoryDatabase("RatDb"));
         }
 
         /// <summary>

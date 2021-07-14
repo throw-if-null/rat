@@ -1,9 +1,14 @@
-﻿namespace Rat.Data.Entities
-{
-    public record User
-    {
-        public int Id { get; init; }
+﻿using System;
+using System.Collections.Generic;
 
-        public string ExternalId { get; init; }
+namespace Rat.Data.Entities
+{
+    public class User
+    {
+        public int Id { get; set; }
+
+        public string UserId { get; set; }
+
+        public ICollection<Project> Projects { get; set; } = Array.Empty<Project>();
     }
 }

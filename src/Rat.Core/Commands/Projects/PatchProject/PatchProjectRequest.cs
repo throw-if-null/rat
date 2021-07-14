@@ -6,8 +6,10 @@ namespace Rat.Core.Commands.Projects.PatchProject
     {
         public RatContext Context { get; init; } = new();
 
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         public string Name { get; init; }
+
+        public int ProjectTypeId { get; init; }
     }
 }
