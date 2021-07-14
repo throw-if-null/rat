@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Rat.Api.Auth;
 using Rat.Api.Test._.Mocks;
 using Rat.DataAccess.Projects;
 using Rat.DataAccess.Users;
@@ -13,10 +14,17 @@ namespace Rat.Api.Test
         {
             builder.ConfigureServices(services =>
             {
-                services.AddHttpClient();
+                services.AddHttpClient(
+                    "test",
+                    x =>
+                    {
+                        x.DefaultRequestHeaders.Add("no-user", "false");
+                    });
 
                 services.AddTransient<IProjectRepository, TestProjectRepository>();
                 services.AddTransient<IUserRepository, TestUserRepository>();
+
+                services.AddSingleton<IUserProvider, TestUserProvider>();
             });
         }
     }

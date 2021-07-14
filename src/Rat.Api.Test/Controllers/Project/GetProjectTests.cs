@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Rat.Data.Views;
@@ -58,12 +60,39 @@ namespace Rat.Api.Test.Controllers.Project
             }
         }
 
-        [Fact(Skip = "Need to fixup claims for this to work")]
-        public async Task Should_Return_NotFound_When_User_Is_Not_In_Database()
+        [Fact]
+        public async Task Should_Return_Projects_When_User_Is_Not_In_Rat_Database()
         {
-            var response = await Client.GetAsync($"/api/projects");
+            Client.DefaultRequestHeaders.Add("test-user", "no-user");
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            var response = await Client.GetAsync("/api/projects/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            using (var content = await response.Content.ReadAsStreamAsync())
+            {
+                UserProjectStats projects =
+                    await JsonSerializer.DeserializeAsync<UserProjectStats>(
+                        content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                Snapshot.Match(projects);
+            }
+        }
+
+        [Fact]
+        public async Task Should_Return_Forbidden_When_NameClaim_Is_Missing()
+        {
+            Client.DefaultRequestHeaders.Add("test-user", "null");
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("/api/projects", UriKind.Relative)
+            };
+
+            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
     }
 }

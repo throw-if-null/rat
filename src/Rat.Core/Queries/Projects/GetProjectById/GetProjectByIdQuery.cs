@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess;
 using Rat.DataAccess.Projects;
 
 namespace Rat.Core.Queries.Projects.GetProjectById

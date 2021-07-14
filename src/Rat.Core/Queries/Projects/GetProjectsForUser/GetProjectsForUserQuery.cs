@@ -34,9 +34,7 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
 
             if (user == null)
             {
-                request.Context.Status = ProcessingStatus.NotFound;
-
-                return new() { Context = request.Context };
+                user = await _userRepository.Create(request.UserId, cancellationToken);
             }
 
             var userProjectStats = await _projectRepository.RetrieveUserProjectStats(user.Id, cancellationToken);

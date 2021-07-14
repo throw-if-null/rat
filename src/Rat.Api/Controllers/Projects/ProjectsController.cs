@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Rat.Api.Auth;
 using Rat.Api.Controllers.Projects.Models;
 using Rat.Core;
 using Rat.Core.Commands.Projects.CreateProject;
@@ -21,10 +22,12 @@ namespace Rat.Api.Controllers.Projects
     public class ProjectsController : RatController
     {
         private readonly IMediator _mediator;
+        private readonly IUserProvider _userProvider;
 
-        public ProjectsController(IMediator mediator)
+        public ProjectsController(IMediator mediator, IUserProvider userProvider)
         {
             _mediator = mediator;
+            _userProvider = userProvider;
         }
 
         [HttpPost]
@@ -42,10 +45,15 @@ namespace Rat.Api.Controllers.Projects
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(CancellationToken cancellation)
         {
-            // extract UserId from HttpContext
+            var userId = _userProvider.GetUserId();
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Forbid();
+
             var response = await _mediator.Send(new GetProjectsForUserRequest { UserId = Guid.NewGuid().ToString("N") }, cancellation);
 
             if (response.Context.Status != ProcessingStatus.Ok)
