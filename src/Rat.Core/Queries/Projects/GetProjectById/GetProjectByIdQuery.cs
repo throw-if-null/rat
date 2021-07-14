@@ -28,7 +28,11 @@ namespace Rat.Core.Queries.Projects.GetProjectById
                 return new() { Context = request.Context };
             }
 
-            var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var project =
+                await
+                    _context.Projects
+                        .Include(x => x.Type)
+                        .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (project == null)
             {

@@ -1,4 +1,17 @@
 ﻿{
   "UserId": 1,
-  "ProjectStats": []
+  "ProjectStats": [
+    {
+      "Id": 71,
+      "Name": "Test",
+      "TotalConfigurationCount": 0,
+      "TotalEntryCount": 0
+    },
+    {
+      "Id": 72,
+      "Name": "Test 2",
+      "TotalConfigurationCount": 0,
+      "TotalEntryCount": 0
+    }
+  ]
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -21,7 +20,7 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Get_Project_By_Id()
         {
             // Seed the real data
-            var projectId = 42.ToString();
+            var projectId = 33.ToString();
 
             var response = await Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -61,9 +60,9 @@ namespace Rat.Api.Test.Controllers.Project
         }
 
         [Fact]
-        public async Task Should_Return_Projects_When_User_Is_Not_In_Rat_Database()
+        public async Task Should_Return_No_Projects_When_User_Is_Not_In_Rat_Database()
         {
-            Client.DefaultRequestHeaders.Add("test-user", "no-user");
+            Client.DefaultRequestHeaders.Add("test-user", "test-user");
 
             var response = await Client.GetAsync("/api/projects/");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -75,7 +74,8 @@ namespace Rat.Api.Test.Controllers.Project
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                Snapshot.Match(projects);
+                Assert.True(projects.UserId > 0);
+                Assert.Empty(projects.ProjectStats);
             }
         }
 

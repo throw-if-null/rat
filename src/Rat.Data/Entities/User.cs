@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Rat.Data.Entities
 {
@@ -9,6 +8,6 @@ namespace Rat.Data.Entities
 
         public string UserId { get; set; }
 
-        public ICollection<Project> Projects { get; set; } = Array.Empty<Project>();
+        public ICollection<Project> Projects { get; set; } = new List<Project>();
     }
 }

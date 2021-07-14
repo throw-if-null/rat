@@ -28,7 +28,7 @@ namespace Rat.Api.Test.Controllers.Project
             var projectId = 100.ToString();
 
             var response = await Client.DeleteAsync($"/api/projects/{projectId}");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]

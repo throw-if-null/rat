@@ -39,8 +39,22 @@ namespace Rat.Api.Test
 
                     try
                     {
-                        db.ProjectTypes.Add(new ProjectType { Id = 1, Name = "js" });
+                        var type1 = db.ProjectTypes.Add(new ProjectType { Id = 1, Name = "js" });
                         db.ProjectTypes.Add(new ProjectType { Id = 2, Name = "csharp" });
+
+                        var user = db.Users.Add(new User { Id = 1, UserId = "3feslrj3ssd111" });
+
+                        db.Projects.Add(new Project { Id = 42, Name = "Test-42", Type = type1.Entity });
+                        db.Projects.Add(new Project { Id = 33, Name = "Test-33", Type = type1.Entity });
+                        var project = new Project { Id = 71, Name = "Test", Type = type1.Entity };
+                        project.Users.Add(user.Entity);
+
+                        db.Projects.Add(project);
+
+                        var project2 = new Project { Id = 72, Name = "Test 2", Type = type1.Entity };
+                        project2.Users.Add(user.Entity);
+
+                        db.Projects.Add(project2);
 
                         db.SaveChanges();
                     }

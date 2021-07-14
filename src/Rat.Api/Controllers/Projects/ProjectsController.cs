@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +53,7 @@ namespace Rat.Api.Controllers.Projects
             if (string.IsNullOrWhiteSpace(userId))
                 return Forbid();
 
-            var response = await _mediator.Send(new GetProjectsForUserRequest { UserId = Guid.NewGuid().ToString("N") }, cancellation);
+            var response = await _mediator.Send(new GetProjectsForUserRequest { UserId = userId }, cancellation);
 
             if (response.Context.Status != ProcessingStatus.Ok)
                 return HandleUnscusseful(response.Context);

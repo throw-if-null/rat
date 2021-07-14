@@ -38,7 +38,7 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 user = userEntity.Entity;
             }
 
-            var projects = await _context.Projects.Where(x => x.Users.Contains(user)).ToListAsync(cancellationToken);
+            var projects = await _context.Projects.Include(x => x.Type).Where(x => x.Users.Contains(user)).ToListAsync(cancellationToken);
 
             request.Context.Status = ProcessingStatus.Ok;
 
