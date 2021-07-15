@@ -114,7 +114,7 @@ namespace Rat.Api
 
             services.AddCommandsAndQueries();
 
-            services.AddDbContext<RatDbContext>(options => options.UseInMemoryDatabase("RatDb"));
+            services.AddRatDbContext(configuration);
         }
 
         /// <summary>

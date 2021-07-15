@@ -8,6 +8,22 @@ x-base: &base-service-template
 
 services:
 
+  sqlserver:
+    <<: *base-service-template
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQLSERVER_SA_PASSWORD:-Password1!}
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ./opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Password1! -Q "SELECT 1" || exit 1
+      interval: 2s
+      timeout: 2s
+      retries: 3
+      start_period: 3s
+
   rat-api:
     <<: *base-service-template
     container_name: rat-api
