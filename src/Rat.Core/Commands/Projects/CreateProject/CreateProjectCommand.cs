@@ -47,7 +47,7 @@ namespace Rat.Core.Commands.Projects.CreateProject
             };
         }
 
-        private void ValidateName([NotNull] CreateProjectRequest request)
+        private static void ValidateName([NotNull] CreateProjectRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
                 request.Context.ValidationErrors.Add(

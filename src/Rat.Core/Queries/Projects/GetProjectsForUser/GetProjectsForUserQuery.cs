@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Rat.Data;
+using Rat.Data.Exceptions;
 using Rat.Data.Views;
 
 namespace Rat.Core.Queries.Projects.GetProjectsForUser
@@ -35,7 +36,10 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
             if (user == null)
             {
                 var userEntity = await _context.Users.AddAsync(new () {UserId = request.UserId }, cancellationToken);
-                await _context.SaveChangesAsync();
+                var changes = await _context.SaveChangesAsync(cancellationToken);
+
+                if (changes != 1)
+                    throw new RatDbException($"Number of changes: {changes} is not 1");
 
                 user = userEntity.Entity;
             }
