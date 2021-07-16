@@ -35,6 +35,8 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
             if (user == null)
             {
                 var userEntity = await _context.Users.AddAsync(new () {UserId = request.UserId }, cancellationToken);
+                await _context.SaveChangesAsync();
+
                 user = userEntity.Entity;
             }
 

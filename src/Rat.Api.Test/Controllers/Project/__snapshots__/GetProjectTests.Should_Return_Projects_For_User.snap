@@ -2,14 +2,14 @@
   "UserId": 1,
   "ProjectStats": [
     {
-      "Id": 71,
-      "Name": "Test",
+      "Id": 1,
+      "Name": "Project A",
       "TotalConfigurationCount": 0,
       "TotalEntryCount": 0
     },
     {
-      "Id": 72,
-      "Name": "Test 2",
+      "Id": 2,
+      "Name": "Project B",
       "TotalConfigurationCount": 0,
       "TotalEntryCount": 0
     }

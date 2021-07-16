@@ -16,6 +16,11 @@ namespace Rat.Data
         {
         }
 
+        public RatDbContext(string connectionString)
+            : this(new DbContextOptionsBuilder<RatDbContext>().UseSqlServer(connectionString).Options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>(entity =>

@@ -9,9 +9,10 @@ using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
+    [CollectionDefinition("Integration")]
     public class PatchProjectTests : ProjectTestsBase
     {
-        public PatchProjectTests(CustomWebApplicationFactory<Startup> factory) : base(factory)
+        public PatchProjectTests(CustomWebApplicationFactory factory) : base(factory)
         {
         }
 

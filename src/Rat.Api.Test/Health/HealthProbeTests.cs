@@ -9,11 +9,11 @@ using Xunit;
 
 namespace Rat.Api.Test
 {
-    public class HealthProbeTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class HealthProbeTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _client;
 
-        public HealthProbeTests(CustomWebApplicationFactory<Startup> factory)
+        public HealthProbeTests(CustomWebApplicationFactory factory)
         {
             _client = factory.CreateClient(new WebApplicationFactoryClientOptions
             {

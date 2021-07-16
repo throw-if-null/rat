@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +13,12 @@ using Rat.Data.Entities;
 
 namespace Rat.Api.Test
 {
-    public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+    public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
     {
+        private const string LocalDbConnectionString = "Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
+
+        private int _initialized;
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
@@ -25,43 +30,39 @@ namespace Rat.Api.Test
                 var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
                 services.Remove(descriptor);
 
-                services.AddDbContext<RatDbContext>(options => options.UseInMemoryDatabase("RatDb"));
+                services.AddDbContext<RatDbContext>(options => options.UseSqlServer(LocalDbConnectionString));
 
-                var provider = services.BuildServiceProvider();
+                using var provider = services.BuildServiceProvider();
+                using var scope = provider.CreateScope();
 
-                using (var scope = provider.CreateScope())
+                var scopedServices = scope.ServiceProvider;
+                var db = scopedServices.GetRequiredService<RatDbContext>();
+                var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory>>();
+
+                if (Interlocked.Exchange(ref _initialized, 1) == 1)
+                    db.Database.EnsureDeleted();
+
+                db.Database.EnsureCreated();
+
+                try
                 {
-                    var scopedServices = scope.ServiceProvider;
-                    var db = scopedServices.GetRequiredService<RatDbContext>();
-                    var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                    var projectType = db.ProjectTypes.FirstOrDefault(x => x.Name == "js");
 
-                    db.Database.EnsureCreated();
+                    if (projectType == null)
+                        db.ProjectTypes.Add(new ProjectType { Name = "js" });
 
-                    try
-                    {
-                        var type1 = db.ProjectTypes.Add(new ProjectType { Id = 1, Name = "js" });
-                        db.ProjectTypes.Add(new ProjectType { Id = 2, Name = "csharp" });
+                    projectType = db.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
+                    if (projectType == null)
+                        db.ProjectTypes.Add(new ProjectType { Name = "csharp" });
 
-                        var user = db.Users.Add(new User { Id = 1, UserId = "3feslrj3ssd111" });
-
-                        db.Projects.Add(new Project { Id = 42, Name = "Test-42", Type = type1.Entity });
-                        db.Projects.Add(new Project { Id = 33, Name = "Test-33", Type = type1.Entity });
-                        var project = new Project { Id = 71, Name = "Test", Type = type1.Entity };
-                        project.Users.Add(user.Entity);
-
-                        db.Projects.Add(project);
-
-                        var project2 = new Project { Id = 72, Name = "Test 2", Type = type1.Entity };
-                        project2.Users.Add(user.Entity);
-
-                        db.Projects.Add(project2);
-
+                    if (projectType == null)
                         db.SaveChanges();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
+
+                    throw;
                 }
             });
         }

@@ -1,17 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Rat.Data;
 using Rat.Data.Views;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
+    [CollectionDefinition("Integration")]
     public class GetProjectTests : ProjectTestsBase
     {
-        public GetProjectTests(CustomWebApplicationFactory<Startup> factory)
+        public GetProjectTests(CustomWebApplicationFactory factory)
             : base(factory)
         {
         }
@@ -19,14 +24,18 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Get_Project_By_Id()
         {
-            // Seed the real data
-            var projectId = 33.ToString();
+            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
+            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Should_Get_Project_By_Id", Type = projectType });
+            await context.SaveChangesAsync();
+
+            var projectId = project.Entity.Id.ToString();
 
             var response = await Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = JsonSerializer.DeserializeAsync<Data.Views.UserProjectStatsView>(contentStream);
+            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Snapshot.Match(content);
         }
@@ -45,6 +54,14 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_Projects_For_User()
         {
+            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
+            var user = await context.Users.AddAsync(new Data.Entities.User { UserId = "3feslrj3ssd111" });
+
+            var projectA = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Project A", Type = projectType, Users = new List<Data.Entities.User> { user.Entity } });
+            var projectB = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Project B", Type = projectType, Users = new List<Data.Entities.User> { user.Entity } });
+            await context.SaveChangesAsync();
+
             var response = await Client.GetAsync("/api/projects/");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

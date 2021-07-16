@@ -1,10 +1,5 @@
 ﻿{
-  "IsCompleted": true,
-  "IsCompletedSuccessfully": true,
-  "IsFaulted": false,
-  "IsCanceled": false,
-  "Result": {
-    "UserId": 0,
-    "ProjectStats": []
-  }
+  "Id": 1,
+  "Name": "Should_Get_Project_By_Id",
+  "TypeId": 2
 }
