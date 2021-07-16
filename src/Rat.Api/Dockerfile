@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine AS base
+
 WORKDIR /app
 EXPOSE 80
 
@@ -7,7 +8,6 @@ WORKDIR /src
 
 COPY ["Rat.Api/Rat.Api.csproj", "Rat.Api/"]
 COPY ["Rat.Core/Rat.Core.csproj", "Rat.Core/"]
-COPY ["Rat.DataAccess/Rat.DataAccess.csproj", "Rat.DataAccess/"]
 COPY ["Rat.Data/Rat.Data.csproj", "Rat.Data/"]
 RUN dotnet restore "Rat.Api/Rat.Api.csproj"
 
@@ -21,4 +21,9 @@ RUN dotnet publish "Rat.Api.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Without this SQL Client fails (https://github.com/dotnet/SqlClient/issues/220)
+RUN apk add --no-cache icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 ENTRYPOINT ["dotnet", "Rat.Api.dll"]
