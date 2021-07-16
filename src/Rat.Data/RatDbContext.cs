@@ -64,7 +64,7 @@ namespace Rat.Data
         public RatDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<RatDbContext>();
-            optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;");
+            optionsBuilder.UseSqlServer("");
 
             return new RatDbContext(optionsBuilder.Options);
         }
