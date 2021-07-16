@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Controllers.Projects.Models;
 using Rat.Data;
 using Rat.Data.Views;
@@ -16,19 +16,18 @@ namespace Rat.Api.Test.Controllers.Project
     [Collection("Integration")]
     public class CreateProjectTests
     {
-        private readonly IConfiguration Configuration;
-        private readonly HttpClient Client;
+        private readonly RatFixture _fixture;
 
         public CreateProjectTests(RatFixture fixture)
         {
-            Configuration = fixture.Configuration;
-            Client = fixture.Client;
+            _fixture = fixture;
         }
 
         [Fact]
         public async Task Should_Return_Created()
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
 
             var model = new CreateProjectModel
@@ -37,7 +36,7 @@ namespace Rat.Api.Test.Controllers.Project
                 TypeId = projectType.Id
             };
 
-            var response = await Client.PostAsync(
+            var response = await _fixture.Client.PostAsync(
                 "/api/projects",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
@@ -59,7 +58,7 @@ namespace Rat.Api.Test.Controllers.Project
                 Name = name
             };
 
-            var response = await Client.PostAsync(
+            var response = await _fixture.Client.PostAsync(
                 "/api/projects",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 

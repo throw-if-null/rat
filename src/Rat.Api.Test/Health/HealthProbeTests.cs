@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Rat.Api.Observability.Health.Responses;
-using Rat.Api.Test.Controllers.Project;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -12,11 +11,11 @@ namespace Rat.Api.Test
     [Collection("Integration")]
     public class HealthProbeTests
     {
-        private readonly HttpClient Client;
+        private readonly HttpClient _client;
 
         public HealthProbeTests(RatFixture fixture)
         {
-            Client = fixture.Client;
+            _client = fixture.Client;
         }
 
         [Theory]
@@ -24,7 +23,7 @@ namespace Rat.Api.Test
         [InlineData("live", HttpStatusCode.ServiceUnavailable)]
         public async Task Probe_Should_Return_Response(string path, HttpStatusCode httpStatusCode)
         {
-            var healthResponse = await Client.GetAsync($"/health/{path}");
+            var healthResponse = await _client.GetAsync($"/health/{path}");
             Assert.Equal(httpStatusCode, healthResponse.StatusCode);
 
             using (var stream = await healthResponse.Content.ReadAsStreamAsync())

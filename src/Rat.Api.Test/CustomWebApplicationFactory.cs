@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +16,11 @@ namespace Rat.Api.Test
     {
         private const string LocalDbConnectionString = "Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
 
-        private int _initialized;
+        private readonly bool _useSqlLite;
 
-        public CustomWebApplicationFactory() : base()
+        public CustomWebApplicationFactory(bool useSqlLite) : base()
         {
+            _useSqlLite = useSqlLite;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -34,7 +34,13 @@ namespace Rat.Api.Test
                 var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
                 services.Remove(descriptor);
 
-                services.AddDbContext<RatDbContext>(options => options.UseSqlServer(LocalDbConnectionString));
+                services.AddDbContext<RatDbContext>(options =>
+                {
+                    if (_useSqlLite)
+                        options.UseSqlite("Data Source=RatDb.db");
+                    else
+                        options.UseSqlServer(LocalDbConnectionString);
+                });
 
                 using var provider = services.BuildServiceProvider();
                 using var scope = provider.CreateScope();

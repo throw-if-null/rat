@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Rat.Data;
 using Rat.Data.Views;
 using Snapshooter.Xunit;
@@ -16,26 +16,26 @@ namespace Rat.Api.Test.Controllers.Project
     [Collection("Integration")]
     public class GetProjectTests
     {
-        private readonly IConfiguration Configuration;
-        private readonly HttpClient Client;
+        private readonly RatFixture _fixture;
 
         public GetProjectTests(RatFixture fixture)
         {
-            Configuration = fixture.Configuration;
-            Client = fixture.Client;
+            _fixture = fixture;
         }
 
         [Fact]
         public async Task Should_Get_Project_By_Id()
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
+
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
             var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Should_Get_Project_By_Id", Type = projectType });
             await context.SaveChangesAsync();
 
             var projectId = project.Entity.Id.ToString();
 
-            var response = await Client.GetAsync($"/api/projects/{projectId}");
+            var response = await _fixture.Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
@@ -58,14 +58,15 @@ namespace Rat.Api.Test.Controllers.Project
         {
             var projectId = id.ToString();
 
-            var response = await Client.GetAsync($"/api/projects/{projectId}");
+            var response = await _fixture.Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
         public async Task Should_Return_Projects_For_User()
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
             var user = await context.Users.AddAsync(new Data.Entities.User { UserId = "3feslrj3ssd111" });
 
@@ -73,7 +74,7 @@ namespace Rat.Api.Test.Controllers.Project
             var projectB = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Project B", Type = projectType, Users = new List<Data.Entities.User> { user.Entity } });
             await context.SaveChangesAsync();
 
-            var response = await Client.GetAsync("/api/projects/");
+            var response = await _fixture.Client.GetAsync("/api/projects/");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             using (var content = await response.Content.ReadAsStreamAsync())
@@ -105,7 +106,7 @@ namespace Rat.Api.Test.Controllers.Project
 
             request.Headers.Add("test-user", "test-user");
 
-            var response = await Client.SendAsync(request);
+            var response = await _fixture.Client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -132,7 +133,7 @@ namespace Rat.Api.Test.Controllers.Project
 
             request.Headers.Add("test-user", "null");
 
-            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }

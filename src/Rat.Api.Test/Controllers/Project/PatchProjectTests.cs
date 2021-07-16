@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Controllers.Projects.Models;
 using Rat.Data;
 using Rat.Data.Views;
@@ -16,19 +16,19 @@ namespace Rat.Api.Test.Controllers.Project
     [Collection("Integration")]
     public class PatchProjectTests
     {
-        private readonly IConfiguration Configuration;
-        private readonly HttpClient Client;
+        private readonly RatFixture _fixture;
 
         public PatchProjectTests(RatFixture fixture)
         {
-            Configuration = fixture.Configuration;
-            Client = fixture.Client;
+            _fixture = fixture;
         }
 
         [Fact]
         public async Task Should_Patch()
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
+
             var projectTypes = await context.ProjectTypes.ToListAsync();
             var jsType = projectTypes.First(x => x.Name == "js");
             var csharpType = projectTypes.First(x => x.Name == "csharp");
@@ -43,7 +43,7 @@ namespace Rat.Api.Test.Controllers.Project
                 TypeId = csharpType.Id
             };
 
-            var response = await Client.PatchAsync(
+            var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
@@ -61,7 +61,8 @@ namespace Rat.Api.Test.Controllers.Project
         [InlineData("sqoyhhpamcsnpwzjdwwneydgighyecnwpykbtbugmqclefuhndqpvnfhupwaofgnwlehtwfujyrlavgubnuvqrjdbbanpwvnaneembgplatqvselnwvfefezxznyvnqkdqaalqwyjmlskovuowehyaujnhevlpcgtxhfwwbiwsuozfmeishfnovyteddvyxfmclwiekfqjmelujrevprrsctksqkvnzwqwksibojrnhmcftdjnogsrmane")]
         public async Task Should_Return_BadRequest_When_Name_Value_Is_Invalid(string name)
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
 
             var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Patch", Type = projectType });
@@ -74,7 +75,7 @@ namespace Rat.Api.Test.Controllers.Project
                 TypeId = projectType.Id
             };
 
-            var response = await Client.PatchAsync(
+            var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
@@ -84,7 +85,8 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_NotFound()
         {
-            using var context = new RatDbContext(Configuration.GetConnectionString("RatDb"));
+            using var scope = _fixture.Provider.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
 
             var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Patch", Type = projectType });
@@ -100,7 +102,7 @@ namespace Rat.Api.Test.Controllers.Project
                 TypeId = projectType.Id
             };
 
-            var response = await Client.PatchAsync(
+            var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
