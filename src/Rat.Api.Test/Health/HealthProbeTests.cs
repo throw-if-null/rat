@@ -2,23 +2,20 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Rat.Api.Observability.Health.Responses;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Rat.Api.Test
 {
-    public class HealthProbeTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    [Collection("Integration")]
+    public class HealthProbeTests
     {
         private readonly HttpClient _client;
 
-        public HealthProbeTests(CustomWebApplicationFactory<Startup> factory)
+        public HealthProbeTests(RatFixture fixture)
         {
-            _client = factory.CreateClient(new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = false
-            });
+            _client = fixture.Client;
         }
 
         [Theory]
