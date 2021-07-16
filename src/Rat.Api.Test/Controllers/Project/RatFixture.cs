@@ -6,18 +6,19 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Test.Auth;
-using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    public abstract class ProjectTestsBase : IClassFixture<CustomWebApplicationFactory>
+    public class RatFixture
     {
+        private readonly CustomWebApplicationFactory _factory = new CustomWebApplicationFactory();
+
         public HttpClient Client { get; }
         public IConfiguration Configuration { get; }
 
-        protected ProjectTestsBase(CustomWebApplicationFactory factory)
+        public RatFixture()
         {
-            var hostBuilder = factory.WithWebHostBuilder(builder =>
+            var hostBuilder = _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureTestServices(services =>
                 {

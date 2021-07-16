@@ -81,7 +81,7 @@ namespace Rat.Api.Controllers.Projects
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Patch(PatchProjectModel model, CancellationToken cancellation)
         {
-            var response = await _mediator.Send(new PatchProjectRequest { Id = model.Id, Name = model.Name }, cancellation);
+            var response = await _mediator.Send(new PatchProjectRequest { Id = model.Id, Name = model.Name, ProjectTypeId = model.TypeId }, cancellation);
 
             if (response.Context.Status != ProcessingStatus.Ok)
                 return HandleUnscusseful(response.Context);

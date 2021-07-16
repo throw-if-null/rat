@@ -2,23 +2,21 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Rat.Api.Observability.Health.Responses;
+using Rat.Api.Test.Controllers.Project;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Rat.Api.Test
 {
-    public class HealthProbeTests : IClassFixture<CustomWebApplicationFactory>
+    [Collection("Integration")]
+    public class HealthProbeTests
     {
-        private readonly HttpClient _client;
+        private readonly HttpClient Client;
 
-        public HealthProbeTests(CustomWebApplicationFactory factory)
+        public HealthProbeTests(RatFixture fixture)
         {
-            _client = factory.CreateClient(new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = false
-            });
+            Client = fixture.Client;
         }
 
         [Theory]
@@ -26,7 +24,7 @@ namespace Rat.Api.Test
         [InlineData("live", HttpStatusCode.ServiceUnavailable)]
         public async Task Probe_Should_Return_Response(string path, HttpStatusCode httpStatusCode)
         {
-            var healthResponse = await _client.GetAsync($"/health/{path}");
+            var healthResponse = await Client.GetAsync($"/health/{path}");
             Assert.Equal(httpStatusCode, healthResponse.StatusCode);
 
             using (var stream = await healthResponse.Content.ReadAsStreamAsync())

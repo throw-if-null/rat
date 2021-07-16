@@ -83,10 +83,10 @@ namespace Rat.Core.Commands.Projects.PatchProject
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
                     "Cannot be null or empty");
 
-            if (request.Name?.Length > 512)
+            if (request.Name?.Length > 248)
                 request.Context.ValidationErrors.Add(
                     $"{nameof(CreateProjectRequest)}.{nameof(CreateProjectRequest.Name)}",
-                    $"Lenght: {request.Name.Length} cannot be longer then 512 characters");
+                    $"Lenght: {request.Name.Length} cannot be longer then 248 characters");
         }
 
         private async Task<ProjectType> ValidateProjectType(

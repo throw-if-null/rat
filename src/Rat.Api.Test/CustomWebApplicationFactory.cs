@@ -19,6 +19,10 @@ namespace Rat.Api.Test
 
         private int _initialized;
 
+        public CustomWebApplicationFactory() : base()
+        {
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
@@ -39,9 +43,7 @@ namespace Rat.Api.Test
                 var db = scopedServices.GetRequiredService<RatDbContext>();
                 var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory>>();
 
-                if (Interlocked.Exchange(ref _initialized, 1) == 1)
-                    db.Database.EnsureDeleted();
-
+                db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
 
                 try

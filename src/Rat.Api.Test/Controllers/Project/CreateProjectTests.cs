@@ -13,12 +13,16 @@ using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [CollectionDefinition("Integration")]
-    public class CreateProjectTests : ProjectTestsBase
+    [Collection("Integration")]
+    public class CreateProjectTests
     {
-        public CreateProjectTests(CustomWebApplicationFactory factory)
-            : base(factory)
+        private readonly IConfiguration Configuration;
+        private readonly HttpClient Client;
+
+        public CreateProjectTests(RatFixture fixture)
         {
+            Configuration = fixture.Configuration;
+            Client = fixture.Client;
         }
 
         [Fact]

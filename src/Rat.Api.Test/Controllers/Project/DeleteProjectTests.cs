@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,11 +8,16 @@ using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [CollectionDefinition("Integration")]
-    public class DeleteProjectTests : ProjectTestsBase
+    [Collection("Integration")]
+    public class DeleteProjectTests
     {
-        public DeleteProjectTests(CustomWebApplicationFactory factory) : base(factory)
+        private readonly IConfiguration Configuration;
+        private readonly HttpClient Client;
+
+        public DeleteProjectTests(RatFixture fixture)
         {
+            Configuration = fixture.Configuration;
+            Client = fixture.Client;
         }
 
         [Theory]

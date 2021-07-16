@@ -13,12 +13,16 @@ using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [CollectionDefinition("Integration")]
-    public class GetProjectTests : ProjectTestsBase
+    [Collection("Integration")]
+    public class GetProjectTests
     {
-        public GetProjectTests(CustomWebApplicationFactory factory)
-            : base(factory)
+        private readonly IConfiguration Configuration;
+        private readonly HttpClient Client;
+
+        public GetProjectTests(RatFixture fixture)
         {
+            Configuration = fixture.Configuration;
+            Client = fixture.Client;
         }
 
         [Fact]
@@ -37,7 +41,14 @@ namespace Rat.Api.Test.Controllers.Project
             var contentStream = await response.Content.ReadAsStreamAsync();
             var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            Snapshot.Match(content);
+            Snapshot.Match(
+                content,
+                x =>
+                {
+                    x.IgnoreField<int>("Id");
+
+                    return x;
+                });
         }
 
         [Theory]
@@ -72,16 +83,30 @@ namespace Rat.Api.Test.Controllers.Project
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                Snapshot.Match(projects);
+                Snapshot.Match(
+                    projects,
+                    x =>
+                    {
+                        x.IgnoreFields<int>("ProjectStats[*].Id");
+
+                        return x;
+                    });
             }
         }
 
         [Fact]
         public async Task Should_Return_No_Projects_When_User_Is_Not_In_Rat_Database()
         {
-            Client.DefaultRequestHeaders.Add("test-user", "test-user");
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("/api/projects", UriKind.Relative)
+            };
 
-            var response = await Client.GetAsync("/api/projects/");
+            request.Headers.Add("test-user", "test-user");
+
+            var response = await Client.SendAsync(request);
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             using (var content = await response.Content.ReadAsStreamAsync())
@@ -99,13 +124,13 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_Forbidden_When_NameClaim_Is_Missing()
         {
-            Client.DefaultRequestHeaders.Add("test-user", "null");
-
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri("/api/projects", UriKind.Relative)
             };
+
+            request.Headers.Add("test-user", "null");
 
             var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
