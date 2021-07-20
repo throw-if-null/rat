@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rat.Core\Rat.Core.csproj" />
-    <ProjectReference Include="..\Rat.Data\Rat.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Hosting;
 using System;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Rat.Api.Controllers
 {
+    [ExcludeFromCodeCoverage]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : ControllerBase

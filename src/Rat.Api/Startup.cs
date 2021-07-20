@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,7 @@ using Rat.Data;
 
 namespace Rat.Api
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         private static readonly string[] CORS_ALLOW_ALL = new string[1] { "*" };
