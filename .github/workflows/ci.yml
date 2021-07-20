@@ -69,7 +69,7 @@ jobs:
         id: sonar-setup
         env:
           OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
-          COVERAGE_EXCLUSIONS: "src/Rat.Data/Migrations/*,src/Rat.Api/Startup.cs,src/Rat/Api/Controllers/ErrorController.cs"
+          COVERAGE_EXCLUSIONS: "src/Rat.Data/Migrations/*.cs,src/Rat.Api/Startup.cs,src/Rat/Api/Controllers/ErrorController.cs"
         shell: pwsh
         run: >
           ./.sonar/scanner/dotnet-sonarscanner begin
@@ -79,6 +79,7 @@ jobs:
           /d:sonar.host.url="https://sonarcloud.io"
           /d:sonar.cs.opencover.reportsPaths=${{ env.OPENCOVER_REPORTS_PATH }}
           /d:sonar.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
+          /d:sonar.coverage.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
           /d:sonar.dotnet.excludeTestProjects=true
 
       - name: Run Tests
