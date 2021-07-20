@@ -69,7 +69,7 @@ jobs:
         id: sonar-setup
         env:
           OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
-          COVERAGE_EXCLUSIONS: "**Test*.cs"
+          COVERAGE_EXCLUSIONS: "src/Rat.Data/Migrations/*,src/Rat.Api/Startup.cs,src/Rat/Api/Controllers/ErrorController.cs"
         shell: pwsh
         run: >
           ./.sonar/scanner/dotnet-sonarscanner begin
@@ -78,7 +78,8 @@ jobs:
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
           /d:sonar.host.url="https://sonarcloud.io"
           /d:sonar.cs.opencover.reportsPaths=${{ env.OPENCOVER_REPORTS_PATH }}
-          /d:sonar.coverage.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
+          /d:sonar.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
+          /d:sonar.dotnet.excludeTestProjects=true
 
       - name: Run Tests
         id: tests-run
@@ -97,18 +98,6 @@ jobs:
           set_check_status_from_test_outcome: true
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
-
-      - name: Codecov
-        id: codecov-run
-        uses: codecov/codecov-action@v1.5.2
-        env:
-          OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ env.OPENCOVER_REPORTS_PATH }}
-          name: Rat Code Coverage
-          fail_ci_if_error: true
-          verbose: true
 
       - name: Run Sonar Analysis
         id: sonar-run
