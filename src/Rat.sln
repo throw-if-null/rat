@@ -20,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AC202AF0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Data", "Rat.Data\Rat.Data.csproj", "{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utilities", "utilities", "{D4F191DD-9FB2-4F93-9250-1903A2DD1AA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rat.DbSeeder", "Rat.DbSeeder\Rat.DbSeeder.csproj", "{1658BE13-F6D6-4DB1-A270-1E94778DF994}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,10 @@ Global
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1658BE13-F6D6-4DB1-A270-1E94778DF994}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1658BE13-F6D6-4DB1-A270-1E94778DF994}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1658BE13-F6D6-4DB1-A270-1E94778DF994}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1658BE13-F6D6-4DB1-A270-1E94778DF994}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +59,7 @@ Global
 		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB} = {AC202AF0-DDDA-4F3C-B0F5-7FBAF621BD5F}
 		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
+		{1658BE13-F6D6-4DB1-A270-1E94778DF994} = {D4F191DD-9FB2-4F93-9250-1903A2DD1AA5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1fc0228f-7271-471f-8946-67a1608594f2}

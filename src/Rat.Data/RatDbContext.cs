@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Rat.Data.Entities;
 
@@ -55,6 +56,13 @@ namespace Rat.Data
                 builder.Property(x => x.Name).HasMaxLength(64).IsRequired();
 
                 builder.HasIndex(x => x.Name).IsUnique();
+
+                builder.HasData(new List<ProjectType>
+                {
+                    new ProjectType {Id = 1, Name = "other"},
+                    new ProjectType {Id = 2, Name = "js"},
+                    new ProjectType {Id = 3, Name = "csharp"}
+                });
             });
         }
     }
@@ -64,7 +72,7 @@ namespace Rat.Data
         public RatDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<RatDbContext>();
-            optionsBuilder.UseSqlServer("");
+            optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30");
 
             return new RatDbContext(optionsBuilder.Options);
         }
