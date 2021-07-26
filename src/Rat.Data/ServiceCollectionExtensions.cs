@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Rat.Data
 {
-    public static class SerrviceCollectionExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddRatDbContext(this IServiceCollection services, IConfiguration configuration)
         {
