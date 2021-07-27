@@ -15,6 +15,15 @@ jobs:
       DEFAULT_DOCKER_IMAGE_TAG: latest
       DOCKER_REPOSITORY: rat
 
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Password1!
+        ports:
+          - 1433:1433
+
     steps:
       - name: Set up JDK 11
         id: install-jdk-11
@@ -88,6 +97,7 @@ jobs:
         env:
           TEST_PROJECT_PATH: ./src/Rat.sln
           TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+          DATABASE_ENGINE: sqlserver
         with:
           project_path: ${{ env.TEST_PROJECT_PATH }}
           report_name: Test report

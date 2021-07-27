@@ -13,9 +13,7 @@ namespace Rat.Api.Test
 {
     public class RatFixture
     {
-        private const bool USE_SQLLITE = true;
-
-        private readonly CustomWebApplicationFactory _factory = new CustomWebApplicationFactory(USE_SQLLITE);
+        private readonly CustomWebApplicationFactory _factory = new CustomWebApplicationFactory();
 
         public HttpClient Client { get; }
         public IConfiguration Configuration { get; }

@@ -14,13 +14,13 @@ namespace Rat.Api.Test
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
     {
+        private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
+        private const string DefaultDatabaseEngine = "sqllite";
+
         private const string LocalDbConnectionString = "Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
 
-        private readonly bool _useSqlLite;
-
-        public CustomWebApplicationFactory(bool useSqlLite) : base()
+        public CustomWebApplicationFactory() : base()
         {
-            _useSqlLite = useSqlLite;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -34,9 +34,14 @@ namespace Rat.Api.Test
                 var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
                 services.Remove(descriptor);
 
+                var databaseEngine = Environment.GetEnvironmentVariable(DatabaseEngineEnvironmentVariable);
+
+                if (string.IsNullOrWhiteSpace(databaseEngine))
+                    databaseEngine = DefaultDatabaseEngine;
+
                 services.AddDbContext<RatDbContext>(options =>
                 {
-                    if (_useSqlLite)
+                    if (databaseEngine.Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
                         options.UseSqlite("Data Source=RatDb.db");
                     else
                         options.UseSqlServer(LocalDbConnectionString);
@@ -46,32 +51,39 @@ namespace Rat.Api.Test
                 using var scope = provider.CreateScope();
 
                 var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<RatDbContext>();
+                var context = scopedServices.GetRequiredService<RatDbContext>();
                 var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory>>();
 
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
 
-                try
+                context.Database.EnsureDeleted();
+
+                if (databaseEngine.Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    var projectType = db.ProjectTypes.FirstOrDefault(x => x.Name == "js");
+                    context.Database.EnsureCreated();
 
-                    if (projectType == null)
-                        db.ProjectTypes.Add(new ProjectType { Name = "js" });
+                    try
+                    {
+                        var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
 
-                    projectType = db.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
-                    if (projectType == null)
-                        db.ProjectTypes.Add(new ProjectType { Name = "csharp" });
+                        if (projectType == null)
+                            context.ProjectTypes.Add(new ProjectType { Name = "js" });
 
-                    if (projectType == null)
-                        db.SaveChanges();
+                        projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
+                        if (projectType == null)
+                            context.ProjectTypes.Add(new ProjectType { Name = "csharp" });
+
+                        if (projectType == null)
+                            context.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
+
+                        throw;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
-
-                    throw;
-                }
+                else
+                    context.Database.Migrate();
             });
         }
     }

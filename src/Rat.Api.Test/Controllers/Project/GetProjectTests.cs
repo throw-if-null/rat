@@ -46,6 +46,7 @@ namespace Rat.Api.Test.Controllers.Project
                 x =>
                 {
                     x.IgnoreField<int>("Id");
+                    x.IgnoreField<int>("TypeId");
 
                     return x;
                 });
