@@ -20,9 +20,14 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: ${SQLSERVER_SA_PASSWORD:-Password1!}
+          SA_PASSWORD: Password1!
         ports:
           - 1433:1433
+        options: >-
+          --health-cmd "./opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Password1! -Q "SELECT 1" || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Set up JDK 11

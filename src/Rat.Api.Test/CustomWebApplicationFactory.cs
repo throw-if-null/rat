@@ -17,7 +17,7 @@ namespace Rat.Api.Test
         private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
         private const string DefaultDatabaseEngine = "sqllite";
 
-        private const string LocalDbConnectionString = "Data Source=sqlserver;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
+        private const string LocalDbConnectionString = "Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
 
         public CustomWebApplicationFactory() : base()
         {
