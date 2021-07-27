@@ -14,7 +14,7 @@ using Rat.Data;
 namespace Rat.Api
 {
     [ExcludeFromCodeCoverage]
-    internal class Program
+    internal static class Program
     {
         internal static async Task Main(string[] args)
         {
