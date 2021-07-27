@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Rat.Data.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class Seed_ProjectTypes : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

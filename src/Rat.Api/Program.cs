@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ using Rat.Data;
 
 namespace Rat.Api
 {
+    [ExcludeFromCodeCoverage]
     internal class Program
     {
         internal static async Task Main(string[] args)
