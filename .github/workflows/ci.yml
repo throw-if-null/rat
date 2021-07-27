@@ -96,7 +96,8 @@ jobs:
         uses: rocklan/dotnet-tests-report@master
         env:
           TEST_PROJECT_PATH: ./src/Rat.sln
-          TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml --environment DATABASE_ENGINE=sqlserver
+          TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+          DATABASE_ENGINE: sqlserver
         with:
           project_path: ${{ env.TEST_PROJECT_PATH }}
           report_name: Test report
