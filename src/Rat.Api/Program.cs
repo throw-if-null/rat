@@ -46,7 +46,7 @@ namespace Rat.Api
         private static async Task MigrateDatabase(IServiceProvider provider, CancellationToken cancellation)
         {
             var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger<Program>();
+            var logger = loggerFactory.CreateLogger(nameof(Program));
 
             using var scope = provider.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
