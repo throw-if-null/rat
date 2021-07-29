@@ -8,6 +8,6 @@ namespace Rat.Data.Entities
 
         public string UserId { get; set; }
 
-        public ICollection<ProjectEntity> Projects { get; set; } = new List<ProjectEntity>();
+        public ICollection<ProjectUserEntity> Projects { get; set; } = new List<ProjectUserEntity>();
     }
 }

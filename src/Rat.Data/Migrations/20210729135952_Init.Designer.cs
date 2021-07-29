@@ -10,7 +10,7 @@ using Rat.Data;
 namespace Rat.Data.Migrations
 {
     [DbContext(typeof(RatDbContext))]
-    [Migration("20210715222434_Init")]
+    [Migration("20210729135952_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,22 +21,7 @@ namespace Rat.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.8")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ProjectUser", b =>
-                {
-                    b.Property<int>("ProjectsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProjectsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ProjectUser");
-                });
-
-            modelBuilder.Entity("Rat.Data.Entities.Project", b =>
+            modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,10 +40,10 @@ namespace Rat.Data.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Project");
                 });
 
-            modelBuilder.Entity("Rat.Data.Entities.ProjectType", b =>
+            modelBuilder.Entity("Rat.Data.Entities.ProjectTypeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,10 +60,42 @@ namespace Rat.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ProjectTypes");
+                    b.ToTable("ProjectType");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "other"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "js"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "csharp"
+                        });
                 });
 
-            modelBuilder.Entity("Rat.Data.Entities.User", b =>
+            modelBuilder.Entity("Rat.Data.Entities.ProjectUserEntity", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectUser");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.UserEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,31 +109,45 @@ namespace Rat.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
-            modelBuilder.Entity("ProjectUser", b =>
+            modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
                 {
-                    b.HasOne("Rat.Data.Entities.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Rat.Data.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Rat.Data.Entities.Project", b =>
-                {
-                    b.HasOne("Rat.Data.Entities.ProjectType", "Type")
+                    b.HasOne("Rat.Data.Entities.ProjectTypeEntity", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId");
 
                     b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ProjectUserEntity", b =>
+                {
+                    b.HasOne("Rat.Data.Entities.ProjectEntity", "Project")
+                        .WithMany("Users")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rat.Data.Entities.UserEntity", "User")
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.UserEntity", b =>
+                {
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

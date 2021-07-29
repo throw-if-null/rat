@@ -10,6 +10,6 @@ namespace Rat.Data.Entities
 
         public ProjectTypeEntity Type { get; set; }
 
-        public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
+        public ICollection<ProjectUserEntity> Users { get; set; } = new List<ProjectUserEntity>();
     }
 }

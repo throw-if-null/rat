@@ -23,19 +23,18 @@ namespace Rat.Data
         {
             modelBuilder.Entity<ProjectEntity>(entity =>
                 {
-                    entity.ToTable("Projects");
+                    entity.ToTable("Project");
                     entity.HasKey(e => e.Id);
                     entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                     entity.Property(e => e.Name).HasMaxLength(ProjectSchema.Max_Name_Length).IsRequired();
 
                     entity.HasOne(e => e.Type);
-                    entity.HasMany(e => e.Users).WithMany(u => u.Projects);
                 });
 
             modelBuilder.Entity<UserEntity>(builer =>
             {
-                builer.ToTable("Users");
+                builer.ToTable("User");
 
                 builer.HasKey(x => x.Id);
                 builer.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -43,9 +42,19 @@ namespace Rat.Data
                 builer.Property(x => x.UserId).HasMaxLength(UserSchema.Max_UserId_Length).IsRequired();
             });
 
+            modelBuilder.Entity<ProjectUserEntity>(builder =>
+            {
+                builder.ToTable("ProjectUser");
+
+                builder.HasKey(x => new { x.ProjectId, x.UserId });
+
+                builder.HasOne(x => x.Project).WithMany(x => x.Users).HasForeignKey(x => x.ProjectId);
+                builder.HasOne(x => x.User).WithMany(x => x.Projects).HasForeignKey(x => x.UserId);
+            });
+
             modelBuilder.Entity<ProjectTypeEntity>(builder =>
             {
-                builder.ToTable("ProjectTypes");
+                builder.ToTable("ProjectType");
 
                 builder.HasKey(x => x.Id);
                 builder.Property(x => x.Id).ValueGeneratedOnAdd();
