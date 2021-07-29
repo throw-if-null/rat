@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Data;
+using Rat.Data.Entities;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
@@ -35,7 +36,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var scope = _fixture.Provider.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Test", Type = projectType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Test", Type = projectType });
             await context.SaveChangesAsync();
 
             var projectId = project.Entity.Id.ToString();
@@ -53,7 +54,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var scope = _fixture.Provider.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Test", Type = projectType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Test", Type = projectType });
             await context.SaveChangesAsync();
 
             var projectId = project.Entity.Id.ToString();

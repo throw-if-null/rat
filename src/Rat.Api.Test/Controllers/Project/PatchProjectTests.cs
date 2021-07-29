@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Controllers.Projects.Models;
 using Rat.Data;
+using Rat.Data.Entities;
 using Rat.Data.Views;
 using Xunit;
 
@@ -33,7 +34,7 @@ namespace Rat.Api.Test.Controllers.Project
             var jsType = projectTypes.First(x => x.Name == "js");
             var csharpType = projectTypes.First(x => x.Name == "csharp");
 
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Patch", Type = jsType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = jsType });
             await context.SaveChangesAsync();
 
             var model = new PatchProjectModel
@@ -65,7 +66,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
 
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Patch", Type = projectType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
             await context.SaveChangesAsync();
 
             var model = new PatchProjectModel()
@@ -89,7 +90,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
 
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Patch", Type = projectType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
             await context.SaveChangesAsync();
 
             context.Projects.Remove(project.Entity);

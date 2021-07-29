@@ -17,22 +17,18 @@ namespace Rat.Core.Queries.Projects.GetProjectById
 
         public async Task<GetProjectByIdResponse> Handle(GetProjectByIdRequest request, CancellationToken cancellationToken)
         {
-            if (request.Id <= 0)
-            {
-                request.Context.ValidationErrors.Add(
-                    $"{nameof(GetProjectByIdRequest)}.{nameof(GetProjectByIdRequest.Id)}",
-                    "Id must have larger value then 0");
+            request.Validate();
 
-                request.Context.Status = ProcessingStatus.BadRequest;
-
+            if (request.Context.Status != ProcessingStatus.GoodRequest)
                 return new() { Context = request.Context };
-            }
+
+            var projectId = request.Id;
 
             var project =
                 await
                     _context.Projects
                         .Include(x => x.Type)
-                        .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+                        .FirstOrDefaultAsync(x => x.Id == projectId, cancellationToken);
 
             if (project == null)
             {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Data;
+using Rat.Data.Entities;
 using Rat.Data.Views;
 using Snapshooter.Xunit;
 using Xunit;
@@ -30,7 +31,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
 
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
-            var project = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Should_Get_Project_By_Id", Type = projectType });
+            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Should_Get_Project_By_Id", Type = projectType });
             await context.SaveChangesAsync();
 
             var projectId = project.Entity.Id.ToString();
@@ -69,10 +70,10 @@ namespace Rat.Api.Test.Controllers.Project
             using var scope = _fixture.Provider.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
-            var user = await context.Users.AddAsync(new Data.Entities.User { UserId = "3feslrj3ssd111" });
+            var user = await context.Users.AddAsync(new UserEntity { UserId = "3feslrj3ssd111" });
 
-            var projectA = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Project A", Type = projectType, Users = new List<Data.Entities.User> { user.Entity } });
-            var projectB = await context.Projects.AddAsync(new Data.Entities.Project { Name = "Project B", Type = projectType, Users = new List<Data.Entities.User> { user.Entity } });
+            var projectA = await context.Projects.AddAsync(new ProjectEntity { Name = "Project A", Type = projectType, Users = new List<ProjectUserEntity> { new () { User = user.Entity } } });
+            var projectB = await context.Projects.AddAsync(new ProjectEntity { Name = "Project B", Type = projectType, Users = new List<ProjectUserEntity> { new () { User = user.Entity } } });
             await context.SaveChangesAsync();
 
             var response = await _fixture.Client.GetAsync("/api/projects/");

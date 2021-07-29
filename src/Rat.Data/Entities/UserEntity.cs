@@ -2,12 +2,12 @@
 
 namespace Rat.Data.Entities
 {
-    public class User
+    public class UserEntity
     {
         public int Id { get; set; }
 
         public string UserId { get; set; }
 
-        public ICollection<Project> Projects { get; set; } = new List<Project>();
+        public ICollection<ProjectUserEntity> Projects { get; set; } = new List<ProjectUserEntity>();
     }
 }

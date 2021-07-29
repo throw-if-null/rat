@@ -1,15 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Rat.Data.Migrations
 {
-    [ExcludeFromCodeCoverage]
     public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ProjectTypes",
+                name: "ProjectType",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -18,11 +16,11 @@ namespace Rat.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectTypes", x => x.Id);
+                    table.PrimaryKey("PK_ProjectType", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -31,11 +29,11 @@ namespace Rat.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Projects",
+                name: "Project",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -45,11 +43,11 @@ namespace Rat.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Projects", x => x.Id);
+                    table.PrimaryKey("PK_Project", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Projects_ProjectTypes_TypeId",
+                        name: "FK_Project_ProjectType_TypeId",
                         column: x => x.TypeId,
-                        principalTable: "ProjectTypes",
+                        principalTable: "ProjectType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -58,41 +56,56 @@ namespace Rat.Data.Migrations
                 name: "ProjectUser",
                 columns: table => new
                 {
-                    ProjectsId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<int>(type: "int", nullable: false)
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectUser", x => new { x.ProjectsId, x.UsersId });
+                    table.PrimaryKey("PK_ProjectUser", x => new { x.ProjectId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_ProjectUser_Projects_ProjectsId",
-                        column: x => x.ProjectsId,
-                        principalTable: "Projects",
+                        name: "FK_ProjectUser_Project_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Project",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProjectUser_Users_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "Users",
+                        name: "FK_ProjectUser_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "ProjectType",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "other" });
+
+            migrationBuilder.InsertData(
+                table: "ProjectType",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 2, "js" });
+
+            migrationBuilder.InsertData(
+                table: "ProjectType",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 3, "csharp" });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_TypeId",
-                table: "Projects",
+                name: "IX_Project_TypeId",
+                table: "Project",
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectTypes_Name",
-                table: "ProjectTypes",
+                name: "IX_ProjectType_Name",
+                table: "ProjectType",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectUser_UsersId",
+                name: "IX_ProjectUser_UserId",
                 table: "ProjectUser",
-                column: "UsersId");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -101,13 +114,13 @@ namespace Rat.Data.Migrations
                 name: "ProjectUser");
 
             migrationBuilder.DropTable(
-                name: "Projects");
+                name: "Project");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
 
             migrationBuilder.DropTable(
-                name: "ProjectTypes");
+                name: "ProjectType");
         }
     }
 }

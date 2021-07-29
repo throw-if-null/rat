@@ -1,6 +1,6 @@
 ﻿namespace Rat.Data.Entities
 {
-    public class ProjectType
+    public class ProjectTypeEntity
     {
         public int Id { get; set; }
 

@@ -4,8 +4,9 @@
     {
         None = 0,
         Ok = 1,
-        BadRequest = 2,
-        NotFound = 4,
-        Error = 8
+        GoodRequest = 2,
+        BadRequest = 4,
+        NotFound = 8,
+        Error = 16
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Rat.Core.Properties;
 using Rat.Data;
 using Rat.Data.Exceptions;
 using Rat.Data.Views;
@@ -20,31 +21,31 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
 
         public async Task<GetProjectsForUserResponse> Handle(GetProjectsForUserRequest request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.UserId))
-            {
-                request.Context.ValidationErrors.Add(
-                    $"{nameof(GetProjectsForUserRequest)}.{nameof(GetProjectsForUserRequest.UserId)}",
-                    "UserId must be provided");
+            request.Validate();
 
-                request.Context.Status = ProcessingStatus.BadRequest;
-
+            if (request.Context.Status != ProcessingStatus.GoodRequest)
                 return new() { Context = request.Context };
-            }
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
+            var userId = request.UserId;
+            var user =
+                await
+                    _context.Users
+                        .Include(x => x.Projects)
+                        .ThenInclude(x => x.Project)
+                        .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
 
             if (user == null)
             {
-                var userEntity = await _context.Users.AddAsync(new () {UserId = request.UserId }, cancellationToken);
+                var userEntity = await _context.Users.AddAsync(new() { UserId = request.UserId }, cancellationToken);
+
+                var expectedNumberOfChanges = 1;
                 var changes = await _context.SaveChangesAsync(cancellationToken);
 
-                if (changes != 1)
-                    throw new RatDbException($"Number of changes: {changes} is not 1");
+                if (changes != expectedNumberOfChanges)
+                    throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
 
                 user = userEntity.Entity;
             }
-
-            var projects = await _context.Projects.Include(x => x.Type).Where(x => x.Users.Contains(user)).ToListAsync(cancellationToken);
 
             request.Context.Status = ProcessingStatus.Ok;
 
@@ -54,10 +55,10 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 UserProjectStats = new()
                 {
                     UserId = user.Id,
-                    ProjectStats = projects.Select(x => new ProjectStatsView
+                    ProjectStats = user.Projects.Select(x => new ProjectStatsView
                     {
-                        Id = x.Id,
-                        Name = x.Name,
+                        Id = x.ProjectId,
+                        Name = x.Project.Name,
                         TotalConfigurationCount = 0,
                         TotalEntryCount = 0
                     })
