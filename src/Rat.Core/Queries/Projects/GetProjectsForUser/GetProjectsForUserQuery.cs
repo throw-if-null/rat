@@ -27,11 +27,16 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 return new() { Context = request.Context };
 
             var userId = request.UserId;
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+            var user =
+                await
+                    _context.Users
+                        .Include(x => x.Projects)
+                        .ThenInclude(x => x.Project)
+                        .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
 
             if (user == null)
             {
-                var userEntity = await _context.Users.AddAsync(new () {UserId = request.UserId }, cancellationToken);
+                var userEntity = await _context.Users.AddAsync(new() { UserId = request.UserId }, cancellationToken);
 
                 var expectedNumberOfChanges = 1;
                 var changes = await _context.SaveChangesAsync(cancellationToken);
@@ -42,8 +47,6 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 user = userEntity.Entity;
             }
 
-            var projects = await _context.Projects.Include(x => x.Type).Where(x => x.Users.Contains(user)).ToListAsync(cancellationToken);
-
             request.Context.Status = ProcessingStatus.Ok;
 
             return new()
@@ -52,10 +55,10 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
                 UserProjectStats = new()
                 {
                     UserId = user.Id,
-                    ProjectStats = projects.Select(x => new ProjectStatsView
+                    ProjectStats = user.Projects.Select(x => new ProjectStatsView
                     {
-                        Id = x.Id,
-                        Name = x.Name,
+                        Id = x.ProjectId,
+                        Name = x.Project.Name,
                         TotalConfigurationCount = 0,
                         TotalEntryCount = 0
                     })

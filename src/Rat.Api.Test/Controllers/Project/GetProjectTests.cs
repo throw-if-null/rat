@@ -72,8 +72,8 @@ namespace Rat.Api.Test.Controllers.Project
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
             var user = await context.Users.AddAsync(new UserEntity { UserId = "3feslrj3ssd111" });
 
-            var projectA = await context.Projects.AddAsync(new ProjectEntity { Name = "Project A", Type = projectType, Users = new List<UserEntity> { user.Entity } });
-            var projectB = await context.Projects.AddAsync(new ProjectEntity { Name = "Project B", Type = projectType, Users = new List<UserEntity> { user.Entity } });
+            var projectA = await context.Projects.AddAsync(new ProjectEntity { Name = "Project A", Type = projectType, Users = new List<ProjectUserEntity> { new () { User = user.Entity } } });
+            var projectB = await context.Projects.AddAsync(new ProjectEntity { Name = "Project B", Type = projectType, Users = new List<ProjectUserEntity> { new () { User = user.Entity } } });
             await context.SaveChangesAsync();
 
             var response = await _fixture.Client.GetAsync("/api/projects/");
