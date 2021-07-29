@@ -54,7 +54,6 @@ namespace Rat.Api.Test
                 var context = scopedServices.GetRequiredService<RatDbContext>();
                 var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory>>();
 
-
                 context.Database.EnsureDeleted();
 
                 if (databaseEngine.Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
