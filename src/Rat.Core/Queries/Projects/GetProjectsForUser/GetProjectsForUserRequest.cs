@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Rat.Core.Properties;
+using Rat.Core.Commands.Projects;
 
 namespace Rat.Core.Queries.Projects.GetProjectsForUser
 {
@@ -16,19 +16,9 @@ namespace Rat.Core.Queries.Projects.GetProjectsForUser
     {
         public static void Validate(this GetProjectsForUserRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.UserId))
-            {
-                request.Context.ValidationErrors.Add(
-                    GetProjectsForUserRequest.UserId_Signature,
-                    Resources.MustNotBeNullOrEmpty);
+            Validators.ValidateUserId(request.UserId, request.Context);
 
-                request.Context.Status = ProcessingStatus.BadRequest;
-                request.Context.FailureReason = Resources.BadRequest;
-            }
-            else
-            {
-                request.Context.Status = ProcessingStatus.GoodRequest;
-            }
+            Validators.MakeGoodOrBad(request.Context);
         }
     }
 }

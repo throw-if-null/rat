@@ -65,11 +65,11 @@ namespace Rat.Api.Test
                         var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
 
                         if (projectType == null)
-                            context.ProjectTypes.Add(new ProjectType { Name = "js" });
+                            context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
 
                         projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
                         if (projectType == null)
-                            context.ProjectTypes.Add(new ProjectType { Name = "csharp" });
+                            context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
 
                         if (projectType == null)
                             context.SaveChanges();

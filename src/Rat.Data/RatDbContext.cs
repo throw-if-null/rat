@@ -3,15 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Rat.Data.Entities;
 
+using static Rat.Data.DatabaseSchema;
+
 namespace Rat.Data
 {
     public class RatDbContext : DbContext
     {
-        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectEntity> Projects { get; set; }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
 
-        public DbSet<ProjectType> ProjectTypes { get; set; }
+        public DbSet<ProjectTypeEntity> ProjectTypes { get; set; }
 
         public RatDbContext(DbContextOptions<RatDbContext> options) : base(options)
         {
@@ -19,44 +21,44 @@ namespace Rat.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Project>(entity =>
+            modelBuilder.Entity<ProjectEntity>(entity =>
                 {
                     entity.ToTable("Projects");
                     entity.HasKey(e => e.Id);
                     entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-                    entity.Property(e => e.Name).HasMaxLength(248).IsRequired();
+                    entity.Property(e => e.Name).HasMaxLength(ProjectSchema.Max_Name_Length).IsRequired();
 
                     entity.HasOne(e => e.Type);
                     entity.HasMany(e => e.Users).WithMany(u => u.Projects);
                 });
 
-            modelBuilder.Entity<User>(builer =>
+            modelBuilder.Entity<UserEntity>(builer =>
             {
                 builer.ToTable("Users");
 
                 builer.HasKey(x => x.Id);
                 builer.Property(x => x.Id).ValueGeneratedOnAdd();
 
-                builer.Property(x => x.UserId).HasMaxLength(128).IsRequired();
+                builer.Property(x => x.UserId).HasMaxLength(UserSchema.Max_UserId_Length).IsRequired();
             });
 
-            modelBuilder.Entity<ProjectType>(builder =>
+            modelBuilder.Entity<ProjectTypeEntity>(builder =>
             {
                 builder.ToTable("ProjectTypes");
 
                 builder.HasKey(x => x.Id);
                 builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-                builder.Property(x => x.Name).HasMaxLength(64).IsRequired();
+                builder.Property(x => x.Name).HasMaxLength(ProjectTypeSchema.Max_Name_Length).IsRequired();
 
                 builder.HasIndex(x => x.Name).IsUnique();
 
-                builder.HasData(new List<ProjectType>
+                builder.HasData(new List<ProjectTypeEntity>
                 {
-                    new ProjectType {Id = 1, Name = "other"},
-                    new ProjectType {Id = 2, Name = "js"},
-                    new ProjectType {Id = 3, Name = "csharp"}
+                    new ProjectTypeEntity {Id = 1, Name = "other"},
+                    new ProjectTypeEntity {Id = 2, Name = "js"},
+                    new ProjectTypeEntity {Id = 3, Name = "csharp"}
                 });
             });
         }

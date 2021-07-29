@@ -30,7 +30,7 @@ namespace Rat.Core.Commands.Projects.CreateProject
             var project =
                 await
                     _context.Projects.AddAsync(
-                        new Project { Name = request.Name, Type = projectType },
+                        new ProjectEntity { Name = request.Name, Type = projectType },
                         cancellationToken);
 
             var expectedNumberOfChanges = 1;

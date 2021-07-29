@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Rat.Core.Properties;
 
 namespace Rat.Core.Commands.Projects.DeleteProject
 {
@@ -16,19 +15,9 @@ namespace Rat.Core.Commands.Projects.DeleteProject
     {
         public static void Validate(this DeleteProjectRequest request)
         {
-            if (request.Id <= 0)
-            {
-                request.Context.ValidationErrors.Add(
-                    DeleteProjectRequest.ID_SIGNATURE,
-                    Resources.IdMustBeLargerThenZero);
+            Validators.ValidateId(request.Id, request.Context);
 
-                request.Context.Status = ProcessingStatus.BadRequest;
-                request.Context.FailureReason = Resources.BadRequest;
-            }
-            else
-            {
-                request.Context.Status = ProcessingStatus.GoodRequest;
-            }
+            Validators.MakeGoodOrBad(request.Context);
         }
     }
 }
