@@ -14,12 +14,21 @@ namespace Rat.Api.Test
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
     {
-        private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
+		private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
         private const string DefaultDatabaseEngine = "sqllite";
 
         private const string LocalDbConnectionString = "Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;";
 
-        public CustomWebApplicationFactory() : base()
+		private static readonly Func<string> GetDatabaseEngine = delegate () {
+			var engine = Environment.GetEnvironmentVariable(DatabaseEngineEnvironmentVariable);
+
+			if (string.IsNullOrWhiteSpace(engine))
+				engine = DefaultDatabaseEngine;
+
+			return engine;
+		};
+
+		public CustomWebApplicationFactory() : base()
         {
         }
 
@@ -34,14 +43,9 @@ namespace Rat.Api.Test
                 var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
                 services.Remove(descriptor);
 
-                var databaseEngine = Environment.GetEnvironmentVariable(DatabaseEngineEnvironmentVariable);
-
-                if (string.IsNullOrWhiteSpace(databaseEngine))
-                    databaseEngine = DefaultDatabaseEngine;
-
                 services.AddDbContext<RatDbContext>(options =>
                 {
-                    if (databaseEngine.Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
+					if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
                         options.UseSqlite("Data Source=RatDb.db");
                     else
                         options.UseSqlServer(LocalDbConnectionString);
@@ -56,33 +60,35 @@ namespace Rat.Api.Test
 
                 context.Database.EnsureDeleted();
 
-                if (databaseEngine.Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    context.Database.EnsureCreated();
+				if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
+				{
+					context.Database.EnsureCreated();
 
-                    try
-                    {
-                        var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
+					try
+					{
+						var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
 
-                        if (projectType == null)
-                            context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
+						if (projectType == null)
+							context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
 
-                        projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
-                        if (projectType == null)
-                            context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
+						projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
+						if (projectType == null)
+							context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
 
-                        if (projectType == null)
-                            context.SaveChanges();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
+						if (projectType == null)
+							context.SaveChanges();
+					}
+					catch (Exception ex)
+					{
+						logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
 
-                        throw;
-                    }
-                }
-                else
-                    context.Database.Migrate();
+						throw;
+					}
+				}
+				else
+				{
+					context.Database.Migrate();
+				}
             });
         }
     }
