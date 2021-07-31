@@ -28,13 +28,12 @@ namespace Rat.Api.Auth
 		public static IDisposable AppendNameClaim(this ILogger logger, string nameClaim) => _appendNameClaim(logger, nameClaim);
 		public static IDisposable AppendUserId(this ILogger logger, string userId) => _appendUserId(logger, userId);
 
+		public static void ProcessingStartedDebug(this ILogger logger) => _debug(logger, "Processing started", default!);
+		public static void ProcessingFinishedDebug(this ILogger logger) => _debug(logger, "Processing finished", default!);
 
 		public static void UserInHttpContexIsNullWarning(this ILogger logger) => _extractUserIdFailedWarning(logger, "HttpContext.User is null", default!);
 		public static void IdentityInUserIsNullWarning(this ILogger logger) => _extractUserIdFailedWarning(logger, "HttpContext.User.Identity is null", default!);
 		public static void NameClaimIsNullOrEmptyWarning(this ILogger logger) => _extractUserIdFailedWarning(logger, "Identity.Name is null/empty. Check the sub claim", default!);
 		public static void NameClaimShouldContainPipe(this ILogger logger) => _extractUserIdFailedWarning(logger, "Identity.Name should contain |", default!);
-
-		public static void ProcessingStartedDebug(this ILogger logger) => _debug(logger, "Processing started", default!);
-		public static void ProcessingFinishedDebug(this ILogger logger) => _debug(logger, "Processing finished", default!);
 	}
 }
