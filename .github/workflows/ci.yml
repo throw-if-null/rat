@@ -30,6 +30,8 @@ jobs:
           POSTGRES_USER: sa
           POSTGRES_PASSWORD: Password1!
           POSTGRES_DB: RatDb
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
