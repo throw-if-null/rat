@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Rat.Data.Migrations
 {
@@ -10,9 +11,9 @@ namespace Rat.Data.Migrations
                 name: "ProjectType",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -23,9 +24,9 @@ namespace Rat.Data.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,10 +37,10 @@ namespace Rat.Data.Migrations
                 name: "Project",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(248)", maxLength: 248, nullable: false),
-                    TypeId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(248)", maxLength: 248, nullable: false),
+                    TypeId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -56,8 +57,8 @@ namespace Rat.Data.Migrations
                 name: "ProjectUser",
                 columns: table => new
                 {
-                    ProjectId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    ProjectId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,17 +80,12 @@ namespace Rat.Data.Migrations
             migrationBuilder.InsertData(
                 table: "ProjectType",
                 columns: new[] { "Id", "Name" },
-                values: new object[] { 1, "other" });
-
-            migrationBuilder.InsertData(
-                table: "ProjectType",
-                columns: new[] { "Id", "Name" },
-                values: new object[] { 2, "js" });
-
-            migrationBuilder.InsertData(
-                table: "ProjectType",
-                columns: new[] { "Id", "Name" },
-                values: new object[] { 3, "csharp" });
+                values: new object[,]
+                {
+                    { 1, "other" },
+                    { 2, "js" },
+                    { 3, "csharp" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Project_TypeId",

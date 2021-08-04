@@ -14,7 +14,7 @@ namespace Rat.Data
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new ArgumentException("Connection string for RatDb is not set");
 
-            services.AddDbContext<RatDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<RatDbContext>(options => options.UseNpgsql(connectionString));
 
             return services;
         }

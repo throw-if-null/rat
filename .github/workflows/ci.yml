@@ -16,13 +16,27 @@ jobs:
       DOCKER_REPOSITORY: rat
 
     services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2019-latest
+      #sqlserver:
+      #  image: mcr.microsoft.com/mssql/server:2019-latest
+      #  env:
+      #    ACCEPT_EULA: Y
+      #    SA_PASSWORD: Password1!
+      #  ports:
+      #    - 1433:1433
+
+      postgres:
+        image: postgres
         env:
-          ACCEPT_EULA: Y
-          SA_PASSWORD: Password1!
+          POSTGRES_USER: sa
+          POSTGRES_PASSWORD: Password1!
+          POSTGRES_DB: RatDb
         ports:
-          - 1433:1433
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Set up JDK 11
@@ -97,7 +111,7 @@ jobs:
         env:
           TEST_PROJECT_PATH: ./src/Rat.sln
           TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
-          DATABASE_ENGINE: sqlserver
+          DATABASE_ENGINE: postgres
         with:
           project_path: ${{ env.TEST_PROJECT_PATH }}
           report_name: Test report
