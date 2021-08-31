@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rat.Api.Auth;
-using Rat.Api.Test._.Mocks;
+using Rat.Api.Test.Mocks;
 using Rat.Data;
 using Rat.Data.Entities;
 
@@ -64,26 +64,17 @@ namespace Rat.Api.Test
 				{
 					context.Database.EnsureCreated();
 
-					try
-					{
-						var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
+					var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
 
-						if (projectType == null)
-							context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
+					if (projectType == null)
+						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
 
-						projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
-						if (projectType == null)
-							context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
+					projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
+					if (projectType == null)
+						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
 
-						if (projectType == null)
-							context.SaveChanges();
-					}
-					catch (Exception ex)
-					{
-						logger.LogError(ex, "Seeding database failed. Error: {Message}", ex.Message);
-
-						throw;
-					}
+					if (projectType == null)
+						context.SaveChanges();
 				}
 				else
 				{
