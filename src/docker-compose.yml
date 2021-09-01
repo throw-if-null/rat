@@ -10,8 +10,8 @@ services:
 
   #sqlserver:
   #  <<: *base-service-template
-  #  image: mcr.microsoft.com/mssql/server:2019-latest
   #  container_name: sqlserver
+  #  image: mcr.microsoft.com/mssql/server:2019-latest
   #  environment:
   #    - ACCEPT_EULA=Y
   #    - SA_PASSWORD=${SQLSERVER_SA_PASSWORD:-Password1!}
@@ -26,8 +26,8 @@ services:
 
   postgresql:
     <<: *base-service-template
-    image: postgres
     container_name: postgresql
+    image: postgres
     environment:
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=Password1!
@@ -40,9 +40,10 @@ services:
   rat-api:
     <<: *base-service-template
     container_name: rat-api
-    build:
-      context: .
-      dockerfile: Rat.Api/Dockerfile
+    image: throwifnull/rat:latest
+    #build:
+    #  context: .
+    #  dockerfile: Rat.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       # SQL Connection string:
