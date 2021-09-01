@@ -57,8 +57,9 @@ services:
       retries: 3
       start_period: 1s
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      postgresql
+      #  sqlserver:
+      #    condition: service_healthy
     ports:
       - "8485:80"
 
