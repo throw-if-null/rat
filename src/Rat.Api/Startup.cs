@@ -26,32 +26,25 @@ namespace Rat.Api
     {
         private static readonly string[] CORS_ALLOW_ALL = new string[1] { "*" };
 
-        private readonly IWebHostEnvironment _env;
+        private readonly IWebHostEnvironment _environment;
+		private readonly IConfiguration _configuration;
 
-        /// <summary>
-        /// Initializes new instance of <see cref="Startup"/>
-        /// </summary>
-        /// <param name="env"></param>
-        public Startup(IWebHostEnvironment env)
+		/// <summary>
+		/// Initializes new instance of <see cref="Startup"/>
+		/// </summary>
+		public Startup(IWebHostEnvironment env, IConfiguration configuration)
+		{
+			_environment = env;
+			_configuration = configuration;
+		}
+
+		/// <summary>
+		///
+		/// </summary>
+		/// <param name="services"></param>
+		/// <returns></returns>
+		public void ConfigureServices(IServiceCollection services)
         {
-            _env = env;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public void ConfigureServices(IServiceCollection services)
-        {
-            IConfigurationRoot configuration =
-                new ConfigurationBuilder()
-                    .SetBasePath(_env.ContentRootPath)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .Build();
-
             services.AddLogging(x =>
             {
                 x.Configure(options =>
@@ -59,11 +52,9 @@ namespace Rat.Api
                         ActivityTrackingOptions.SpanId |
                         ActivityTrackingOptions.TraceId |
                         ActivityTrackingOptions.ParentId);
-
-                x.AddSimpleConsole();
             });
 
-            var healthCheckTimeout = configuration.GetValue<int>("HealthCheckOptions:TimeoutMs");
+            var healthCheckTimeout = _configuration.GetValue<int>("HealthCheckOptions:TimeoutMs");
             healthCheckTimeout = healthCheckTimeout == default ? 30 : healthCheckTimeout;
 
             services
@@ -92,14 +83,14 @@ namespace Rat.Api
                     .Build();
             }
 
-            var domain = $"https://{configuration["Auth0:Domain"]}";
+            var domain = $"https://{_configuration["Auth0:Domain"]}";
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.Authority = domain;
-                    options.Audience = $"https://{configuration["Auth0:Audience"]}";
+                    options.Audience = $"https://{_configuration["Auth0:Audience"]}";
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         NameClaimType = ClaimTypes.NameIdentifier
@@ -115,7 +106,7 @@ namespace Rat.Api
 
             services.AddCommandsAndQueries();
 
-            services.AddRatDbContext(configuration);
+            services.AddRatDbContext(_configuration);
         }
 
         /// <summary>
@@ -124,7 +115,7 @@ namespace Rat.Api
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app)
         {
-            if (_env.IsDevelopment())
+            if (_environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-local");
             }
