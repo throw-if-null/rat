@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Rat.Core.Observability.Logging;
 
 namespace Rat.Api.Auth
 {
-    public sealed class UserProvider : IUserProvider
+	public sealed class UserProvider : IUserProvider
     {
         private static readonly string Method = $"{nameof(UserProvider)}.{nameof(GetUserId)}";
 
@@ -21,45 +20,44 @@ namespace Rat.Api.Auth
         {
             var user = _contextAccessor.HttpContext.User;
 
-            using var _ = _logger.BeginScope("{Method}", Method);
+            using var _ = _logger.AppendMethodScope(Method);
+			_logger.ProcessingStartedDebug();
 
             if (user == null)
             {
-                _logger.LogWarning(LogEvents.ExtractUserIdFromHttpContext, "HttpContext.User is null");
+                _logger.UserInHttpContexIsNullWarning();
 
                 return null;
             }
 
             if (user.Identity == null)
             {
-                _logger.LogWarning(LogEvents.ExtractUserIdFromHttpContext, "HttpContext.User.Identity is null");
+                _logger.IdentityInUserIsNullWarning();
 
                 return null;
             }
 
             var name = user.Identity.Name;
-            using var __ = _logger.BeginScope("{NameClaim}", name);
+            using var __ = _logger.AppendNameClaim(name);
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                _logger.LogWarning(LogEvents.ExtractUserIdFromHttpContext, "Identity.Name is null/empty. Check the sub claim");
+                _logger.NameClaimIsNullOrEmptyWarning();
 
                 return null;
             }
 
             if (!name.Contains('|'))
             {
-                _logger.LogWarning(
-                    LogEvents.ExtractUserIdFromHttpContext,
-                    "Identity.Name should contain |", name);
+                _logger.NameClaimShouldContainPipe();
 
                 return null;
             }
 
             var userId = name.Split('|')[1];
 
-            using var ___ = _logger.BeginScope("{UserId}", userId);
-            _logger.LogInformation("{Method} finished");
+            using var ___ = _logger.AppendUserId(userId);
+            _logger.ProcessingFinishedDebug();
 
             return userId;
         }

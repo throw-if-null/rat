@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Rat.Api.Auth;
 
-namespace Rat.Api.Test._.Mocks
+namespace Rat.Api.Test.Mocks
 {
     public class TestUserProvider : IUserProvider
     {
