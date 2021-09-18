@@ -7,6 +7,6 @@
         GoodRequest = 2,
         BadRequest = 4,
         NotFound = 8,
-        Error = 16
-    }
+		Error = 32
+	}
 }

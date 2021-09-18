@@ -5,7 +5,9 @@ namespace Rat.Api.Test.Mocks
 {
     public class TestUserProvider : IUserProvider
     {
-        private readonly IHttpContextAccessor _contextAccessor;
+		public const string UserId = "3feslrj3ssd111";
+
+		private readonly IHttpContextAccessor _contextAccessor;
 
         public TestUserProvider(IHttpContextAccessor contextAccessor)
         {
@@ -25,7 +27,7 @@ namespace Rat.Api.Test.Mocks
                 return value;
             }
 
-            return "3feslrj3ssd111";
+            return UserId;
         }
     }
 }

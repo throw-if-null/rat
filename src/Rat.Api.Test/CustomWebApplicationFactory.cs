@@ -70,11 +70,21 @@ namespace Rat.Api.Test
 						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
 
 					projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
+
 					if (projectType == null)
 						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
 
 					if (projectType == null)
 						context.SaveChanges();
+
+					var user = context.Users.FirstOrDefault(x => x.UserId == "3feslrj3ssd111");
+
+					if (user == null)
+					{
+						context.Users.Add(new UserEntity { UserId = "3feslrj3ssd111" });
+
+						context.SaveChanges();
+					}
 				}
 				else
 				{

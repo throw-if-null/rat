@@ -7,7 +7,7 @@ using static Rat.Data.DatabaseSchema;
 
 namespace Rat.Data
 {
-    public class RatDbContext : DbContext
+	public class RatDbContext : DbContext
     {
         public DbSet<ProjectEntity> Projects { get; set; }
 
@@ -15,6 +15,7 @@ namespace Rat.Data
 
         public DbSet<ProjectTypeEntity> ProjectTypes { get; set; }
 
+		public DbSet<ProjectUserEntity> ProjectUsers { get; set; }
         public RatDbContext(DbContextOptions<RatDbContext> options) : base(options)
         {
         }
