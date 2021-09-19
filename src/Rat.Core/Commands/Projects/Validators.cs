@@ -40,7 +40,17 @@ namespace Rat.Core.Commands.Projects
             }
         }
 
-        public static void ValidateProjectType(ProjectTypeEntity projectType, RatContext context)
+		public static void ValidateUser(UserEntity user, RatContext context)
+		{
+			if (user == null)
+			{
+				context.ValidationErrors.Add(
+					CreateProjectRequest.UserId_Signature,
+					Resources.NotFound);
+			}
+		}
+
+		public static void ValidateProjectType(ProjectTypeEntity projectType, RatContext context)
         {
             if (projectType == null)
             {
@@ -50,7 +60,7 @@ namespace Rat.Core.Commands.Projects
             }
         }
 
-        public static void ValidateUserId(string userId, RatContext context)
+		public static void ValidateUserId(string userId, RatContext context)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {

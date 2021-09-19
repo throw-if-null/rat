@@ -64,23 +64,38 @@ namespace Rat.Api.Test
 				{
 					context.Database.EnsureCreated();
 
-					var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "js");
-
-					if (projectType == null)
-						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "js" });
-
-					projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == "csharp");
-					if (projectType == null)
-						context.ProjectTypes.Add(new ProjectTypeEntity { Name = "csharp" });
-
-					if (projectType == null)
-						context.SaveChanges();
+					AddProjectType(context, "js");
+					AddProjectType(context, "csharp");
 				}
 				else
 				{
 					context.Database.Migrate();
 				}
+
+				AddUser(context);
 			});
+		}
+
+		private static void AddProjectType(RatDbContext context, string name)
+		{
+			var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == name);
+
+			if (projectType == null)
+				context.ProjectTypes.Add(new ProjectTypeEntity { Name = name });
+
+			context.SaveChanges();
+		}
+
+		private static void AddUser(RatDbContext context)
+		{
+			var user = context.Users.FirstOrDefault(x => x.UserId == TestUserProvider.UserId);
+
+			if (user == null)
+			{
+				context.Users.Add(new UserEntity { UserId = TestUserProvider.UserId });
+
+				context.SaveChanges();
+			}
 		}
 	}
 }

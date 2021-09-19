@@ -67,16 +67,27 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_Projects_For_User()
         {
-            using var scope = _fixture.Provider.CreateScope();
+			var userId = "3er4werlj21x";
+
+			using var scope = _fixture.Provider.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
-            var user = await context.Users.AddAsync(new UserEntity { UserId = "3feslrj3ssd111" });
+            var user = await context.Users.AddAsync(new UserEntity { UserId = userId });
 
 			await context.Projects.AddAsync(new ProjectEntity { Name = "Project A", Type = projectType, Users = new List<ProjectUserEntity> { new() { User = user.Entity } } });
 			await context.Projects.AddAsync(new ProjectEntity { Name = "Project B", Type = projectType, Users = new List<ProjectUserEntity> { new() { User = user.Entity } } });
             await context.SaveChangesAsync();
 
-            var response = await _fixture.Client.GetAsync("/api/projects/");
+			var request = new HttpRequestMessage
+			{
+				Method = HttpMethod.Get,
+				RequestUri = new Uri("/api/projects/", uriKind: UriKind.Relative)
+			};
+
+			request.Headers.Add("test-user", userId);
+
+			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             using (var content = await response.Content.ReadAsStreamAsync())
@@ -90,9 +101,10 @@ namespace Rat.Api.Test.Controllers.Project
                     projects,
                     x =>
                     {
-                        x.IgnoreFields<int>("ProjectStats[*].Id");
+						x.IgnoreFields<int>("UserId");
+						x.IgnoreFields<int>("ProjectStats[*].Id");
 
-                        return x;
+						return x;
                     });
             }
         }
