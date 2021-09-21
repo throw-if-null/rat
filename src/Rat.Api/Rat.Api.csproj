@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Rat.Core\Rat.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Rat.Api.Test" />
+  </ItemGroup>
+
 </Project>
