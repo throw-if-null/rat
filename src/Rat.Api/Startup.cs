@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Exceptionless;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -101,7 +102,14 @@ namespace Rat.Api
 
             services.AddMvc(x => x.EnableEndpointRouting = false);
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			var exceptionlessKey = _configuration.GetValue<string>("Exceptionless:Key");
+
+			if (string.IsNullOrWhiteSpace(exceptionlessKey))
+				throw new ArgumentException("Exceptionless key is not set");
+
+			services.AddExceptionless(exceptionlessKey);
+
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IUserProvider, UserProvider>();
 
             services.AddCommandsAndQueries();
@@ -115,7 +123,9 @@ namespace Rat.Api
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app)
         {
-            if (_environment.IsDevelopment())
+			app.UseExceptionless();
+
+			if (_environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-local");
             }
