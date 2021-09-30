@@ -1,7 +1,5 @@
 # Rat
-[![CI](https://github.com/throw-if-null/rat.api/actions/workflows/ci.yml/badge.svg)](https://github.com/throw-if-null/rat.api/actions/workflows/ci.yml) 
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=throw-if-null_rat.api&metric=coverage)](https://sonarcloud.io/dashboard?id=throw-if-null_rat.api) 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=throw-if-null_rat.api&metric=alert_status)](https://sonarcloud.io/dashboard?id=throw-if-null_rat.api)
+[![CI](https://github.com/throw-if-null/rat/actions/workflows/ci.yml/badge.svg)](https://github.com/throw-if-null/rat/actions/workflows/ci.yml) 
 
 # :rat: Rat
 
