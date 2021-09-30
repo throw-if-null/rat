@@ -1,7 +1,24 @@
-# [Rat Api](https://github.com/throw-if-null/rat/blob/branch-0/Rat/documentation/api/rat-api.md)
+# Rat
 [![CI](https://github.com/throw-if-null/rat.api/actions/workflows/ci.yml/badge.svg)](https://github.com/throw-if-null/rat.api/actions/workflows/ci.yml) 
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=throw-if-null_rat.api&metric=coverage)](https://sonarcloud.io/dashboard?id=throw-if-null_rat.api) 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=throw-if-null_rat.api&metric=alert_status)](https://sonarcloud.io/dashboard?id=throw-if-null_rat.api)
+
+# :rat: Rat
+
+The :rat: is configuration manager mediator that is capable of importing data from different sources.  
+Currently: _JSON file_, _MongoDb_ and/or _evnironment variables_ with goal to extend that support towrads: _Consul_, _ETCD_, _MS SQL_ other :rat: instance(s) and probable some other sources.
+
+# Motivation
+Maintaing and handling configuration is one of more tedious and at some point complex problems that you need to resolve when building your application(s). Even if you have just one application the amount of configuration can be huge, or it can be just couple of keys and a connection string that after a few years become a page that requires a documentation!  
+Now there are many ways to store your configuration entries if the file is becoming to cumbersome, you could just store it in the database and be done with it, or go with enterprise solutions like [Consul](https://www.consul.io/docs/agent/kv.html) or [ETCD](https://etcd.io/). [Consul](https://www.consul.io/docs/agent/kv.html) even offers you a very nice [UI](https://learn.hashicorp.com/consul/getting-started/ui) for managing your configuration keys.  
+So, why yet another configuration manager?  
+Because of need for something simple - yet very extendable.  
+Something that can have a lifecycle of a "simple" API.  
+Something that is capable of importing configurations from different sources: files, databases, KV stores or even other APIs.  
+Something that can fit into an already matured environment that has lots of different services: legacy, old and new that are going to be built.  
+Something that will not require extra work, or huge refactoring in order to become a single source of truth.  
+
+So, that's how the idea for :rat: came to life. 
 
 # Build
 
