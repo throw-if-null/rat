@@ -1,73 +1,67 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Rat.Data;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Rat.Api.Routes;
 
-namespace Rat.Api
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMediatR(new Program().GetType().Assembly);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services
+	.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(
+		JwtBearerDefaults.AuthenticationScheme,
+		configureOptions =>
+		{
+			configureOptions.Authority = $"{builder.Configuration["Auth0:Domain"]}";
+			configureOptions.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+			{
+				ValidAudience = builder.Configuration["Auth0:Audience"],
+				ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
+			};
+		});
+
+builder.Services.AddAuthorization(configureOptions =>
 {
-    [ExcludeFromCodeCoverage]
-    internal static class Program
-    {
-        internal static async Task Main(string[] args)
-        {
-            var cancellationSource = new CancellationTokenSource();
+	configureOptions.AddPolicy(
+		"MustHaveAuthenticatedUser",
+		policy => policy.RequireAuthenticatedUser());
+});
 
-            Console.CancelKeyPress += (s, e) =>
-            {
-                cancellationSource.Cancel();
-                e.Cancel = true;
-            };
+WebApplication? app = builder.Build();
 
-            var host = CreateHostBuilder(args).Build();
-
-            var environment = host.Services.GetRequiredService<IWebHostEnvironment>();
-
-            if (environment.IsDevelopment())
-                await MigrateDatabase(host.Services, cancellationSource.Token);
-
-            await host.RunAsync(cancellationSource.Token);
-        }
-
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-
-        private static async Task MigrateDatabase(IServiceProvider provider, CancellationToken cancellation)
-        {
-            var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger(nameof(Program));
-
-            using var scope = provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-
-            var pendingMigration = (await context.Database.GetPendingMigrationsAsync(cancellation)).ToArray();
-            logger.LogInformation($"Number of pending migrations: {pendingMigration.Length}", Array.Empty<object>());
-
-            await context.Database.MigrateAsync(cancellation);
-            logger.LogInformation("Database migrated successfully", Array.Empty<object>());
-
-            var migrations = (await context.Database.GetAppliedMigrationsAsync(cancellation)).ToArray();
-
-            logger.LogInformation($"Total number of applied migrations: {migrations.Length}", Array.Empty<object>());
-
-            var builder = new StringBuilder();
-            for (int i = 0; i < migrations.Length; i++)
-            {
-                builder.AppendLine($"Migration [{i}]: {migrations[i]}");
-            }
-
-            logger.LogInformation(builder.ToString(), Array.Empty<object>());
-        }
-    }
+if (app.Environment.IsDevelopment())
+{
+	app.UseDeveloperExceptionPage();
 }
+
+app.MapSwagger();
+app.UseSwaggerUI();
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.Use(async (ctx, next) =>
+{
+	try
+	{
+		await next();
+	}
+	catch (BadHttpRequestException ex)
+	{
+		ctx.Response.StatusCode = ex.StatusCode;
+		await ctx.Response.WriteAsync(ex.Message);
+	}
+});
+
+CreateProjectRoute.Map(app);
+GetProjectsForUserRoute.Map(app);
+GetProjectRoute.Map(app);
+UpdateProjectRoute.Map(app);
+DeleteProjectRoute.Map(app);
+
+app.Run();

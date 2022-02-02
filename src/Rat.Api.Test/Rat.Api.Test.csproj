@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rat.Api\Rat.Api.csproj" />
+    <ProjectReference Include="..\Rat.Api.Old\Rat.Api.Old.csproj" />
   </ItemGroup>
 
 </Project>

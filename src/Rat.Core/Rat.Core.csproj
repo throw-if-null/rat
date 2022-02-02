@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Rat.Api" />
+    <InternalsVisibleTo Include="Rat.Api.Old" />
     <InternalsVisibleTo Include="Rat.Api.Test" />
   </ItemGroup>
 
