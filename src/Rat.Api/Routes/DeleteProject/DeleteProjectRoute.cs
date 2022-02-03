@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Rat.Core;
+using Rat.Core.Commands.Projects.DeleteProject;
 
 namespace Rat.Api.Routes
 {
@@ -10,9 +12,14 @@ namespace Rat.Api.Routes
 				endpoints
 					.MapDelete(
 						"/api/project/{id:int}",
-						(int id, IMediator mediator) =>
+						async (int id, IMediator mediator) =>
 						{
-							return;
+							var response = await mediator.Send(new DeleteProjectRequest { Id = id });
+
+							if (response.Context.Status != ProcessingStatus.Ok)
+								return HttpResponseHandler.HandleUnscusseful(response.Context);
+
+							return Results.Ok();
 						})
 					.RequireAuthorization()
 					.WithName("DeleteProject");

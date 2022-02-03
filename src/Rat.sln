@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Api.Old", "Rat.Api.Old\Rat.Api.Old.csproj", "{57739FB2-668F-4480-9A86-E91CD888B360}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Api.Test", "Rat.Api.Test\Rat.Api.Test.csproj", "{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".docker", ".docker", "{CADA4485-4CDC-439E-AE75-B55AF7C92362}"
@@ -25,9 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rat.Api", "Rat.Api\Rat.Api.csproj", "{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Api", "Rat.Api\Rat.Api.csproj", "{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +31,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{57739FB2-668F-4480-9A86-E91CD888B360}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57739FB2-668F-4480-9A86-E91CD888B360}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57739FB2-668F-4480-9A86-E91CD888B360}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57739FB2-668F-4480-9A86-E91CD888B360}.Release|Any CPU.Build.0 = Release|Any CPU
 		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,10 +43,6 @@ Global
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -64,11 +52,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{57739FB2-668F-4480-9A86-E91CD888B360} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
 		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB} = {AC202AF0-DDDA-4F3C-B0F5-7FBAF621BD5F}
 		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
 		{7F2C3499-F9CC-4FC0-89BB-02FD8D1F041A} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
-		{419E9C11-D69D-4DAB-9FD6-31EF3AD14EE7} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
 		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

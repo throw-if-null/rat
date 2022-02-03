@@ -24,8 +24,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Rat.Api.Old\Rat.Api.Old.csproj" />
-  </ItemGroup>
-
 </Project>

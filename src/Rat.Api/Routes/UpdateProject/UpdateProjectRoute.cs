@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Rat.Api.Routes.Data;
+using Rat.Core;
+using Rat.Core.Commands.Projects.PatchProject;
 
 namespace Rat.Api.Routes
 {
@@ -11,9 +13,14 @@ namespace Rat.Api.Routes
 				endpoints
 					.MapPut(
 						"/api/project",
-						(UpdateProjectRouteInput input, IMediator mediator) =>
+						async (UpdateProjectRouteInput input, IMediator mediator) =>
 						{
-							return new UpdateProjectRouteOutput(1, "test", 1);
+							var response = await mediator.Send(new PatchProjectRequest { Id = input.Id, Name = input.Name, ProjectTypeId = input.TypeId });
+
+							if (response.Context.Status != ProcessingStatus.Ok)
+								return HttpResponseHandler.HandleUnscusseful(response.Context);
+
+							return Results.Ok(new UpdateProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
 						})
 					.RequireAuthorization()
 					.WithName("UpdateProject");

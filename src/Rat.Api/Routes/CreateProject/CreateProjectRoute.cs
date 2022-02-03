@@ -1,5 +1,8 @@
 ﻿using MediatR;
+using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
+using Rat.Core;
+using Rat.Core.Commands.Projects.CreateProject;
 
 namespace Rat.Api.Routes
 {
@@ -11,7 +14,20 @@ namespace Rat.Api.Routes
 				endpoints
 					.MapPost(
 						"/api/project",
-						(CreateProjectRouteInput model, IMediator mediator) => { return new CreateProjectRouteOutput(1, "test", 1); })
+						async (CreateProjectRouteInput model, IMediator mediator, IUserProvider userProvider) =>
+						{
+							var userId = userProvider.GetUserId();
+
+							if (string.IsNullOrWhiteSpace(userId))
+								return Results.Forbid();
+
+							var response = await mediator.Send(new CreateProjectRequest { Name = model.Name, ProjectTypeId = model.TypeId, UserId = userId });
+
+							if (response.Context.Status != ProcessingStatus.Ok)
+								return HttpResponseHandler.HandleUnscusseful(response.Context);
+
+							return Results.Ok(new CreateProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
+						})
 					.RequireAuthorization()
 					.WithName("CreateProject");
 

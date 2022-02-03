@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Rat.Api.Routes.Data;
+using Rat.Core;
+using Rat.Core.Queries.Projects.GetProjectById;
 
 namespace Rat.Api.Routes
 {
@@ -11,11 +13,16 @@ namespace Rat.Api.Routes
 				endpoints
 					.MapGet(
 						"/api/project/{id:int}",
-						(int id, IMediator mediator) =>
+						async (int id, IMediator mediator) =>
 						{
-							return new GetProjectRouteOutput(id, "test", 1);
+							var response = await mediator.Send(new GetProjectByIdRequest { Id = id });
+
+							if (response.Context.Status != ProcessingStatus.Ok)
+								return HttpResponseHandler.HandleUnscusseful(response.Context);
+
+							return Results.Ok(new GetProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
 						})
-					//.RequireAuthorization()
+					.RequireAuthorization()
 					.WithName("GetProjectsById");
 
 			return builder;
