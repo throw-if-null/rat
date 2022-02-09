@@ -60,7 +60,7 @@ namespace Rat.Api.Test.Controllers.Project
             var projectId = project.Entity.Id.ToString();
 
             var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

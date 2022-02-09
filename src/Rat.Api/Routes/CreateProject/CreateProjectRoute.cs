@@ -8,12 +8,12 @@ namespace Rat.Api.Routes
 {
 	public static class CreateProjectRoute
 	{
-		public static RouteHandlerBuilder Map(IEndpointRouteBuilder endpoints)
+		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
 				endpoints
 					.MapPost(
-						"/api/project",
+						"/api/projects",
 						async (CreateProjectRouteInput model, IMediator mediator, IUserProvider userProvider) =>
 						{
 							var userId = userProvider.GetUserId();
@@ -26,10 +26,14 @@ namespace Rat.Api.Routes
 							if (response.Context.Status != ProcessingStatus.Ok)
 								return HttpResponseHandler.HandleUnscusseful(response.Context);
 
-							return Results.Ok(new CreateProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
+							return Results.CreatedAtRoute("CreateProject", null, new CreateProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
 						})
 					.RequireAuthorization()
-					.WithName("CreateProject");
+					.WithName("CreateProject")
+					.Produces(StatusCodes.Status201Created, typeof(CreateProjectRouteOutput), "application/json")
+					.Accepts<CreateProjectRouteInput>("application/json")
+					.ProducesValidationProblem()
+					.ProducesProblem(StatusCodes.Status403Forbidden);
 
 			return builder;
 		}

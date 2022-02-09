@@ -6,15 +6,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.Api.Controllers.Projects.Models;
+using Rat.Api.Routes.Data;
 using Rat.Data;
 using Rat.Data.Entities;
-using Rat.Data.Views;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [Collection("Integration")]
+	[Collection("Integration")]
     public class PatchProjectTests
     {
         private readonly RatFixture _fixture;
@@ -37,19 +36,14 @@ namespace Rat.Api.Test.Controllers.Project
             var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = jsType });
             await context.SaveChangesAsync();
 
-            var model = new PatchProjectModel
-            {
-                Id = project.Entity.Id,
-                Name = "New test",
-                TypeId = csharpType.Id
-            };
+            var model = new UpdateProjectRouteInput(project.Entity.Id, "New test", csharpType.Id);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<UpdateProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("New test", content.Name);
@@ -69,14 +63,9 @@ namespace Rat.Api.Test.Controllers.Project
             var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
             await context.SaveChangesAsync();
 
-            var model = new PatchProjectModel()
-            {
-                Id = project.Entity.Id,
-                Name = name,
-                TypeId = projectType.Id
-            };
+			var model = new UpdateProjectRouteInput(project.Entity.Id, name, projectType.Id);
 
-            var response = await _fixture.Client.PatchAsync(
+			var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
@@ -96,12 +85,7 @@ namespace Rat.Api.Test.Controllers.Project
             context.Projects.Remove(project.Entity);
             await context.SaveChangesAsync();
 
-            var model = new PatchProjectModel()
-            {
-                Id = project.Entity.Id,
-                Name = "Rat",
-                TypeId = projectType.Id
-            };
+			var model = new UpdateProjectRouteInput(project.Entity.Id, "Rat", projectType.Id);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",

@@ -7,12 +7,12 @@ namespace Rat.Api.Routes
 {
 	internal static class GetProjectRoute
 	{
-		public static RouteHandlerBuilder Map(IEndpointRouteBuilder endpoints)
+		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
 				endpoints
 					.MapGet(
-						"/api/project/{id:int}",
+						"/api/projects/{id:int}",
 						async (int id, IMediator mediator) =>
 						{
 							var response = await mediator.Send(new GetProjectByIdRequest { Id = id });
@@ -23,7 +23,11 @@ namespace Rat.Api.Routes
 							return Results.Ok(new GetProjectRouteOutput(response.Project.Id, response.Project.Name, response.Project.TypeId));
 						})
 					.RequireAuthorization()
-					.WithName("GetProjectsById");
+					.WithName("GetProjectsById")
+					.Produces(StatusCodes.Status200OK, typeof(GetProjectRouteOutput), "application/json")
+					.ProducesValidationProblem()
+					.ProducesProblem(StatusCodes.Status403Forbidden)
+					.ProducesProblem(StatusCodes.Status404NotFound);
 
 			return builder;
 		}

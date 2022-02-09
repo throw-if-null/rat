@@ -6,12 +6,12 @@ namespace Rat.Api.Routes
 {
 	internal static class DeleteProjectRoute
 	{
-		public static RouteHandlerBuilder Map(IEndpointRouteBuilder endpoints)
+		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
 				endpoints
 					.MapDelete(
-						"/api/project/{id:int}",
+						"/api/projects/{id:int}",
 						async (int id, IMediator mediator) =>
 						{
 							var response = await mediator.Send(new DeleteProjectRequest { Id = id });
@@ -19,10 +19,14 @@ namespace Rat.Api.Routes
 							if (response.Context.Status != ProcessingStatus.Ok)
 								return HttpResponseHandler.HandleUnscusseful(response.Context);
 
-							return Results.Ok();
+							return Results.NoContent();
 						})
 					.RequireAuthorization()
-					.WithName("DeleteProject");
+					.WithName("DeleteProject")
+					.Produces(StatusCodes.Status204NoContent)
+					.ProducesValidationProblem()
+					.ProducesProblem(StatusCodes.Status403Forbidden)
+					.ProducesProblem(StatusCodes.Status404NotFound);
 
 			return builder;
 		}

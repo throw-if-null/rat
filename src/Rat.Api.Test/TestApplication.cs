@@ -1,18 +1,26 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rat.Api.Auth;
+using Rat.Api.Test.Auth;
 using Rat.Api.Test.Mocks;
 using Rat.Data;
 using Rat.Data.Entities;
 
 namespace Rat.Api.Test
 {
-	public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
+	internal class TestApplication : WebApplicationFactory<Program>
 	{
 		private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
 		private const string DefaultDatabaseEngine = "sqllite";
@@ -28,12 +36,27 @@ namespace Rat.Api.Test
 			return engine;
 		};
 
-		public CustomWebApplicationFactory() : base()
+		public TestApplication() : base()
 		{
 		}
 
-		protected override void ConfigureWebHost(IWebHostBuilder builder)
+		protected override void ConfigureClient(HttpClient client)
 		{
+			client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
+		}
+
+		protected override IHost CreateHost(IHostBuilder builder)
+		{
+			builder.UseEnvironment("Development");
+
+			builder.ConfigureAppConfiguration(configurationBuilder =>
+			{
+				configurationBuilder
+					.SetBasePath(Directory.GetCurrentDirectory())
+					.AddJsonFile("appsettings.test.json", optional: false, reloadOnChange: true)
+					.AddEnvironmentVariables();
+			});
+
 			builder.ConfigureServices(services =>
 			{
 				services.AddHttpClient();
@@ -42,6 +65,10 @@ namespace Rat.Api.Test
 
 				var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
 				services.Remove(descriptor);
+
+				services
+					.AddAuthentication("Test")
+					.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
 
 				services.AddDbContext<RatDbContext>(options =>
 				{
@@ -56,7 +83,7 @@ namespace Rat.Api.Test
 
 				var scopedServices = scope.ServiceProvider;
 				var context = scopedServices.GetRequiredService<RatDbContext>();
-				var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory>>();
+				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
 				context.Database.EnsureDeleted();
 
@@ -74,6 +101,8 @@ namespace Rat.Api.Test
 
 				AddUser(context);
 			});
+
+			return base.CreateHost(builder);
 		}
 
 		private static void AddProjectType(RatDbContext context, string name)

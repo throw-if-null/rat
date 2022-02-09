@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Rat.Api.Routes.Data;
 using Rat.Data;
 using Rat.Data.Entities;
 using Rat.Data.Views;
@@ -40,7 +41,7 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<GetProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Snapshot.Match(
                 content,
@@ -93,7 +94,7 @@ namespace Rat.Api.Test.Controllers.Project
             using (var content = await response.Content.ReadAsStreamAsync())
             {
                 var projects =
-                    await JsonSerializer.DeserializeAsync<UserProjectStatsView>(
+                    await JsonSerializer.DeserializeAsync<GetProjectForUserRouteOutput>(
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -126,8 +127,8 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-                UserProjectStatsView projects =
-                    await JsonSerializer.DeserializeAsync<UserProjectStatsView>(
+				var projects =
+                    await JsonSerializer.DeserializeAsync<GetProjectForUserRouteOutput>(
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

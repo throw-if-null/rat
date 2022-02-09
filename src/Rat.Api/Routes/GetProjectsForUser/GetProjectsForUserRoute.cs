@@ -8,12 +8,12 @@ namespace Rat.Api.Routes
 {
 	internal static class GetProjectsForUserRoute
 	{
-		public static RouteHandlerBuilder Map(IEndpointRouteBuilder endpoints)
+		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
 				endpoints
 					.MapGet(
-						"/api/project",
+						"/api/projects",
 						async (IMediator mediator, IUserProvider userProvider) =>
 							{
 								var userId = userProvider.GetUserId();
@@ -31,7 +31,10 @@ namespace Rat.Api.Routes
 								return Results.Ok(new GetProjectForUserRouteOutput(response.UserProjectStats.UserId, projectStats));
 							})
 					.RequireAuthorization()
-					.WithName("GetProjectsForUser");
+					.WithName("GetProjectsForUser")
+					.ProducesValidationProblem()
+					.Produces(StatusCodes.Status200OK, typeof(GetProjectForUserRouteOutput), "application/json")
+					.ProducesProblem(StatusCodes.Status403Forbidden);
 
 			return builder;
 		}

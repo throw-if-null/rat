@@ -19,7 +19,7 @@ namespace Rat.Api.Observability.Health
             HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(HealthCheckResult.Healthy("Not ready"));
+            return Task.FromResult(HealthCheckResult.Healthy("Ready"));
         }
     }
 }

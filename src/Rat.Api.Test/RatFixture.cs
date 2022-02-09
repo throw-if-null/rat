@@ -1,19 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.Api.Test.Auth;
 
 namespace Rat.Api.Test
 {
-    public class RatFixture
+	public class RatFixture
     {
-        private readonly CustomWebApplicationFactory _factory = new CustomWebApplicationFactory();
+        private readonly TestApplication _application = new TestApplication();
 
         public HttpClient Client { get; }
         public IConfiguration Configuration { get; }
@@ -21,34 +16,15 @@ namespace Rat.Api.Test
 
         public RatFixture()
         {
-            var hostBuilder = _factory.WithWebHostBuilder(builder =>
+            Client = _application.CreateClient(new WebApplicationFactoryClientOptions
             {
-                builder.ConfigureAppConfiguration((_, builder) =>
-                {
-                    builder
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.test.json", optional: false, reloadOnChange: true)
-                        .AddEnvironmentVariables();
-                });
-
-                builder.ConfigureTestServices(services =>
-                {
-                    services
-                        .AddAuthentication("Test")
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
-                });
+                AllowAutoRedirect = true,
+				BaseAddress = new Uri("http://localhost")
             });
 
-            Client = hostBuilder.CreateClient(new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = false,
-            });
+            Configuration = _application.Services.GetRequiredService<IConfiguration>();
 
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
-
-            Configuration = hostBuilder.Services.GetRequiredService<IConfiguration>();
-
-            Provider = _factory.Factories[0].Services;
-        }
+			Provider = _application.Services;
+		}
     }
 }
