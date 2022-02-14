@@ -5,7 +5,7 @@
       "Name": "Readiness probe",
       "Report": {
         "Status": "Healthy",
-        "Description": "Not ready",
+        "Description": "Ready",
         "ElapsedMilliseconds": 0.9675,
         "Tags": [
           "ready"

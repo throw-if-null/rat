@@ -1,73 +1,155 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Rat.Api.Auth;
+using Rat.Api.Observability.Health;
+using Rat.Api.Routes;
+using Rat.Api.Routes.Health;
+using Rat.Core;
 using Rat.Data;
 
 namespace Rat.Api
 {
-    [ExcludeFromCodeCoverage]
-    internal static class Program
-    {
-        internal static async Task Main(string[] args)
-        {
-            var cancellationSource = new CancellationTokenSource();
+	public partial class Program
+	{
+		public static void Main(string[] args)
+		{
+			WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
 
-            Console.CancelKeyPress += (s, e) =>
-            {
-                cancellationSource.Cancel();
-                e.Cancel = true;
-            };
+			builder.Services.AddLogging(x =>
+			{
+				x.Configure(options =>
+					options.ActivityTrackingOptions =
+						ActivityTrackingOptions.SpanId |
+						ActivityTrackingOptions.TraceId |
+						ActivityTrackingOptions.ParentId);
+			});
 
-            var host = CreateHostBuilder(args).Build();
+			var healthCheckTimeout = builder.Configuration.GetValue<int>("HealthCheckOptions:TimeoutMs");
+			healthCheckTimeout = healthCheckTimeout == default ? 30 : healthCheckTimeout;
 
-            var environment = host.Services.GetRequiredService<IWebHostEnvironment>();
+			builder.Services
+				.AddHealthChecks()
+				.AddCheck<ReadyHealthCheck>("Readiness probe", tags: new[] { "ready" }, timeout: TimeSpan.FromSeconds(healthCheckTimeout))
+				.AddCheck<LiveHealthCheck>("Liveness probe", tags: new[] { "live" }, timeout: TimeSpan.FromSeconds(healthCheckTimeout));
 
-            if (environment.IsDevelopment())
-                await MigrateDatabase(host.Services, cancellationSource.Token);
+			builder.Services.AddCors(options => { options.AddPolicy("AllowAllPolicy", BuildCorsPolicy); });
 
-            await host.RunAsync(cancellationSource.Token);
-        }
+			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			builder.Services.AddSingleton<IUserProvider, UserProvider>();
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+			builder.Services.AddCommandsAndQueries();
 
-        private static async Task MigrateDatabase(IServiceProvider provider, CancellationToken cancellation)
-        {
-            var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger(nameof(Program));
+			builder.Services.AddRatDbContext(builder.Configuration);
 
-            using var scope = provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddSwaggerGen(options =>
+			{
+				options.SwaggerDoc("v1", new OpenApiInfo { Title = "Rat API", Version = "v1" });
 
-            var pendingMigration = (await context.Database.GetPendingMigrationsAsync(cancellation)).ToArray();
-            logger.LogInformation($"Number of pending migrations: {pendingMigration.Length}", Array.Empty<object>());
+				options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					In = ParameterLocation.Header,
+					Description = "Please enter token",
+					Name = "Authorization",
+					Type = SecuritySchemeType.Http,
+					BearerFormat = "JWT",
+					Scheme = "bearer"
+				});
 
-            await context.Database.MigrateAsync(cancellation);
-            logger.LogInformation("Database migrated successfully", Array.Empty<object>());
+				options.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Reference = new OpenApiReference
+							{
+								Id = "Bearer",
+								Type = ReferenceType.SecurityScheme
+							}
+						},
+						new string[] {}
+					}
+				});
+			});
 
-            var migrations = (await context.Database.GetAppliedMigrationsAsync(cancellation)).ToArray();
+			builder.Services
+				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddJwtBearer(
+					JwtBearerDefaults.AuthenticationScheme,
+					configureOptions =>
+					{
+						configureOptions.Authority = $"{builder.Configuration["Auth0:Domain"]}";
+						configureOptions.TokenValidationParameters = new TokenValidationParameters
+						{
+							ValidAudience = builder.Configuration["Auth0:Audience"],
+							ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
+						};
+					});
 
-            logger.LogInformation($"Total number of applied migrations: {migrations.Length}", Array.Empty<object>());
+			builder.Services.AddAuthorization(configureOptions =>
+			{
+				configureOptions.AddPolicy(
+					"MustHaveAuthenticatedUser",
+					policy => policy.RequireAuthenticatedUser());
+			});
 
-            var builder = new StringBuilder();
-            for (int i = 0; i < migrations.Length; i++)
-            {
-                builder.AppendLine($"Migration [{i}]: {migrations[i]}");
-            }
+			WebApplication? app = builder.Build();
 
-            logger.LogInformation(builder.ToString(), Array.Empty<object>());
-        }
-    }
+			if (app.Environment.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.MapSwagger();
+			app.UseSwaggerUI(options =>
+			{
+				options.EnableTryItOutByDefault();
+			});
+
+			app.UseHttpsRedirection();
+
+			app.UseAuthentication();
+			app.UseAuthorization();
+
+			app.Use(async (ctx, next) =>
+			{
+				try
+				{
+					await next();
+				}
+				catch (BadHttpRequestException ex)
+				{
+					ctx.Response.StatusCode = ex.StatusCode;
+					await ctx.Response.WriteAsync(ex.Message);
+				}
+			});
+
+			LivenessRoute.Map(app);
+			ReadinessRoute.Map(app);
+			CreateProjectRoute.Map(app);
+			GetProjectsForUserRoute.Map(app);
+			GetProjectRoute.Map(app);
+			UpdateProjectRoute.Map(app);
+			DeleteProjectRoute.Map(app);
+
+			app.Run();
+
+			// Refer to this article if you require more information on CORS
+			// https://docs.microsoft.com/en-us/aspnet/core/security/cors
+			static void BuildCorsPolicy(CorsPolicyBuilder builder)
+			{
+				string[] CORS_ALLOW_ALL = new string[1] { "*" };
+
+				builder
+					.WithOrigins(CORS_ALLOW_ALL)
+					.WithMethods(CORS_ALLOW_ALL)
+					.WithHeaders(CORS_ALLOW_ALL)
+					.Build();
+			}
+		}
+	}
+
 }

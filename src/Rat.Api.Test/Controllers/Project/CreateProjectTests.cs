@@ -6,16 +6,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.Api.Controllers.Projects.Models;
+using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
 using Rat.Data;
-using Rat.Data.Views;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [Collection("Integration")]
+	[Collection("Integration")]
     public class CreateProjectTests
     {
         private readonly RatFixture _fixture;
@@ -32,11 +31,7 @@ namespace Rat.Api.Test.Controllers.Project
             using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
             var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
 
-            var model = new CreateProjectModel
-            {
-                Name = "Rat Api",
-                TypeId = projectType.Id
-            };
+            var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
 
             var response = await _fixture.Client.PostAsync(
                 "/api/projects",
@@ -45,7 +40,7 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<ProjectView>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<CreateProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.True(content.Id > 0);
         }
@@ -57,11 +52,7 @@ namespace Rat.Api.Test.Controllers.Project
 			using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
 			var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
 
-			var model = new CreateProjectModel
-			{
-				Name = "Rat Api",
-				TypeId = projectType.Id
-			};
+			var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
 
 			var request = new HttpRequestMessage
 			{
@@ -83,10 +74,7 @@ namespace Rat.Api.Test.Controllers.Project
 		[InlineData("Test", "1", "unknown-user")]
 		public async Task Should_Return_BadRequest(string name, string version, string userId)
         {
-            var model = new CreateProjectModel
-            {
-                Name = name
-            };
+            var model = new CreateProjectRouteInput(name, 0);
 
 			var request = new HttpRequestMessage
 			{
