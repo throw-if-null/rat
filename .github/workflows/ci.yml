@@ -74,7 +74,7 @@ jobs:
 
       - name: Publish
         id: dotnet-publish
-        run: dotnet publish ./src/Rat.Api/Rat.Api.csproj
+        run: dotnet publish ./src/Rat.Api/Rat.Api.csproj -o ./published
 
       #- name: Run Tests
       #  id: tests-run
