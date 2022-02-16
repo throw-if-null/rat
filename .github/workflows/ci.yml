@@ -68,11 +68,13 @@ jobs:
 
       - name: Test
         id: dotnet-test
-        run: dotnet test --no-build --verbosity normal
+        env:
+          DATABASE_ENGINE: postgres
+        run: dotnet test ./src/Rat.Api.Test/Rat.Api.Test.csproj --no-build --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
       - name: Publish
         id: dotnet-publish
-        run: dotnet publish ./src/Rat.Api/Rat.Api.csproj --no-build -o
+        run: dotnet publish ./src/Rat.Api/Rat.Api.csproj --no-build -o ./published
 
       #- name: Run Tests
       #  id: tests-run
