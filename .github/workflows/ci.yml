@@ -76,6 +76,13 @@ jobs:
         id: dotnet-publish
         run: dotnet publish ./src/Rat.Api/Rat.Api.csproj -o ./published
 
+      - name: Upload publish result
+        uses: actions/upload-artifact@v2
+        with:
+          name: published
+          path: |
+            published
+
       #- name: Run Tests
       #  id: tests-run
       #  uses: rocklan/dotnet-tests-report@master
