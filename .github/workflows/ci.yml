@@ -39,12 +39,6 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Set up JDK 11
-        id: install-jdk-11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.11
-
       - name: Setup .NET Core SDK
         id: install-dotnet-50x
         uses: actions/setup-dotnet@v1.8.1
@@ -58,52 +52,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache SonarCloud packages
-        id: cache-sonar
-        uses: actions/cache@v1
-        with:
-          path: ~/sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache SonarCloud scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v1
-        with:
-          path: ./.sonar/scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-
-      - name: Install SonarCloud scanner
-        id: install-sonar
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          New-Item -Path ./.sonar/scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-
       - name: Setup CodeQL
         id: codeql-setup
         uses: github/codeql-action/init@v1
         with:
           languages: 'csharp'
-
-      - name: Setup Sonar
-        id: sonar-setup
-        env:
-          OPENCOVER_REPORTS_PATH: "./_TMP/*/coverage.opencover.xml"
-          COVERAGE_EXCLUSIONS: "src/Rat.Data/Migrations/*.cs,src/Rat.Api/Startup.cs,src/Rat/Api/Controllers/ErrorController.cs"
-        shell: pwsh
-        run: >
-          ./.sonar/scanner/dotnet-sonarscanner begin
-          /k:"throw-if-null_rat.api"
-          /o:"throw-if-null"
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-          /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.cs.opencover.reportsPaths=${{ env.OPENCOVER_REPORTS_PATH }}
-          /d:sonar.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
-          /d:sonar.coverage.exclusions=${{ env.COVERAGE_EXCLUSIONS }}
-          /d:sonar.dotnet.excludeTestProjects=true
 
       - name: Run Tests
         id: tests-run
@@ -123,13 +76,6 @@ jobs:
           set_check_status_from_test_outcome: true
           fail_build_on_failed_tests: true
           extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
-
-      - name: Run Sonar Analysis
-        id: sonar-run
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
       - name: Run CodeQL Analysis
         id: codeql-run
