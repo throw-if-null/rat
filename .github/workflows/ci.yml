@@ -70,7 +70,7 @@ jobs:
         id: dotnet-test
         env:
           DATABASE_ENGINE: postgres
-        run: dotnet test ./src/Rat.Api.Test/Rat.Api.Test.csproj --no-build --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+        run: dotnet test ./src/Rat.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
       - name: Publish
         id: dotnet-publish
