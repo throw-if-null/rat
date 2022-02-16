@@ -58,57 +58,73 @@ jobs:
         with:
           languages: 'csharp'
 
-      - name: Run Tests
-        id: tests-run
-        uses: rocklan/dotnet-tests-report@master
-        env:
-          TEST_PROJECT_PATH: ./src/Rat.sln
-          TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
-          DATABASE_ENGINE: postgres
-        with:
-          project_path: ${{ env.TEST_PROJECT_PATH }}
-          report_name: Test report
-          report_title: ${{ env.GITHUB_REPOSITORY }} test results
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          gist_name: test_run.md
-          gist_badge_label: 'Tests passed: %Counters_passed%/%Counters_total%'
-          gist_token: ${{ secrets.GIST_TOKEN }}
-          set_check_status_from_test_outcome: true
-          fail_build_on_failed_tests: true
-          extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
+      - name: Restore nuget packages
+        id: dotnet-restore
+        run: dotnet restore ./src/Rat.sln
 
-      - name: Run CodeQL Analysis
-        id: codeql-run
-        uses: github/codeql-action/analyze@v1
+      - name: Build
+        id: dotnet-build
+        run: dotnet build ./src/Rat.sln --configuration Release --no-restore
 
-      - name: Get branch Name
-        id: get-branch-name
-        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+      - name: Test
+        id: dotnet-test
+        run: dotnet test ./src/Rat.sln --no-build --verbosity normal
 
-      - name: Set default docker image tag
-        id: set-default-docker-image-tag
-        if: env.BRANCH != env.DEFAULT_BRANCH
-        run: echo "DEFAULT_DOCKER_IMAGE_TAG=$(echo $BRANCH)" >> $GITHUB_ENV
+      - name: Publish
+        id: dotnet-publish
+        run: dotnet publish ./src/Rat.Api/Rat.Api.csproj --no-build -o
 
-      - name: Set unique docker image tag
-        id: set-unique-docker-image-tag
-        run: echo "DOCKER_TAG=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
+      #- name: Run Tests
+      #  id: tests-run
+      #  uses: rocklan/dotnet-tests-report@master
+      #  env:
+      #    TEST_PROJECT_PATH: ./src/Rat.sln
+      #    TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+      #    DATABASE_ENGINE: postgres
+      #  with:
+      #    project_path: ${{ env.TEST_PROJECT_PATH }}
+      #    report_name: Test report
+      #    report_title: ${{ env.GITHUB_REPOSITORY }} test results
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    gist_name: test_run.md
+      #    gist_badge_label: 'Tests passed: %Counters_passed%/%Counters_total%'
+      #    gist_token: ${{ secrets.GIST_TOKEN }}
+      #    set_check_status_from_test_outcome: true
+      #    fail_build_on_failed_tests: true
+      #    extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
 
-      - name: Build Docker image
-        id: docker-build-publish
-        uses: elgohr/Publish-Docker-Github-Action@3.04
-        with:
-          name: throwifnull/${{ env.DOCKER_REPOSITORY }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          context: .
-          dockerfile: ./Rat.Api/Dockerfile
-          workdir: ./src
-          tags: "${{ env.DOCKER_TAG }},${{env.DEFAULT_DOCKER_IMAGE_TAG}}"
+      #- name: Run CodeQL Analysis
+      #  id: codeql-run
+      #  uses: github/codeql-action/analyze@v1
 
-      - name: Print published docker image tags
-        id: print-docker-image-tags
-        run: |
-          echo "Published Docker tags:"
-          echo $DEFAULT_DOCKER_IMAGE_TAG
-          echo $DOCKER_TAG
+      #- name: Get branch Name
+      #  id: get-branch-name
+      #  run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+
+      #- name: Set default docker image tag
+      #  id: set-default-docker-image-tag
+      #  if: env.BRANCH != env.DEFAULT_BRANCH
+      #  run: echo "DEFAULT_DOCKER_IMAGE_TAG=$(echo $BRANCH)" >> $GITHUB_ENV
+
+      #- name: Set unique docker image tag
+      #  id: set-unique-docker-image-tag
+      #  run: echo "DOCKER_TAG=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
+
+      #- name: Build Docker image
+      #  id: docker-build-publish
+      #  uses: elgohr/Publish-Docker-Github-Action@3.04
+      #  with:
+      #    name: throwifnull/${{ env.DOCKER_REPOSITORY }}
+      #    username: ${{ secrets.DOCKER_USERNAME }}
+      #    password: ${{ secrets.DOCKER_PASSWORD }}
+      #    context: .
+      #    dockerfile: ./Rat.Api/Dockerfile
+      #    workdir: ./src
+      #    tags: "${{ env.DOCKER_TAG }},${{env.DEFAULT_DOCKER_IMAGE_TAG}}"
+
+      #- name: Print published docker image tags
+      #  id: print-docker-image-tags
+      #  run: |
+      #    echo "Published Docker tags:"
+      #    echo $DEFAULT_DOCKER_IMAGE_TAG
+      #    echo $DOCKER_TAG
