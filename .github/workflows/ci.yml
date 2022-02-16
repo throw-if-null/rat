@@ -68,7 +68,7 @@ jobs:
 
       - name: Test
         id: dotnet-test
-        run: dotnet test ./src/Rat.sln --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal
 
       - name: Publish
         id: dotnet-publish
