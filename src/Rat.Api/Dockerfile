@@ -1,4 +1,4 @@
-ARG PUBLISH_RESULT_PATH
+ARG PUBLISH_RESULT_PATH=/bin/debug
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS base
 EXPOSE 80
