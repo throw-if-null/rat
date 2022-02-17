@@ -102,7 +102,7 @@ jobs:
         id: docker-build
         uses: docker/build-push-action@v2
         with:
-          context: ./src
+          context: .
           file: ./src/Rat.Api/Dockerfile
           push: false
           tags: throwifnull/rat:latest
