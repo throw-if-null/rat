@@ -106,28 +106,9 @@ jobs:
         with:
           context: .
           file: ./src/Rat.Api/Dockerfile
-          build-args: PUBLISH_RESULT_PATH=/published
+          build-args: PUBLISH_RESULT_PATH=published
           push: true
           tags: throwifnull/rat:experimental
-
-      #- name: Run Tests
-      #  id: tests-run
-      #  uses: rocklan/dotnet-tests-report@master
-      #  env:
-      #    TEST_PROJECT_PATH: ./src/Rat.sln
-      #    TEST_EXTRA_TEST_PARAMETERS: --configuration release --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
-      #    DATABASE_ENGINE: postgres
-      #  with:
-      #    project_path: ${{ env.TEST_PROJECT_PATH }}
-      #    report_name: Test report
-      #    report_title: ${{ env.GITHUB_REPOSITORY }} test results
-      #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    gist_name: test_run.md
-      #    gist_badge_label: 'Tests passed: %Counters_passed%/%Counters_total%'
-      #    gist_token: ${{ secrets.GIST_TOKEN }}
-      #    set_check_status_from_test_outcome: true
-      #    fail_build_on_failed_tests: true
-      #    extra_test_parameters: ${{ env.TEST_EXTRA_TEST_PARAMETERS }}
 
       #- name: Run CodeQL Analysis
       #  id: codeql-run

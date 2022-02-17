@@ -40,10 +40,12 @@ services:
   rat-api:
     <<: *base-service-template
     container_name: rat-api
-    image: throwifnull/rat:latest
-    #build:
-    #  context: .
-    #  dockerfile: Rat.Api/Dockerfile
+    #image: throwifnull/rat:latest
+    build:
+      context: .
+      dockerfile: Rat.Api/Dockerfile
+      args:
+        - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       # SQL Connection string:
