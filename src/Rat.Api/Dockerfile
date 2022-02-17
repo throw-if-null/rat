@@ -20,7 +20,8 @@ EXPOSE 443
 #RUN dotnet publish "Rat.Api.csproj" -c Release -o /app/publish
 #
 #FROM base AS final
-COPY ./published /app/publish .
+WORKDIR /published
+COPY . /app/publish
 
 WORKDIR /app
 
