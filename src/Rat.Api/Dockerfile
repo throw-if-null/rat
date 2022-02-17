@@ -6,8 +6,8 @@ EXPOSE 443
 COPY . .
 
 FROM base as final
-WORKDIR /app
 COPY --from=base /app/publish .
+WORKDIR /app
 
 # Without this SQL Client fails (https://github.com/dotnet/SqlClient/issues/220)
 RUN apk add --no-cache icu-libs
