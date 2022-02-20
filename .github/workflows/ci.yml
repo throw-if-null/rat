@@ -104,7 +104,7 @@ jobs:
       - name: Generate docker tag
         id: docker-generateTag
         run: |
-          if [[ $GITHUB_REF != 'refs/tags/'$DEFAULT_BRANCH ]]; then
+          if [[ $GITHUB_REF != 'refs/tags/'$DEFAULT_BRANCH ]]
             echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
 
       - name: Set docker image metadata
