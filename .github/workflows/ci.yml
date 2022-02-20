@@ -143,16 +143,16 @@ jobs:
         with:
           app-name: 'rattus'
           connection-strings-json: |
-            '[
+            [
               {
                 "name": "RatDb",
                 "value": "${{ env.RAT_DATABASE_CONNECTION_STRING }}",
                 "type": "Custom",
                 "slotSetting": false
               }
-            ]'
+            ]
           app-settings-json: |
-            '[
+            [
               {
                 "name": "ASPNETCORE_ENVIRONMENT",
                 "value": "Production",
@@ -178,7 +178,7 @@ jobs:
                 "value": "false",
                 "slotSetting": false
               }
-            ]'
+            ]
 
       #- name: Run CodeQL Analysis
       #  id: codeql-run
