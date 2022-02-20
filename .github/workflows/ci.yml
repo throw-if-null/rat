@@ -12,9 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEFAULT_BRANCH: branch0
-      DEFAULT_DOCKER_IMAGE_TAG: latest
-      DOCKER_REPOSITORY: rat
-      VERSION: v0.2.1
+      DOCKER_TAG: v0.2.1
 
     services:
       #sqlserver:
@@ -110,7 +108,7 @@ jobs:
         with:
           images: throwifnull/rat
           tags: |
-            type=semver,pattern={{version}},value=${{ env.VERSION }}-$GITHUB_RUN_ID)
+            type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}-$GITHUB_RUN_ID)
 
       - name: Set docker image metadata
         id: docker-metadata
@@ -119,7 +117,7 @@ jobs:
         with:
           images: throwifnull/rat
           tags: |
-            type=semver,pattern={{version}},value=${{ env.VERSION }}
+            type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}
 
       - name: Docker build and publish
         id: docker-buildAndPublish
