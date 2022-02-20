@@ -131,7 +131,7 @@ jobs:
         with:
           app-name: rattus
           publish-profile: ${{ secrets.RAT_AZURE_PUBLISH_PROFILE }}
-          images: 'docker.io/rat:${{ env.DOCKER_TAG }}'
+          images: 'https://docker.io/rat:${{ env.DOCKER_TAG }}'
 
       #- name: Run CodeQL Analysis
       #  id: codeql-run
