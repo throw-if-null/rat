@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEFAULT_BRANCH: branch0
-      DOCKER_TAG: v0.2.1
+      DOCKER_TAG: 0.2.1
 
     services:
       #sqlserver:
@@ -104,11 +104,8 @@ jobs:
       - name: Generate docker tag
         id: docker-generateTag
         run: |
-          if [[ $GITHUB_REF == 'refs/tags/'$DEFAULT_BRANCH ]]; then
-            echo "DOCKER_TAG=$(echo DOCKER_TAG)" >> $GITHUB_ENV
-          else
+          if [[ $GITHUB_REF != 'refs/tags/'$DEFAULT_BRANCH ]]; then
             echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
-          fi
 
       - name: Set docker image metadata
         id: docker-metadata
