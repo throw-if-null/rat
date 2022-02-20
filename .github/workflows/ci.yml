@@ -115,7 +115,7 @@ jobs:
       - name: Set docker image metadata
         id: docker-metadata
         uses: docker/metadata-action@v3
-        if: env.BRANCH = env.DEFAULT_BRANCH
+        if: env.BRANCH == env.DEFAULT_BRANCH
         with:
           images: throwifnull/rat
           tags: |
