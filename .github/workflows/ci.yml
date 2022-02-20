@@ -142,8 +142,43 @@ jobs:
         id: azure-deployAppSettings
         with:
           app-name: 'rattus'
-          connection-strings-json: '[{"name":"RatDb","value":"${{ secrets.RAT_DATABASE_CONNECTION_STRING }}","type":"Custom","slotSetting":false}]'
-          app-settings-json: '[{"name":"ASPNETCORE_ENVIRONMENT","value":"Production","slotSetting":false},{"name":"DOCKER_REGISTRY_SERVER_URL","value":"https://index.docker.io/v1","slotSetting":false},{"name":"WEBSITE_HEALTHCHECK_MAXPINGFAILURES","value":"2","slotSetting":false},{"name":"WEBSITE_HTTPLOGGING_RETENTION_DAYS","value":"7","slotSetting":false},{"name":"WEBSITES_ENABLE_APP_SERVICE_STORAGE","value":"false","slotSetting":false}]'
+          connection-strings-json: |
+            '[
+              {
+                "name": "RatDb",
+                "value": "${{ env.RAT_DATABASE_CONNECTION_STRING }}",
+                "type": "Custom",
+                "slotSetting": false
+              }
+            ]'
+          app-settings-json: |
+            '[
+              {
+                "name": "ASPNETCORE_ENVIRONMENT",
+                "value": "Production",
+                "slotSetting": false
+              },
+              {
+                "name": "DOCKER_REGISTRY_SERVER_URL",
+                "value": "https://index.docker.io/v1",
+                "slotSetting": false
+              },
+              {
+                "name": "WEBSITE_HEALTHCHECK_MAXPINGFAILURES",
+                "value": "2",
+                "slotSetting": false
+              },
+              {
+                "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+                "value": "7",
+                "slotSetting": false
+              },
+              {
+                "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                "value": "false",
+                "slotSetting": false
+              }
+            ]'
 
       #- name: Run CodeQL Analysis
       #  id: codeql-run
