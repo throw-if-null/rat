@@ -101,19 +101,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set docker image metadata
-        id: docker-metadata
-        uses: docker/metadata-action@v3
-        if: env.BRANCH != env.DEFAULT_BRANCH
-        with:
-          images: throwifnull/rat
-          tags: |
-            type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}-${{ github.run_number }}
+      - name: Generate docker tag
+        id: docker-generateTag
+        run: |
+          if [[ $GITHUB_REF == 'refs/tags/'$DEFAULT_BRANCH ]]; then
+            echo "DOCKER_TAG=$(echo DOCKER_TAG)" >> $GITHUB_ENV
+          else
+            echo "DOCKER_TAG=$(echo DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
+          fi
 
       - name: Set docker image metadata
         id: docker-metadata
         uses: docker/metadata-action@v3
-        if: env.BRANCH == env.DEFAULT_BRANCH
         with:
           images: throwifnull/rat
           tags: |
