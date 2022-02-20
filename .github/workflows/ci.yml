@@ -108,7 +108,7 @@ jobs:
         with:
           images: throwifnull/rat
           tags: |
-            type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}-$GITHUB_RUN_ID
+            type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}-${{ github.run_number }}
 
       - name: Set docker image metadata
         id: docker-metadata
