@@ -107,7 +107,7 @@ jobs:
           if [[ $GITHUB_REF == 'refs/tags/'$DEFAULT_BRANCH ]]; then
             echo "DOCKER_TAG=$(echo DOCKER_TAG)" >> $GITHUB_ENV
           else
-            echo "DOCKER_TAG=$(echo DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
+            echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
           fi
 
       - name: Set docker image metadata
