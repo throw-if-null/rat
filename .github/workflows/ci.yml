@@ -104,7 +104,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Set docker image metadata
-        id: docker-metadata
+        id: docker-metadata-pre
         uses: docker/metadata-action@v3
         if: env.BRANCH != env.DEFAULT_BRANCH
         with:
