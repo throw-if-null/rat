@@ -106,14 +106,12 @@ jobs:
         id: get-branch-name
         run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
 
-      - name: Set default docker image tag
+      - name: Set docker image tags
         id: docker-addDefaultImageTag
         if: env.BRANCH != env.DEFAULT_BRANCH
-        run: echo "DEFAULT_DOCKER_IMAGE_TAG=$(echo $BRANCH)" >> $GITHUB_ENV
-
-      - name: Set unique docker image tag
-        id: docker-addImageTag
-        run: echo "DOCKER_TAG=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
+        run: |
+          echo "DEFAULT_DOCKER_IMAGE_TAG=$(echo $BRANCH)" >> $GITHUB_ENV
+          echo "DOCKER_TAG=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
 
       #- name: Set latest tag (only if pushing to default branch)
       #  id: docker-addLatestTag
