@@ -146,7 +146,7 @@ jobs:
             [
               {
                 "name": "RatDb",
-                "value": "${{ env.RAT_DATABASE_CONNECTION_STRING }}",
+                "value": "${{ secrets.RAT_DATABASE_CONNECTION_STRING }}",
                 "type": "Custom",
                 "slotSetting": false
               }
