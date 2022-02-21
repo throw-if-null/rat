@@ -136,7 +136,7 @@ jobs:
         with:
           context: .
           file: ./src/Rat.Api/Dockerfile
-          build-args: PUBLISH_RESULT_PATH=${{steps.download.outputs.download-path}}
+          build-args: PUBLISH_RESULT_PATH=published
           push: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
 
