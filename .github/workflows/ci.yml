@@ -125,13 +125,13 @@ jobs:
       - name: Prepare docker tags
         id: docker-prepareTags
         run: |
-          if [[ $GITHUB_REF != 'refs/tags/'$DEFAULT_BRANCH ]]
+          if [[ $GITHUB_REF != 'refs/tags/'${{ env.DEFAULT_BRANCH }} ]]
           then
             echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
           fi
 
           echo "Docker tag $DOCKER_TAG"
-          echo "::set-output name=dockerTag::$DOCKER_TAG"
+          echo "::set-output name=dockerTag::${{ env.DOCKER_TAG }}"
 
       - name: Set docker image metadata
         id: docker-metadata
