@@ -12,7 +12,7 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: Build assemblies and run the tests
     runs-on: ubuntu-latest
 
     services:
@@ -87,10 +87,13 @@ jobs:
           name: 'published-artifact'
           path: published
 
-  deploy:
-    name: Deploy
-    needs: Build
+  docker:
+    name: Build and push Docker image
+    needs: build
     runs-on: ubuntu-latest
+
+    outputs:
+      dockerTag: ${{ steps.docker-prepareTags.outputs.dockerTag }}
 
     steps:
       - name: Checkout
@@ -128,16 +131,7 @@ jobs:
           fi
 
           echo "Docker tag $DOCKER_TAG"
-
-      - name: Determine if image should be pushed
-        id: docker-shouldPush
-        run: |
-          if [[ $GITHUB_REF = 'refs/tags/merge' ]]
-          then
-            echo "DOCKER_SHOULD_PUSH=true" >> $GITHUB_ENV
-          fi
-
-          echo "Docker image will be pushed = $DOCKER_SHOULD_PUSH"
+          echo "::set-output name=dockerTag::$DOCKER_TAG"
 
       - name: Set docker image metadata
         id: docker-metadata
@@ -155,20 +149,28 @@ jobs:
           context: .
           file: ./src/Rat.Api/Dockerfile
           build-args: PUBLISH_RESULT_PATH=published
-          push: ${{ env.DOCKER_SHOULD_PUSH }}
+          push: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
 
       - name: Print published docker image tags
         id: print-docker-image-tags
         run: echo '${{ steps.docker-metadata.outputs.tags }}'
 
+
+  azure:
+    name: Deploy to Azure
+    needs: Docker
+    runs-on: ubuntu-latest
+    #if: github.event_name != 'pull_request'
+
+    steps:
       - name: 'Deploy container to Azure'
         id: azure-deployContainer
         uses: azure/webapps-deploy@v2
         with:
           app-name: rattus
           publish-profile: ${{ secrets.RAT_AZURE_PUBLISH_PROFILE }}
-          images: 'docker.io/throwifnull/rat:${{ env.DOCKER_TAG }}'
+          images: 'docker.io/throwifnull/rat:${{needs.docker.outputs.dockerTag}}'
 
       - name: Login to Azure
         id: azure-loging
