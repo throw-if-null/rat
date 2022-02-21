@@ -129,6 +129,16 @@ jobs:
 
           echo "Docker tag $DOCKER_TAG"
 
+      - name: Determine if image should be pushed
+        id: docker-shouldPush
+        run: |
+          if [[ $GITHUB_REF = 'refs/tags/merge' ]]
+          then
+            echo "DOCKER_SHOULD_PUSH=true" >> $GITHUB_ENV
+          fi
+
+          echo "Docker image will be pushed = $DOCKER_SHOULD_PUSH"
+
       - name: Set docker image metadata
         id: docker-metadata
         uses: docker/metadata-action@v3
@@ -140,11 +150,12 @@ jobs:
       - name: Docker build and publish
         id: docker-buildAndPublish
         uses: docker/build-push-action@v2
+
         with:
           context: .
           file: ./src/Rat.Api/Dockerfile
           build-args: PUBLISH_RESULT_PATH=published
-          push: true
+          push: ${{ env.DOCKER_SHOULD_PUSH }}
           tags: ${{ steps.docker-metadata.outputs.tags }}
 
       - name: Print published docker image tags
