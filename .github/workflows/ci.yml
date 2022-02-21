@@ -81,6 +81,7 @@ jobs:
         run: dotnet publish ./src/Rat.Api/Rat.Api.csproj -o ./published
 
       - name: Upload publish result
+        id: artifacts-upload
         uses: actions/upload-artifact@v2
         with:
           name: 'published-artifact'
@@ -92,8 +93,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v2
-        id: download
+      - name: Checkout
+        id: git-checkhot
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Download published artifact
+        id: artifacts-download
+        uses: actions/download-artifact@v2
         with:
           name: 'published-artifact'
           path: ./published
