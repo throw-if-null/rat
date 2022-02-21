@@ -4,9 +4,7 @@ EXPOSE 443
 
 ARG PUBLISH_RESULT_PATH
 
-WORKDIR $PUBLISH_RESULT_PATH
-COPY . /app
-
+COPY $PUBLISH_RESULT_PATH /app
 WORKDIR /app
 
 # Without this SQL Client fails (https://github.com/dotnet/SqlClient/issues/220)

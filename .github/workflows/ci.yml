@@ -104,6 +104,8 @@ jobs:
       - name: Setup Docker Buildx
         id: docker-buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
 
       - name: Docker login
         id: docker-login
@@ -112,8 +114,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Generate docker tag
-        id: docker-generateTag
+      - name: Prepare docker tags
+        id: docker-prepareTags
         run: |
           if [[ $GITHUB_REF != 'refs/tags/'$DEFAULT_BRANCH ]]
           then
