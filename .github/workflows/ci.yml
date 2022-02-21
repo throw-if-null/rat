@@ -96,7 +96,7 @@ jobs:
         id: download
         with:
           name: 'published-artifact'
-          path: ~/published
+          path: ./published
 
       - name: 'Echo download path'
         run: echo ${{steps.download.outputs.download-path}}
