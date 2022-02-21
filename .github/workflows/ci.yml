@@ -76,7 +76,7 @@ jobs:
         id: codeql-run
         uses: github/codeql-action/analyze@v1
 
-      - name: Publish
+      - name: Publish built binaries
         id: dotnet-publish
         run: dotnet publish ./src/Rat.Api/Rat.Api.csproj -o ./published
 
@@ -105,9 +105,6 @@ jobs:
         with:
           name: 'published-artifact'
           path: ./published
-
-      - name: 'Echo download path'
-        run: echo ${{steps.download.outputs.download-path}}
 
       - name: Setup Docker Buildx
         id: docker-buildx
@@ -162,13 +159,15 @@ jobs:
           publish-profile: ${{ secrets.RAT_AZURE_PUBLISH_PROFILE }}
           images: 'docker.io/throwifnull/rat:${{ env.DOCKER_TAG }}'
 
-      - uses: azure/login@v1
+      - name: Login to Azure
         id: azure-loging
+        uses: azure/login@v1
         with:
           creds: '${{ secrets.RATCAT_AZURE_CREDENTIALS }}'
 
-      - uses: azure/appservice-settings@v1
+      - name: Deploy environment configurations for Azure Web App
         id: azure-deployAppSettings
+        uses: azure/appservice-settings@v1
         with:
           app-name: 'rattus'
           connection-strings-json: |
