@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      dockerTag: ${{ steps.docker-prepareTags.outputs.dockerTag }}
+      dockerTag: ${{ env.DOCKER_TAG }}
 
     steps:
       - name: Checkout
@@ -130,8 +130,7 @@ jobs:
             echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
           fi
 
-          echo "Docker tag $DOCKER_TAG"
-          echo "::set-output name=dockerTag::${{ env.DOCKER_TAG }}"
+          echo "Docker tag ${{ env.DOCKER_TAG }}"
 
       - name: Set docker image metadata
         id: docker-metadata
