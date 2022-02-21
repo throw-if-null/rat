@@ -215,5 +215,10 @@ jobs:
                 "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                 "value": "false",
                 "slotSetting": false
+              },
+              {
+                "name": "DOCKER_IMAGE_TAG",
+                "value": "${{ needs.docker.outputs.dockerTag }}",
+                "slotSetting": false
               }
             ]
