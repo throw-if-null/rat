@@ -6,13 +6,14 @@ on:
   pull_request:
     branches: [ branch0 ]
 
+env:
+  DEFAULT_BRANCH: branch0
+  DOCKER_TAG: 0.2.1
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      DEFAULT_BRANCH: branch0
-      DOCKER_TAG: 0.2.1
 
     services:
       #sqlserver:
@@ -82,9 +83,23 @@ jobs:
       - name: Upload publish result
         uses: actions/upload-artifact@v2
         with:
-          name: published
-          path: |
-            published
+          name: 'published-artifact'
+          path: published
+
+  deploy:
+    name: Deploy
+    needs: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        id: download
+        with:
+          name: 'published-artifact'
+          path: ~/published
+
+      - name: 'Echo download path'
+        run: echo ${{steps.download.outputs.download-path}}
 
       - name: Setup Docker Buildx
         id: docker-buildx
