@@ -123,13 +123,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
 
-      #- name: Docker login
-      #  id: docker-login
-      #  uses: docker/login-action@v1
-      #  with:
-      #    username: ${{ secrets.DOCKER_USERNAME }}
-      #    password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Prepare docker tags
         id: docker-prepareTags
         run: |
@@ -144,8 +137,7 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v3
         with:
-          #images: throwifnull/rat
-          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}
           tags: type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}
 
       - name: Docker build and publish
