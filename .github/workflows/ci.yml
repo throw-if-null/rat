@@ -8,7 +8,7 @@ on:
 
 env:
   DEFAULT_BRANCH: branch0
-  DOCKER_TAG: 0.2.2
+  VERSION: 0.2.3
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:
@@ -128,10 +128,14 @@ jobs:
         run: |
           if [[ $GITHUB_REF != 'refs/tags/'${{ env.DEFAULT_BRANCH }} ]]
           then
-            echo "DOCKER_TAG=$(echo $DOCKER_TAG-$GITHUB_RUN_ID)" >> $GITHUB_ENV
+            echo "DOCKER_TAG=$(echo $VERSION-$GITHUB_RUN_ID)" >> $GITHUB_ENV
+          else
+            echo "DOCKER_TAG=$VERSION" >> $GITHUB_ENV
           fi
 
-          echo "Docker tag ${{ env.DOCKER_TAG }}"
+      - name: Docker tag
+        id: docker-pringTag
+        run: echo "Docker tag ${{ env.DOCKER_TAG }}"
 
       - name: Set docker image metadata
         id: docker-metadata
