@@ -92,6 +92,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    env:
+      REGISTRY: ghcr.io
     outputs:
       dockerTag: ${{ env.DOCKER_TAG }}
 
@@ -115,12 +117,19 @@ jobs:
         with:
           buildkitd-flags: --debug
 
-      - name: Docker login
-        id: docker-login
-        uses: docker/login-action@v1
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
+
+      #- name: Docker login
+      #  id: docker-login
+      #  uses: docker/login-action@v1
+      #  with:
+      #    username: ${{ secrets.DOCKER_USERNAME }}
+      #    password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Prepare docker tags
         id: docker-prepareTags
@@ -136,7 +145,8 @@ jobs:
         id: docker-metadata
         uses: docker/metadata-action@v3
         with:
-          images: throwifnull/rat
+          #images: throwifnull/rat
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
           tags: type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}
 
       - name: Docker build and publish
