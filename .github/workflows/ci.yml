@@ -123,10 +123,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
 
-      - name: Prepare docker tags
+      - name: Prepare docker tag
         id: docker-prepareTags
         run: |
-          if [[ $GITHUB_REF != 'refs/tags/'${{ env.DEFAULT_BRANCH }} ]]
+          if [[ $GITHUB_REF != 'refs/heads/${{ env.DEFAULT_BRANCH }}' ]]
           then
             echo "DOCKER_TAG=$(echo $VERSION-$GITHUB_RUN_ID)" >> $GITHUB_ENV
           else
