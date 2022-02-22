@@ -9,6 +9,7 @@ on:
 env:
   DEFAULT_BRANCH: branch0
   DOCKER_TAG: 0.2.2
+  CONTAINER_REGISTRY: ghcr.io
 
 jobs:
   build:
@@ -92,8 +93,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    env:
-      REGISTRY: ghcr.io
     outputs:
       dockerTag: ${{ env.DOCKER_TAG }}
 
@@ -120,7 +119,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
 
@@ -177,7 +176,7 @@ jobs:
         with:
           app-name: rattus
           publish-profile: ${{ secrets.RAT_AZURE_PUBLISH_PROFILE }}
-          images: 'docker.io/throwifnull/rat:${{needs.docker.outputs.dockerTag}}'
+          images: '${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}:${{needs.docker.outputs.dockerTag}}'
 
       - name: Login to Azure
         id: azure-loging
