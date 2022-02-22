@@ -44,6 +44,8 @@ services:
     #build:
     #  context: .
     #  dockerfile: Rat.Api/Dockerfile
+    #  args:
+    #    - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       # SQL Connection string:
