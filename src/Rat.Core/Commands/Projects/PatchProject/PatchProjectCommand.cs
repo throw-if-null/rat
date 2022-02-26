@@ -8,51 +8,53 @@ using Rat.Data.Exceptions;
 
 namespace Rat.Core.Commands.Projects.PatchProject
 {
-    internal class PatchProjectCommand : IRequestHandler<PatchProjectRequest, PatchProjectResponse>
-    {
-        private readonly RatDbContext _context;
+	internal class PatchProjectCommand : IRequestHandler<PatchProjectRequest, PatchProjectResponse>
+	{
+		private readonly RatDbContext _context;
 
-        public PatchProjectCommand(RatDbContext context)
-        {
-            _context = context;
-        }
+		public PatchProjectCommand(RatDbContext context)
+		{
+			_context = context;
+		}
 
-        public async Task<PatchProjectResponse> Handle(PatchProjectRequest request, CancellationToken cancellationToken)
-        {
-            var projectType = await _context.ProjectTypes.FirstOrDefaultAsync(x => x.Id == request.ProjectTypeId, cancellationToken);
+		public async Task<PatchProjectResponse> Handle(PatchProjectRequest request, CancellationToken cancellationToken)
+		{
+			var projectType = await _context.ProjectTypes.FirstOrDefaultAsync(x => x.Id == request.ProjectTypeId, cancellationToken);
 
-            request.Validate(projectType);
+			request.Validate(projectType);
 
-            if (request.Context.Status != ProcessingStatus.GoodRequest)
-                return new() { Context = request.Context };
+			if (request.Context.Status != ProcessingStatus.GoodRequest)
+				return new() { Context = request.Context };
 
-            var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+			var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
-            if (project == null)
-            {
-                request.Context.Status = ProcessingStatus.NotFound;
+			if (project == null)
+			{
+				request.Context.Status = ProcessingStatus.NotFound;
 
-                return new() { Context = request.Context };
-            }
+				return new() { Context = request.Context };
+			}
 
-            project.Name = request.Name;
-            project.Type = projectType;
+			project.Name = request.Name;
+			project.Type = projectType;
 
-            _context.Projects.Update(project);
+			_context.Projects.Update(project);
 
-            var expectedNumberOfChanges = 1;
-            var changes = await _context.SaveChangesAsync(cancellationToken);
+			var expectedNumberOfChanges = 1;
+			var changes = await _context.SaveChangesAsync(cancellationToken);
 
-            if (changes != expectedNumberOfChanges)
-                throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
+			if (changes != expectedNumberOfChanges)
+				throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
 
-            request.Context.Status = ProcessingStatus.Ok;
+			request.Context.Status = ProcessingStatus.Ok;
 
-            return new()
-            {
-                Context = request.Context,
-                Project = new() { Id = project.Id, Name = project.Name, TypeId = project.Type.Id }
-            };
-        }
-    }
+			return new()
+			{
+				Context = request.Context,
+				Id = project.Id,
+				Name = project.Name,
+				TypeId = project.Type.Id
+			};
+		}
+	}
 }

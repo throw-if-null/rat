@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Rat.Api.Observability.Health.Responses;
 
 namespace Rat.Api.Observability.Health
 {
-    /// <summary>
-    /// Contains utility methods for configuring health checks
-    /// </summary>
-    public static class HealthReportWriter
+	/// <summary>
+	/// Contains utility methods for configuring health checks
+	/// </summary>
+	public static class HealthReportWriter
     {
         /// <summary>
         /// Tries to write the health check result data into HTTP response message.

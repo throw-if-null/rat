@@ -132,7 +132,7 @@ namespace Rat.Api
 			CreateProjectRoute.Map(app);
 			GetProjectsForUserRoute.Map(app);
 			GetProjectRoute.Map(app);
-			UpdateProjectRoute.Map(app);
+			PatchProjectRoute.Map(app);
 			DeleteProjectRoute.Map(app);
 
 			app.Run();

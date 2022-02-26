@@ -6,6 +6,10 @@ namespace Rat.Core.Commands.Projects.CreateProject
     {
         public RatContext Context { get; init; }
 
-        public ProjectView Project { get; init; }
-    }
+		public int Id { get; init; }
+
+		public string Name { get; init; }
+
+		public int TypeId { get; init; }
+	}
 }
