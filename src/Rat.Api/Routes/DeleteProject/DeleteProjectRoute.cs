@@ -1,6 +1,6 @@
 ﻿using MediatR;
+using Rat.Commands.Projects.DeleteProject;
 using Rat.Core;
-using Rat.Core.Commands.Projects.DeleteProject;
 
 namespace Rat.Api.Routes
 {

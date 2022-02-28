@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Rat.Api.Auth
@@ -18,7 +19,7 @@ namespace Rat.Api.Auth
 
 		public string GetUserId()
 		{
-			var user = _contextAccessor.HttpContext.User;
+			ClaimsPrincipal user = _contextAccessor.HttpContext.User;
 
 			using var methodScope = _logger.AppendMethodScope(Method);
 			_logger.ProcessingStartedDebug();

@@ -1,8 +1,8 @@
 ﻿using System.Net.Mime;
 using MediatR;
 using Rat.Api.Routes.Data;
+using Rat.Commands.Projects.PatchProject;
 using Rat.Core;
-using Rat.Core.Commands.Projects.PatchProject;
 
 namespace Rat.Api.Routes
 {

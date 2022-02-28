@@ -7,8 +7,10 @@ using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
 using Rat.Api.Routes.Health;
+using Rat.Commands;
 using Rat.Core;
 using Rat.Data;
+using Rat.Queries;
 
 namespace Rat.Api
 {
@@ -40,7 +42,8 @@ namespace Rat.Api
 			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			builder.Services.AddSingleton<IUserProvider, UserProvider>();
 
-			builder.Services.AddCommandsAndQueries();
+			builder.Services.AddCommands();
+			builder.Services.AddQueries();
 
 			builder.Services.AddRatDbContext(builder.Configuration);
 

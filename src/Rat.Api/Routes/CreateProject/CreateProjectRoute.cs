@@ -2,8 +2,8 @@
 using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
+using Rat.Commands.Projects.CreateProject;
 using Rat.Core;
-using Rat.Core.Commands.Projects.CreateProject;
 
 namespace Rat.Api.Routes
 {
