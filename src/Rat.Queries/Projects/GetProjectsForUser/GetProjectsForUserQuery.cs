@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Rat.Core;
 using Rat.Data;
 using Rat.Data.Exceptions;
 using Rat.Data.Views;
@@ -20,9 +19,6 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 		public async Task<GetProjectsForUserResponse> Handle(GetProjectsForUserRequest request, CancellationToken cancellationToken)
 		{
 			request.Validate();
-
-			if (request.Context.Status != ProcessingStatus.GoodRequest)
-				return new() { Context = request.Context };
 
 			var userId = request.UserId;
 			var user =
@@ -46,11 +42,8 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 				user = userEntity.Entity;
 			}
 
-			request.Context.Status = ProcessingStatus.Ok;
-
 			return new()
 			{
-				Context = request.Context,
 				UserId = user.Id,
 				ProjectStats = user.Projects.Select(x => new ProjectStatsView
 				{

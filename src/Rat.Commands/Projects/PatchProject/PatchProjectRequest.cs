@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using Rat.Core;
 using Rat.Data.Entities;
+using Rat.Data.Exceptions;
 
 namespace Rat.Commands.Projects.PatchProject
 {
@@ -16,19 +16,22 @@ namespace Rat.Commands.Projects.PatchProject
         public string Name { get; init; }
 
         public int ProjectTypeId { get; init; }
-
-        public RatContext Context { get; init; } = new();
     }
 
     internal static class PatchProjectRequestExtensions
     {
         public static void Validate(this PatchProjectRequest request, ProjectTypeEntity projectType)
         {
-            Validators.ValidateId(request.Id, request.Context);
-            Validators.ValidateName(request.Name, request.Context);
-            Validators.ValidateProjectType(projectType, request.Context);
+			var validationErrors =
+				Validators.ValidateId(request.Id)
+				.Union(Validators.ValidateName(request.Name))
+				.Union(Validators.ValidateProjectType(projectType))
+				.ToArray();
 
-            Validators.MakeGoodOrBad(request.Context);
+			if (validationErrors.Length == 0)
+				return;
+
+			throw new InvalidRequestDataException(validationErrors);
         }
     }
 }

@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Rat.Commands.Properties;
-using Rat.Core;
 using Rat.Data;
 using Rat.Data.Exceptions;
 
@@ -21,20 +20,13 @@ namespace Rat.Commands.Projects.DeleteProject
             [NotNull] DeleteProjectRequest request,
             CancellationToken cancellationToken)
         {
-            request.Validate();
-
-            if (request.Context.Status != ProcessingStatus.GoodRequest)
-                return new() { Context = request.Context };
+			request.Validate();
 
             var projectId = request.Id;
             var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == projectId, cancellationToken);
 
             if (project == null)
-            {
-                request.Context.Status = ProcessingStatus.NotFound;
-
-                return new() { Context = request.Context };
-            }
+				throw new ResourceNotFoundException($"Project: {projectId} does not exist");
 
             _context.Projects.Remove(project);
 
@@ -44,9 +36,7 @@ namespace Rat.Commands.Projects.DeleteProject
             if (changes != expectedNumberOfChanges)
                 throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
 
-            request.Context.Status = ProcessingStatus.Ok;
-
-            return new DeleteProjectResponse { Context = request.Context };
+            return new();
         }
     }
 }

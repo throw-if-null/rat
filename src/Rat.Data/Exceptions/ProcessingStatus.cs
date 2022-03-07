@@ -1,4 +1,4 @@
-﻿namespace Rat.Core
+﻿namespace Rat.Data
 {
     public enum ProcessingStatus
     {

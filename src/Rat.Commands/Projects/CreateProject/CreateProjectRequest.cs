@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Rat.Core;
 using Rat.Data.Entities;
+using Rat.Data.Exceptions;
 
 namespace Rat.Commands.Projects.CreateProject
 {
-    internal record CreateProjectRequest : IRequest<CreateProjectResponse>
+	internal record CreateProjectRequest : IRequest<CreateProjectResponse>
     {
         private const string Class_Name = nameof(CreateProject);
         internal const string Name_Signature = Class_Name + "." + nameof(Name);
@@ -16,19 +17,22 @@ namespace Rat.Commands.Projects.CreateProject
         public string Name { get; set; }
 
         public int ProjectTypeId { get; set; }
-
-        public RatContext Context { get; init; } = new();
 	}
 
     internal static class CreateProjectRequestExtensions
     {
         public static void Validate(this CreateProjectRequest request, ProjectTypeEntity projectType, UserEntity user)
         {
-            Validators.ValidateName(request.Name, request.Context);
-            Validators.ValidateProjectType(projectType, request.Context);
-			Validators.ValidateUser(user, request.Context);
+			var validationErrors =
+				Validators.ValidateName(request.Name)
+				.Union(Validators.ValidateProjectType(projectType))
+				.Union(Validators.ValidateUser(user))
+				.ToArray();
 
-            Validators.MakeGoodOrBad(request.Context);
+			if (validationErrors.Length == 0)
+				return;
+
+			throw new InvalidRequestDataException(validationErrors);
         }
     }
 }

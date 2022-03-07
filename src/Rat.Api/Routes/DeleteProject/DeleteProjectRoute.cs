@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Rat.Commands.Projects.DeleteProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -26,9 +25,6 @@ namespace Rat.Api.Routes
 			async static Task<IResult> ProcessInput(int id, IMediator mediator)
 			{
 				var response = await mediator.Send(new DeleteProjectRequest { Id = id });
-
-				if (response.Context.Status != ProcessingStatus.Ok)
-					return HttpResponseHandler.HandleUnscusseful(response.Context);
 
 				return Results.NoContent();
 			}

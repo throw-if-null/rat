@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Rat.Core;
+using Rat.Data.Exceptions;
 
 namespace Rat.Queries.Projects.GetProjectById
 {
@@ -8,17 +9,18 @@ namespace Rat.Queries.Projects.GetProjectById
         internal const string ID_SIGNATURE = nameof(GetProjectByIdRequest) + "." + nameof(Id);
 
         public int Id { get; init; }
-
-        public RatContext Context { get; init; } = new();
     }
 
     internal static class GetProjectByIdRequestExtensions
     {
         public static void Validate(this GetProjectByIdRequest request)
         {
-            Validators.ValidateId(request.Id, request.Context);
+            var validationErrors = Validators.ValidateId(request.Id);
 
-            Validators.MakeGoodOrBad(request.Context);
+			if (validationErrors.Length == 0)
+				return;
+
+			throw new InvalidRequestDataException(validationErrors);
         }
     }
 }

@@ -2,7 +2,6 @@
 using MediatR;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.PatchProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -29,9 +28,6 @@ namespace Rat.Api.Routes
 			async Task<IResult> ProcessInput(int id, PatchProjectRouteInput input, IMediator mediator)
 			{
 				var response = await mediator.Send(Request(input));
-
-				if (response.Context.Status != ProcessingStatus.Ok)
-					return HttpResponseHandler.HandleUnscusseful(response.Context);
 
 				return Results.Ok(Output(response));
 			}

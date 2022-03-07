@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Rat.Core;
 using Rat.Data;
+using Rat.Data.Exceptions;
 
 namespace Rat.Queries.Projects.GetProjectById
 {
@@ -18,9 +18,6 @@ namespace Rat.Queries.Projects.GetProjectById
 		{
 			request.Validate();
 
-			if (request.Context.Status != ProcessingStatus.GoodRequest)
-				return new() { Context = request.Context };
-
 			var projectId = request.Id;
 
 			var project =
@@ -30,17 +27,10 @@ namespace Rat.Queries.Projects.GetProjectById
 						.FirstOrDefaultAsync(x => x.Id == projectId, cancellationToken);
 
 			if (project == null)
-			{
-				request.Context.Status = ProcessingStatus.NotFound;
-
-				return new() { Context = request.Context };
-			}
-
-			request.Context.Status = ProcessingStatus.Ok;
+				throw new ResourceNotFoundException($"Project: {projectId} does not exist");
 
 			return new()
 			{
-				Context = request.Context,
 				Id = project.Id,
 				Name = project.Name,
 				TypeId = project.Type.Id

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Rat.Commands.Properties;
-using Rat.Core;
 using Rat.Data;
 using Rat.Data.Exceptions;
 
@@ -22,17 +21,10 @@ namespace Rat.Commands.Projects.PatchProject
 
 			request.Validate(projectType);
 
-			if (request.Context.Status != ProcessingStatus.GoodRequest)
-				return new() { Context = request.Context };
-
 			var project = await _context.Projects.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
 			if (project == null)
-			{
-				request.Context.Status = ProcessingStatus.NotFound;
-
-				return new() { Context = request.Context };
-			}
+				throw new ResourceNotFoundException($"Project: {request.Id} does not exist");
 
 			project.Name = request.Name;
 			project.Type = projectType;
@@ -45,11 +37,8 @@ namespace Rat.Commands.Projects.PatchProject
 			if (changes != expectedNumberOfChanges)
 				throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
 
-			request.Context.Status = ProcessingStatus.Ok;
-
 			return new()
 			{
-				Context = request.Context,
 				Id = project.Id,
 				Name = project.Name,
 				TypeId = project.Type.Id

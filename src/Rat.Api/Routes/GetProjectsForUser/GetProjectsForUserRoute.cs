@@ -2,7 +2,6 @@
 using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
-using Rat.Core;
 using Rat.Data.Views;
 using Rat.Queries.Projects.GetProjectsForUser;
 
@@ -34,9 +33,6 @@ namespace Rat.Api.Routes
 					return Results.Forbid();
 
 				var response = await mediator.Send(new GetProjectsForUserRequest { UserId = userId });
-
-				if (response.Context.Status != ProcessingStatus.Ok)
-					return HttpResponseHandler.HandleUnscusseful(response.Context);
 
 				return Results.Ok(Output(response));
 			}

@@ -1,11 +1,7 @@
-﻿using Rat.Core;
-using Rat.Data.Views;
-
-namespace Rat.Commands.Projects.CreateProject
+﻿namespace Rat.Commands.Projects.CreateProject
 {
-    internal record CreateProjectResponse
+	internal record CreateProjectResponse
     {
-        public RatContext Context { get; init; }
 
 		public int Id { get; init; }
 

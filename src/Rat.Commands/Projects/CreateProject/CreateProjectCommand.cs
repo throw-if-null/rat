@@ -27,9 +27,6 @@ namespace Rat.Commands.Projects.CreateProject
 
 			request.Validate(projectType, user);
 
-			if (request.Context.Status != ProcessingStatus.GoodRequest)
-				return new() { Context = request.Context };
-
 			var project =
 				await
 					_context.Projects.AddAsync(
@@ -50,14 +47,11 @@ namespace Rat.Commands.Projects.CreateProject
 						changes,
 						expectedNumberOfChanges));
 
-			request.Context.Status = ProcessingStatus.Ok;
-
 			return new()
 			{
 				Id = project.Entity.Id,
 				Name = project.Entity.Name,
-				TypeId = project.Entity.Type.Id,
-				Context = request.Context
+				TypeId = project.Entity.Type.Id
 			};
 		}
 	}

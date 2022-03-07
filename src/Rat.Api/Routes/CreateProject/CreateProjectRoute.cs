@@ -3,7 +3,6 @@ using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.CreateProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -37,9 +36,6 @@ namespace Rat.Api.Routes
 					return Results.Forbid();
 
 				var response = await mediator.Send(Request(input, userId), CancellationToken.None);
-
-				if (response.Context.Status != ProcessingStatus.Ok)
-					return HttpResponseHandler.HandleUnscusseful(response.Context);
 
 				return Results.CreatedAtRoute("CreateProject", null, CreateOutput(response));
 			}
