@@ -7,8 +7,10 @@ using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
 using Rat.Api.Routes.Health;
+using Rat.Commands;
 using Rat.Core;
 using Rat.Data;
+using Rat.Queries;
 
 namespace Rat.Api
 {
@@ -39,8 +41,10 @@ namespace Rat.Api
 
 			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			builder.Services.AddSingleton<IUserProvider, UserProvider>();
+			builder.Services.AddSingleton<RouteExecutor>();
 
-			builder.Services.AddCommandsAndQueries();
+			builder.Services.AddCommands();
+			builder.Services.AddQueries();
 
 			builder.Services.AddRatDbContext(builder.Configuration);
 
@@ -132,7 +136,7 @@ namespace Rat.Api
 			CreateProjectRoute.Map(app);
 			GetProjectsForUserRoute.Map(app);
 			GetProjectRoute.Map(app);
-			UpdateProjectRoute.Map(app);
+			PatchProjectRoute.Map(app);
 			DeleteProjectRoute.Map(app);
 
 			app.Run();

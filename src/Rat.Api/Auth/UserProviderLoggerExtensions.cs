@@ -6,10 +6,10 @@ namespace Rat.Api.Auth
 	{
 		private static readonly Func<EventId> _getEvent = () => new EventId(LogEvents.ExtractUserIdFromHttpContext, nameof(LogEvents.ExtractUserIdFromHttpContext));
 
-		private readonly static Func<ILogger, string, IDisposable> _appendMethod = LoggerMessage.DefineScope<string>("{Method}");
-		private readonly static Func<ILogger, string, IDisposable> _appendNameClaim = LoggerMessage.DefineScope<string>("{NameClaim}");
-		private readonly static Func<ILogger, string, IDisposable> _appendClientNameClaim = LoggerMessage.DefineScope<string>("{ClientNameClaim}");
-		private readonly static Func<ILogger, string, IDisposable> _appendUserId = LoggerMessage.DefineScope<string>("{UserId}");
+		private static readonly Func<ILogger, string, IDisposable> _appendMethod = LoggerMessage.DefineScope<string>("{Method}");
+		private static readonly Func<ILogger, string, IDisposable> _appendNameClaim = LoggerMessage.DefineScope<string>("{NameClaim}");
+		private static readonly Func<ILogger, string, IDisposable> _appendClientNameClaim = LoggerMessage.DefineScope<string>("{ClientNameClaim}");
+		private static readonly Func<ILogger, string, IDisposable> _appendUserId = LoggerMessage.DefineScope<string>("{UserId}");
 
 		private static readonly Action<ILogger, string, Exception> _debug =
 			LoggerMessage.Define<string>(

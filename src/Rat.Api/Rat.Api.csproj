@@ -15,7 +15,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Rat.Commands\Rat.Commands.csproj" />
 	  <ProjectReference Include="..\Rat.Core\Rat.Core.csproj" />
+	  <ProjectReference Include="..\Rat.Queries\Rat.Queries.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -36,14 +36,14 @@ namespace Rat.Api.Test.Controllers.Project
             var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = jsType });
             await context.SaveChangesAsync();
 
-            var model = new UpdateProjectRouteInput(project.Entity.Id, "New test", csharpType.Id);
+            var model = new PatchProjectRouteInput(project.Entity.Id, "New test", csharpType.Id);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<UpdateProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var content = await JsonSerializer.DeserializeAsync<PatchProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("New test", content.Name);
@@ -63,7 +63,7 @@ namespace Rat.Api.Test.Controllers.Project
             var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
             await context.SaveChangesAsync();
 
-			var model = new UpdateProjectRouteInput(project.Entity.Id, name, projectType.Id);
+			var model = new PatchProjectRouteInput(project.Entity.Id, name, projectType.Id);
 
 			var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
@@ -85,7 +85,7 @@ namespace Rat.Api.Test.Controllers.Project
             context.Projects.Remove(project.Entity);
             await context.SaveChangesAsync();
 
-			var model = new UpdateProjectRouteInput(project.Entity.Id, "Rat", projectType.Id);
+			var model = new PatchProjectRouteInput(project.Entity.Id, "Rat", projectType.Id);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
