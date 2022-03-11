@@ -41,6 +41,7 @@ namespace Rat.Api
 
 			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			builder.Services.AddSingleton<IUserProvider, UserProvider>();
+			builder.Services.AddSingleton<RouteExecutor>();
 
 			builder.Services.AddCommands();
 			builder.Services.AddQueries();

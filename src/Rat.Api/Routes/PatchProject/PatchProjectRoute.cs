@@ -2,6 +2,7 @@
 using MediatR;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.PatchProject;
+using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -25,11 +26,16 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async Task<IResult> ProcessInput(int id, PatchProjectRouteInput input, IMediator mediator)
+			async Task<IResult> ProcessInput(int id, PatchProjectRouteInput input, IMediator mediator, RouteExecutor executor)
 			{
-				var response = await mediator.Send(Request(input));
+				var response =
+					await
+						executor.Execute(
+							ROUTE_NAME,
+							() => mediator.Send(Request(input)),
+							x => Results.Ok(Output(x)));
 
-				return Results.Ok(Output(response));
+				return response;
 			}
 
 			static PatchProjectRequest Request(PatchProjectRouteInput input)

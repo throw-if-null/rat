@@ -22,11 +22,16 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(int id, IMediator mediator)
+			async static Task<IResult> ProcessInput(int id, IMediator mediator, RouteExecutor executor)
 			{
-				var response = await mediator.Send(new DeleteProjectRequest { Id = id });
+				var response =
+					await
+						executor.Execute(
+							ROUTE_NAME,
+							() => mediator.Send(new DeleteProjectRequest { Id = id }),
+							_ => Results.NoContent());
 
-				return Results.NoContent();
+				return response;
 			}
 		}
 	}

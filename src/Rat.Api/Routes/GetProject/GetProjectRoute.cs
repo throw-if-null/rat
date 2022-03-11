@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using MediatR;
 using Rat.Api.Routes.Data;
+using Rat.Core;
 using Rat.Queries.Projects.GetProjectById;
 
 namespace Rat.Api.Routes
@@ -24,11 +25,16 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(int id, IMediator mediator)
+			async static Task<IResult> ProcessInput(int id, IMediator mediator, RouteExecutor executor)
 			{
-				var response = await mediator.Send(new GetProjectByIdRequest { Id = id });
+				var response =
+					await
+						executor.Execute(
+							ROUTE_NAME,
+							() => mediator.Send(new GetProjectByIdRequest { Id = id }),
+							x => Results.Ok(new GetProjectRouteOutput(x.Id, x.Name, x.TypeId)));
 
-				return Results.Ok(new GetProjectRouteOutput(response.Id, response.Name, response.TypeId));
+				return response;
 			}
 		}
 	}

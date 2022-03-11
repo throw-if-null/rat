@@ -2,6 +2,7 @@
 using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
+using Rat.Core;
 using Rat.Data.Views;
 using Rat.Queries.Projects.GetProjectsForUser;
 
@@ -25,16 +26,21 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(IMediator mediator, IUserProvider userProvider)
+			async static Task<IResult> ProcessInput(IMediator mediator, IUserProvider userProvider, RouteExecutor executor)
 			{
 				var userId = userProvider.GetUserId();
 
 				if (string.IsNullOrWhiteSpace(userId))
 					return Results.Forbid();
 
-				var response = await mediator.Send(new GetProjectsForUserRequest { UserId = userId });
+				var response =
+					await
+						executor.Execute(
+							ROUTE_NAME,
+							() => mediator.Send(new GetProjectsForUserRequest { UserId = userId }),
+							x => Results.Ok(Output(x)));
 
-				return Results.Ok(Output(response));
+				return response;
 			}
 
 			static GetProjectForUserRouteOutput Output(GetProjectsForUserResponse response)

@@ -3,6 +3,7 @@ using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.CreateProject;
+using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -27,6 +28,7 @@ namespace Rat.Api.Routes
 
 			static async Task<IResult> ProcessInput(
 				CreateProjectRouteInput input,
+				RouteExecutor executor,
 				IMediator mediator,
 				IUserProvider userProvider)
 			{
@@ -35,9 +37,13 @@ namespace Rat.Api.Routes
 				if (string.IsNullOrWhiteSpace(userId))
 					return Results.Forbid();
 
-				var response = await mediator.Send(Request(input, userId), CancellationToken.None);
+				var response =
+					await executor.Execute(
+						ROUTE_NAME,
+						() => mediator.Send(Request(input, userId), CancellationToken.None),
+						x => Results.CreatedAtRoute(ROUTE_NAME, null, CreateOutput(x)));
 
-				return Results.CreatedAtRoute("CreateProject", null, CreateOutput(response));
+				return response;
 			}
 
 			static CreateProjectRequest Request(CreateProjectRouteInput input, string userId)
