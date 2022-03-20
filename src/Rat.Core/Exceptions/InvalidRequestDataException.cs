@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Rat.Data.Exceptions
+namespace Rat.Core.Exceptions
 {
 	[Serializable]
 	public sealed class InvalidRequestDataException : Exception

@@ -1,39 +1,34 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Rat.Data;
-using Rat.Data.Exceptions;
+﻿using Dapper;
+using MediatR;
+using Rat.DataAccess;
+using Rat.DataAccess.Entities;
 
 namespace Rat.Queries.Projects.GetProjectById
 {
 	internal class GetProjectByIdQuery : IRequestHandler<GetProjectByIdRequest, GetProjectByIdResponse>
 	{
-		private readonly RatDbContext _context;
+		private const string SQL_QUERY = "SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id";
 
-		public GetProjectByIdQuery(RatDbContext context)
+		private readonly ISqlConnectionFactory _connectionFactory;
+
+		public GetProjectByIdQuery(ISqlConnectionFactory connectionFactory)
 		{
-			_context = context;
+			_connectionFactory = connectionFactory;
 		}
 
 		public async Task<GetProjectByIdResponse> Handle(GetProjectByIdRequest request, CancellationToken cancellationToken)
 		{
 			request.Validate();
 
-			var projectId = request.Id;
+			await using var connection = _connectionFactory.CreateConnection();
 
-			var project =
-				await
-					_context.Projects
-						.Include(x => x.Type)
-						.FirstOrDefaultAsync(x => x.Id == projectId, cancellationToken);
-
-			if (project == null)
-				throw new ResourceNotFoundException($"Project: {projectId} does not exist");
+			var project = await connection.QuerySingleAsync<ProjectEntity>(SQL_QUERY, cancellationToken);
 
 			return new()
 			{
 				Id = project.Id,
 				Name = project.Name,
-				TypeId = project.Type.Id
+				TypeId = project.ProjectTypeId
 			};
 		}
 	}

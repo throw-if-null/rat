@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Rat.Data.Exceptions
+namespace Rat.Core.Exceptions
 {
 	[Serializable]
 	public sealed class ResourceNotFoundException : Exception

@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
-using Rat.Data;
-using Rat.Data.Entities;
-using Rat.Data.Views;
+using Rat.DataAccess;
 using Snapshooter.Xunit;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [Collection("Integration")]
+	[Collection("Integration")]
     public class GetProjectTests
     {
         private readonly RatFixture _fixture;
@@ -29,13 +27,17 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Get_Project_By_Id()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Should_Get_Project_By_Id", Type = projectType });
-            await context.SaveChangesAsync();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "csharp" });
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-            var projectId = project.Entity.Id.ToString();
+			command = new CommandDefinition(
+				"",
+				new { Name = "Should_Get_Project_By_Id", Type = projectTypeId });
+
+			var projectId = await connection.QuerySingleAsync<int>(command);
 
             var response = await _fixture.Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -68,16 +70,44 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_Projects_For_User()
         {
-			var userId = "3er4werlj21x";
+			var authProviderUserId = "3er4werlj21x";
 
 			using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "csharp");
-            var user = await context.Users.AddAsync(new UserEntity { UserId = userId });
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-			await context.Projects.AddAsync(new ProjectEntity { Name = "Project A", Type = projectType, Users = new List<ProjectUserEntity> { new() { User = user.Entity } } });
-			await context.Projects.AddAsync(new ProjectEntity { Name = "Project B", Type = projectType, Users = new List<ProjectUserEntity> { new() { User = user.Entity } } });
-            await context.SaveChangesAsync();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "csharp" });
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"",
+				new { UserId = authProviderUserId });
+
+			var userId = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT @@SCOPE_INDENTITY()",
+				new { Name = "Project A", ProjectTypeId = projectTypeId });
+
+			var projectIdA = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT @@SCOPE_INDENTITY()",
+				new { Name = "Project B", ProjectTypeId = projectTypeId });
+
+			var projectIdB = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"INSERT INTO UserProject (UserId, ProjectID) VALUES(@UserId, @ProjectId",
+				new { UserId = userId, ProjectId = projectIdA });
+
+			await connection.ExecuteAsync(command);
+
+			command = new CommandDefinition(
+				"INSERT INTO UserProject (UserId, ProjectID) VALUES(@UserId, @ProjectId",
+				new { UserId = userId, ProjectId = projectIdB });
+
+			await connection.ExecuteAsync(command);
 
 			var request = new HttpRequestMessage
 			{
@@ -85,7 +115,7 @@ namespace Rat.Api.Test.Controllers.Project
 				RequestUri = new Uri("/api/projects/", uriKind: UriKind.Relative)
 			};
 
-			request.Headers.Add("test-user", userId);
+			request.Headers.Add("test-user", authProviderUserId);
 
 			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
@@ -132,7 +162,7 @@ namespace Rat.Api.Test.Controllers.Project
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                Assert.True(projects.UserId > 0);
+                Assert.NotNull(projects.UserId);
                 Assert.Empty(projects.ProjectStats);
             }
         }

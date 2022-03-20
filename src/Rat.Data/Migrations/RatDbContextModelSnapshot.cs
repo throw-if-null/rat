@@ -2,9 +2,11 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Rat.Data;
+
+#nullable disable
 
 namespace Rat.Data.Migrations
 {
@@ -15,50 +17,127 @@ namespace Rat.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.8")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationEntryEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Disabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int?>("RootId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(4096)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RootId");
+
+                    b.ToTable("ConfigurationEntry", (string)null);
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationRootEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(248)
-                        .HasColumnType("character varying(248)");
+                        .HasColumnType("nvarchar(248)");
 
                     b.Property<int?>("TypeId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Project");
+                    b.ToTable("ConfigurationRoot", (string)null);
                 });
 
-            modelBuilder.Entity("Rat.Data.Entities.ProjectTypeEntity", b =>
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationTypeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Name")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ProjectType");
+                    b.ToTable("ConfigurationType", (string)null);
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(248)
+                        .HasColumnType("nvarchar(248)");
+
+                    b.Property<int?>("TypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("Project", (string)null);
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ProjectTypeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ProjectType", (string)null);
 
                     b.HasData(
                         new
@@ -81,33 +160,52 @@ namespace Rat.Data.Migrations
             modelBuilder.Entity("Rat.Data.Entities.ProjectUserEntity", b =>
                 {
                     b.Property<int>("ProjectId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("ProjectId", "UserId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProjectUser");
+                    b.ToTable("ProjectUser", (string)null);
                 });
 
             modelBuilder.Entity("Rat.Data.Entities.UserEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationEntryEntity", b =>
+                {
+                    b.HasOne("Rat.Data.Entities.ConfigurationRootEntity", "Root")
+                        .WithMany("Entries")
+                        .HasForeignKey("RootId");
+
+                    b.Navigation("Root");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationRootEntity", b =>
+                {
+                    b.HasOne("Rat.Data.Entities.ConfigurationTypeEntity", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId");
+
+                    b.Navigation("Type");
                 });
 
             modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>
@@ -136,6 +234,11 @@ namespace Rat.Data.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rat.Data.Entities.ConfigurationRootEntity", b =>
+                {
+                    b.Navigation("Entries");
                 });
 
             modelBuilder.Entity("Rat.Data.Entities.ProjectEntity", b =>

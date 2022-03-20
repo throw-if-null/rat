@@ -4,11 +4,12 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
-using Rat.Data;
-using Rat.Data.Entities;
+using Rat.DataAccess;
+using Rat.DataAccess.Entities;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
@@ -27,16 +28,22 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Patch()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var projectTypes = await context.ProjectTypes.ToListAsync();
-            var jsType = projectTypes.First(x => x.Name == "js");
+			var command = new CommandDefinition("SELECT Id, Name FROM ProjectType");
+			var projectTypes = await connection.QueryAsync<ProjectTypeEntity>(command);
+
+			var jsType = projectTypes.First(x => x.Name == "js");
             var csharpType = projectTypes.First(x => x.Name == "csharp");
 
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = jsType });
-            await context.SaveChangesAsync();
+			command = new CommandDefinition(
+				"",
+				new { Name = "Patch", ProjectTypeId = jsType.Id });
 
-            var model = new PatchProjectRouteInput(project.Entity.Id, "New test", csharpType.Id);
+			var projectId = await connection.QuerySingleAsync<int>(command);
+
+            var model = new PatchProjectRouteInput(projectId, "New test", csharpType.Id);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
@@ -57,13 +64,22 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Return_BadRequest_When_Name_Value_Is_Invalid(string name)
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
-            await context.SaveChangesAsync();
+			var command = new CommandDefinition(
+				"SELECT Id FROM ProjectType WHERE Name = @Name",
+				new { Name = "js" });
 
-			var model = new PatchProjectRouteInput(project.Entity.Id, name, projectType.Id);
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)",
+				new { Name = "Patch", ProjectTypeId = projectTypeId });
+
+			var projectId = await connection.QuerySingleAsync<int>(command);
+
+			var model = new PatchProjectRouteInput(projectId, name, projectTypeId);
 
 			var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
@@ -76,16 +92,28 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Return_NotFound()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstAsync(x => x.Name == "js");
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Patch", Type = projectType });
-            await context.SaveChangesAsync();
+			var command = new CommandDefinition(
+				"SELECT Id FROM ProjectType WHERE Name = @Name",
+				new { Name = "js" });
 
-            context.Projects.Remove(project.Entity);
-            await context.SaveChangesAsync();
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-			var model = new PatchProjectRouteInput(project.Entity.Id, "Rat", projectType.Id);
+			command = new CommandDefinition(
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)",
+				new { Name = "Patch", ProjectTypeId = projectTypeId });
+
+			var projectId = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"DELETE FROM Project WHERE Id = @Id",
+				new { Id = projectId });
+
+			await connection.ExecuteAsync(command);
+
+			var model = new PatchProjectRouteInput(projectId, "Rat", projectTypeId);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",

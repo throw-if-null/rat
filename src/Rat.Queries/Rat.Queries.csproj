@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Rat.Core\Rat.Core.csproj" />
+		<ProjectReference Include="..\Rat.DataAccess\Rat.DataAccess.csproj" />
 		<ProjectReference Include="..\Rat.Data\Rat.Data.csproj" />
 	</ItemGroup>
 
@@ -29,6 +30,10 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="Rat.Api" />
 		<InternalsVisibleTo Include="Rat.Api.Test" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Dapper" Version="2.0.123" />
 	</ItemGroup>
 
 </Project>

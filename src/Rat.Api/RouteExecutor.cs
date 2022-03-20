@@ -1,5 +1,5 @@
-﻿using Rat.Core.Observability;
-using Rat.Data.Exceptions;
+﻿using Rat.Core.Exceptions;
+using Rat.Core.Observability;
 
 namespace Rat.Api
 {

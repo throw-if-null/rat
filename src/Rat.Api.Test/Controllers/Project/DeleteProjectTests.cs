@@ -1,14 +1,15 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Dapper;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.Data;
-using Rat.Data.Entities;
+using Rat.DataAccess;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
 {
-    [Collection("Integration")]
+	[Collection("Integration")]
     public class DeleteProjectTests
     {
         private readonly RatFixture _fixture;
@@ -34,15 +35,23 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Return_NotFound()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Test", Type = projectType });
-            await context.SaveChangesAsync();
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var projectId = project.Entity.Id.ToString();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "js" });
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-            context.Projects.Remove(project.Entity);
-            await context.SaveChangesAsync();
+			command = new CommandDefinition(
+				"",
+				new { Name = "Test", Type = projectTypeId });
+
+			var projectId = await connection.QuerySingleAsync<int>(command);
+
+			command = new CommandDefinition(
+				"DELETE FROM Project WHERE Id = @Id",
+				new { Id = projectId });
+
+			await connection.ExecuteAsync(command);
 
             var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -52,14 +61,19 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Delete()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
-            var project = await context.Projects.AddAsync(new ProjectEntity { Name = "Test", Type = projectType });
-            await context.SaveChangesAsync();
+            var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var projectId = project.Entity.Id.ToString();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "js" });
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-            var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
+			command = new CommandDefinition(
+				"",
+				new { Name = "Test", Type = projectTypeId });
+
+			var projectId = await connection.QuerySingleAsync<int>(command);
+
+			var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }

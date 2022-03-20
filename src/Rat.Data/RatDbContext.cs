@@ -16,7 +16,14 @@ namespace Rat.Data
         public DbSet<ProjectTypeEntity> ProjectTypes { get; set; }
 
 		public DbSet<ProjectUserEntity> ProjectUsers { get; set; }
-        public RatDbContext(DbContextOptions<RatDbContext> options) : base(options)
+
+		public DbSet<ConfigurationRootEntity> ConfigurationRoots { get; set; }
+
+		public DbSet<ConfigurationEntryEntity> ConfigurationEntries { get; set; }
+
+		public DbSet<ConfigurationTypeEntity> ConfigurationTypes { get; set; }
+
+		public RatDbContext(DbContextOptions<RatDbContext> options) : base(options)
         {
         }
 
@@ -61,7 +68,6 @@ namespace Rat.Data
                 builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
                 builder.Property(x => x.Name).HasMaxLength(ProjectTypeSchema.Max_Name_Length).IsRequired();
-
                 builder.HasIndex(x => x.Name).IsUnique();
 
                 builder.HasData(new List<ProjectTypeEntity>
@@ -71,17 +77,54 @@ namespace Rat.Data
                     new ProjectTypeEntity {Id = 3, Name = "csharp"}
                 });
             });
+
+			modelBuilder.Entity<ConfigurationRootEntity>(builder =>
+			{
+				builder.ToTable("ConfigurationRoot");
+
+				builder.HasKey(x => x.Id);
+				builder.Property(x => x.Id).ValueGeneratedOnAdd();
+
+				builder.Property(x => x.Name).HasMaxLength(ConfigurationRootSchema.Max_Name_Length).IsRequired();
+
+				builder.HasOne(x => x.Type);
+			});
+
+			modelBuilder.Entity<ConfigurationEntryEntity>(builder =>
+			{
+				builder.ToTable("ConfigurationEntry");
+
+				builder.HasKey(x => x.Id);
+				builder.Property(x => x.Id).ValueGeneratedOnAdd();
+
+				builder.Property(x => x.Key).HasMaxLength(ConfigurationEntrySchema.Max_Key_Length).IsRequired();
+				builder.Property(x => x.Value).HasMaxLength(ConfigurationEntrySchema.Max_Value_Length).IsRequired();
+
+				builder.HasOne(x => x.Root);
+			});
+
+			modelBuilder.Entity<ConfigurationTypeEntity>(builder =>
+			{
+				builder.ToTable("ConfigurationType");
+
+				builder.HasKey(x => x.Id);
+				builder.Property(x => x.Id).ValueGeneratedOnAdd();
+
+				builder.Property(x => x.Name).HasMaxLength(ConfigurationTypeSchema.Max_Name_Length);
+				builder.HasIndex(x => x.Name).IsUnique();
+			});
         }
     }
 
-    internal class RatDesignTimeDbContextFactory : IDesignTimeDbContextFactory<RatDbContext>
+    public class RatDesignTimeDbContextFactory : IDesignTimeDbContextFactory<RatDbContext>
     {
         public RatDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<RatDbContext>();
             optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30");
+			//optionsBuilder.UseNpgsql("Host=localhost;Database=RatDb;Username=sa;Password=Password1!");
 
-            return new RatDbContext(optionsBuilder.Options);
+			return new RatDbContext(optionsBuilder.Options);
         }
     }
 }

@@ -1,54 +1,60 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Rat.Data;
-using Rat.Data.Exceptions;
+﻿using Dapper;
+using MediatR;
 using Rat.Data.Views;
-using Rat.Queries.Properties;
+using Rat.DataAccess;
+using Rat.DataAccess.Entities;
+using Rat.Queries.Users.GetUserByUserId;
 
 namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal class GetProjectsForUserQuery : IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>
 	{
-		private readonly RatDbContext _context;
 
-		public GetProjectsForUserQuery(RatDbContext context)
+		private const string INSERT_USER =
+			@"INSERT INTO USER (UserId) VALUES (@UserId); 
+		     SELECT SCOPE_IDENTITY()";
+
+		private const string SELECT_PROJECT_STATS = "SELECT Id, Name FROM UserProject WHERE UserId = @UserId";
+
+		private readonly ISqlConnectionFactory _connectionFactory;
+		private readonly IMediator _mediator;
+
+		public GetProjectsForUserQuery(ISqlConnectionFactory connectionFactory, IMediator mediator)
 		{
-			_context = context;
+			_connectionFactory = connectionFactory;
+			_mediator = mediator;
 		}
 
 		public async Task<GetProjectsForUserResponse> Handle(GetProjectsForUserRequest request, CancellationToken cancellationToken)
 		{
 			request.Validate();
 
-			var userId = request.UserId;
-			var user =
+			var id = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderUserId = request.UserId });
+
+			//if (!id.HasValue)
+			//{
+			//	var command = new CommandDefinition(INSERT_USER, new { UserId = request.UserId }, cancellationToken: cancellationToken);
+
+			//	id = await connection.QuerySingleAsync<int>(command);
+			//}
+
+			await using var connection = _connectionFactory.CreateConnection();
+
+			var projects =
 				await
-					_context.Users
-						.Include(x => x.Projects)
-						.ThenInclude(x => x.Project)
-						.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-
-			// TODO: Moved this to a Command
-			if (user == null)
-			{
-				var userEntity = await _context.Users.AddAsync(new() { UserId = request.UserId }, cancellationToken);
-
-				var expectedNumberOfChanges = 1;
-				var changes = await _context.SaveChangesAsync(cancellationToken);
-
-				if (changes != expectedNumberOfChanges)
-					throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
-
-				user = userEntity.Entity;
-			}
+					connection.QueryAsync<ProjectEntity>(
+						new CommandDefinition(
+							SELECT_PROJECT_STATS,
+							new { UserId = request.UserId },
+							cancellationToken: cancellationToken));
 
 			return new()
 			{
-				UserId = user.Id,
-				ProjectStats = user.Projects.Select(x => new ProjectStatsView
+				UserId = request.UserId,
+				ProjectStats = projects.Select(x => new ProjectStatsView
 				{
-					Id = x.ProjectId,
-					Name = x.Project.Name,
+					Id = x.Id,
+					Name = x.Name,
 					TotalConfigurationCount = 0,
 					TotalEntryCount = 0
 				})

@@ -4,11 +4,13 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
 using Rat.Data;
+using Rat.DataAccess;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -28,10 +30,12 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Return_Created()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
+            var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "js" });
+			await using var connection = connectionFactory.CreateConnection();
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-            var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
+            var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
             var response = await _fixture.Client.PostAsync(
                 "/api/projects",
@@ -49,10 +53,12 @@ namespace Rat.Api.Test.Controllers.Project
 		public async Task Should_Return_Forbidden()
 		{
 			using var scope = _fixture.Provider.CreateScope();
-			using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-			var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "js" });
+			await using var connection = connectionFactory.CreateConnection();
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-			var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
+			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
 			var request = new HttpRequestMessage
 			{

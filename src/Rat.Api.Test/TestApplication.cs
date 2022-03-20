@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Dapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +15,7 @@ using Microsoft.Extensions.Logging;
 using Rat.Api.Auth;
 using Rat.Api.Test.Auth;
 using Rat.Api.Test.Mocks;
-using Rat.Data;
-using Rat.Data.Entities;
+using Rat.DataAccess;
 
 namespace Rat.Api.Test
 {
@@ -57,74 +56,69 @@ namespace Rat.Api.Test
 					.AddEnvironmentVariables();
 			});
 
-			builder.ConfigureServices(services =>
+			builder.ConfigureServices(async services =>
 			{
 				services.AddHttpClient();
 
 				services.AddSingleton<IUserProvider, TestUserProvider>();
 
-				var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
-				services.Remove(descriptor);
-
 				services
 					.AddAuthentication("Test")
 					.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
-
-				services.AddDbContext<RatDbContext>(options =>
-				{
-					if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-						options.UseSqlite("Data Source=RatDb.db");
-					else
-						options.UseNpgsql(LocalDbConnectionString);
-				});
 
 				using var provider = services.BuildServiceProvider();
 				using var scope = provider.CreateScope();
 
 				var scopedServices = scope.ServiceProvider;
-				var context = scopedServices.GetRequiredService<RatDbContext>();
+				var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
-				context.Database.EnsureDeleted();
+				using var connection = connectionFactory.CreateConnection();
 
-				if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-				{
-					context.Database.EnsureCreated();
+				//context.Database.EnsureDeleted();
 
-					AddProjectType(context, "js");
-					AddProjectType(context, "csharp");
-				}
-				else
-				{
-					context.Database.Migrate();
-				}
+				//if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
+				//{
+				//	context.Database.EnsureCreated();
 
-				AddUser(context);
+				//	AddProjectType(context, "js");
+				//	AddProjectType(context, "csharp");
+				//}
+				//else
+				//{
+				//	context.Database.Migrate();
+				//}
+
+				//AddUser(context);
 			});
 
 			return base.CreateHost(builder);
 		}
 
-		private static void AddProjectType(RatDbContext context, string name)
+		private static void AddProjectType(SqlConnection connection, string name)
 		{
-			var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == name);
+			var getCommand = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @name", new { Name = name });
+			var insertCommand = new CommandDefinition("INSERT INTO ProjectType (Name) VALUES(@Name)", new { Name = name });
 
-			if (projectType == null)
-				context.ProjectTypes.Add(new ProjectTypeEntity { Name = name });
+			var projectTypeId = connection.QuerySingleOrDefault<int?>(getCommand);
 
-			context.SaveChanges();
+			if (projectTypeId.HasValue)
+				return;
+
+			connection.Execute(insertCommand);
 		}
 
-		private static void AddUser(RatDbContext context)
+		private static void AddUser(SqlConnection connection)
 		{
-			var user = context.Users.FirstOrDefault(x => x.UserId == TestUserProvider.UserId);
+			var getCommand = new CommandDefinition("SELECT Id FROM User WHERE AuthProviderUserId = @AuthProviderUserid", new { AuthProviderUserId = TestUserProvider.UserId });
+			var inserCommand = new CommandDefinition("INSERT INTO User (AuthProviderId) VALUES(@AuthProviderId)", new { AuthProviderUserId = TestUserProvider.UserId });
 
-			if (user == null)
-			{
-				context.Users.Add(new UserEntity { UserId = TestUserProvider.UserId });
+			var userId = connection.QuerySingleOrDefault<int?>(getCommand);
 
-				context.SaveChanges();
-			}
+			if (userId.HasValue)
+				return;
+
+			connection.Execute(inserCommand);
 		}
 	}
 }

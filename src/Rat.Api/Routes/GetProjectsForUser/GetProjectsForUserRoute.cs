@@ -2,8 +2,7 @@
 using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
-using Rat.Core;
-using Rat.Data.Views;
+using Rat.DataAccess.Views;
 using Rat.Queries.Projects.GetProjectsForUser;
 
 namespace Rat.Api.Routes
