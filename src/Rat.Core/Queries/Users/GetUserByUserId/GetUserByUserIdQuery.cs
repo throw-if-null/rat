@@ -9,7 +9,7 @@ namespace Rat.Queries.Users.GetUserByUserId
 {
 	internal class GetUserByUserIdQuery : IRequestHandler<GetUserByUserIdRequest, GetUserByUserIdResponse>
 	{
-		private const string SQL_QUERY = "SELECT Id FROM User WHERE UserId = @UserId";
+		private const string SqlQuery = "SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly IMediator _mediator;
@@ -25,8 +25,8 @@ namespace Rat.Queries.Users.GetUserByUserId
 			await using var connection = _connectionFactory.CreateConnection();
 
 			var command = new CommandDefinition(
-				SQL_QUERY,
-				new { AuthProviderUserId = request.AuthProviderUserId },
+				SqlQuery,
+				new { AuthProviderId = request.AuthProviderId },
 				cancellationToken: cancellationToken);
 
 			var id = await connection.QuerySingleOrDefaultAsync<int?>(command);
@@ -34,7 +34,7 @@ namespace Rat.Queries.Users.GetUserByUserId
 			if (id.HasValue)
 				return new() { Id = id.Value };
 
-			var createUserResponse = await _mediator.Send(new CreateUserRequest { AuthProviderUserId = request.AuthProviderUserId });
+			var createUserResponse = await _mediator.Send(new CreateUserRequest { AuthProviderId = request.AuthProviderId });
 
 			return new() { Id = createUserResponse.Id };
 		}

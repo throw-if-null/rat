@@ -30,12 +30,12 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "csharp" });
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"",
-				new { Name = "Should_Get_Project_By_Id", Type = projectTypeId });
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY();",
+				new { Name = "Should_Get_Project_By_Id", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
 
@@ -70,42 +70,42 @@ namespace Rat.Api.Test.Controllers.Project
         [Fact]
         public async Task Should_Return_Projects_For_User()
         {
-			var authProviderUserId = "3er4werlj21x";
+			var authProviderUserId = Guid.NewGuid().ToString().Substring(0, 12);
 
 			using var scope = _fixture.Provider.CreateScope();
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name == @Name", new { Name = "csharp" });
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"",
-				new { UserId = authProviderUserId });
+				"INSERT INTO Member(AuthProviderId) VALUES(@AuthProviderId); SELECT SCOPE_IDENTITY()",
+				new { AuthProviderId = authProviderUserId });
 
 			var userId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT @@SCOPE_INDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
 				new { Name = "Project A", ProjectTypeId = projectTypeId });
 
 			var projectIdA = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT @@SCOPE_INDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
 				new { Name = "Project B", ProjectTypeId = projectTypeId });
 
 			var projectIdB = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO UserProject (UserId, ProjectID) VALUES(@UserId, @ProjectId",
-				new { UserId = userId, ProjectId = projectIdA });
+				"INSERT INTO MemberProject (MemberId, ProjectID) VALUES(@MemberId, @ProjectId)",
+				new { MemberId = userId, ProjectId = projectIdA });
 
 			await connection.ExecuteAsync(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO UserProject (UserId, ProjectID) VALUES(@UserId, @ProjectId",
-				new { UserId = userId, ProjectId = projectIdB });
+				"INSERT INTO MemberProject (MemberId, ProjectID) VALUES(@MemberId, @ProjectId)",
+				new { MemberId = userId, ProjectId = projectIdB });
 
 			await connection.ExecuteAsync(command);
 

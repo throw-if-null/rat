@@ -75,21 +75,10 @@ namespace Rat.Api.Test
 
 				using var connection = connectionFactory.CreateConnection();
 
-				//context.Database.EnsureDeleted();
+				AddProjectType(connection, "js");
+				AddProjectType(connection, "csharp");
 
-				//if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-				//{
-				//	context.Database.EnsureCreated();
-
-				//	AddProjectType(context, "js");
-				//	AddProjectType(context, "csharp");
-				//}
-				//else
-				//{
-				//	context.Database.Migrate();
-				//}
-
-				//AddUser(context);
+				AddUser(connection);
 			});
 
 			return base.CreateHost(builder);
@@ -97,7 +86,7 @@ namespace Rat.Api.Test
 
 		private static void AddProjectType(SqlConnection connection, string name)
 		{
-			var getCommand = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @name", new { Name = name });
+			var getCommand = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = name });
 			var insertCommand = new CommandDefinition("INSERT INTO ProjectType (Name) VALUES(@Name)", new { Name = name });
 
 			var projectTypeId = connection.QuerySingleOrDefault<int?>(getCommand);
@@ -110,8 +99,8 @@ namespace Rat.Api.Test
 
 		private static void AddUser(SqlConnection connection)
 		{
-			var getCommand = new CommandDefinition("SELECT Id FROM User WHERE AuthProviderUserId = @AuthProviderUserid", new { AuthProviderUserId = TestUserProvider.UserId });
-			var inserCommand = new CommandDefinition("INSERT INTO User (AuthProviderId) VALUES(@AuthProviderId)", new { AuthProviderUserId = TestUserProvider.UserId });
+			var getCommand = new CommandDefinition("SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId", new { AuthProviderId = TestUserProvider.UserId });
+			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId)", new { AuthProviderId = TestUserProvider.UserId });
 
 			var userId = connection.QuerySingleOrDefault<int?>(getCommand);
 

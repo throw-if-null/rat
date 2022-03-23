@@ -12,7 +12,7 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal class GetProjectsForUserQuery : IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>
 	{
-		private const string SqlQuery = "SELECT Id, Name FROM UserProject WHERE UserId = @UserId";
+		private const string SqlQuery = "SELECT mp.MemberId, mp.ProjectId, p.Name FROM MemberProject mp INNER JOIN Project p ON mp.ProjectId = p.Id WHERE mp.MemberId = @MemberId";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly IMediator _mediator;
@@ -27,7 +27,7 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 		{
 			request.Validate();
 
-			var id = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderUserId = request.UserId });
+			var getUserByUserIdResponse = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderId = request.MemberId });
 
 			await using var connection = _connectionFactory.CreateConnection();
 
@@ -36,12 +36,12 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 					connection.QueryAsync<ProjectEntity>(
 						new CommandDefinition(
 							SqlQuery,
-							new { UserId = id },
+							new { MemberId = getUserByUserIdResponse.Id },
 							cancellationToken: cancellationToken));
 
 			return new()
 			{
-				UserId = request.UserId,
+				UserId = getUserByUserIdResponse.Id,
 				ProjectStats = projects.Select(x => new ProjectStatsView
 				{
 					Id = x.Id,

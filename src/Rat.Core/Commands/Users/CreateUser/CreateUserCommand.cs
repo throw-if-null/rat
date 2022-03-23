@@ -8,9 +8,7 @@ namespace Rat.Commands.Users.CreateUser
 {
 	internal class CreateUserCommand : IRequestHandler<CreateUserRequest, CreateUserResponse>
 	{
-		private const string SqlQuery =
-			@"INSERT INTO USER (UserId) VALUES (@UserId); 
-		     SELECT SCOPE_IDENTITY()";
+		private const string SqlQuery = "INSERT INTO Member (AuthProviderId) VALUES (@AuthProviderId); SELECT SCOPE_IDENTITY()";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 
@@ -27,7 +25,7 @@ namespace Rat.Commands.Users.CreateUser
 
 			var command = new CommandDefinition(
 				SqlQuery,
-				new { AuthProviderUserId = request.AuthProviderUserId },
+				new { AuthProviderId = request.AuthProviderId },
 				cancellationToken: cancellationToken);
 
 			var id = await connection.QuerySingleAsync<int>(command);

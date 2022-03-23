@@ -12,8 +12,8 @@ namespace Rat.Commands.Projects.CreateProject
 	{
 		private const string SqlQuery =
 			@"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)
-            DECLARE @ProjectId INT = (SELECT @@SCOPE_IDENTITY())
-            INSERT INTO UserProject (UserId, ProjectId) VALUES (@UserId, @ProjectId)
+            DECLARE @ProjectId INT = (SELECT SCOPE_IDENTITY())
+            INSERT INTO MemberProject (MemberId, ProjectId) VALUES (@MemberId, @ProjectId)
 			SELECT @ProjectId";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
@@ -28,7 +28,7 @@ namespace Rat.Commands.Projects.CreateProject
 		public async Task<CreateProjectResponse> Handle(CreateProjectRequest request, CancellationToken cancellationToken)
 		{
 			var getProjectTypeByIdResponse = await _mediator.Send(new GetProjectTypeByIdRequest { Id = request.ProjectTypeId });
-			var getUserByUserIdResponse = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderUserId = request.UserId });
+			var getUserByUserIdResponse = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderId = request.UserId });
 
 			request.Validate();
 
@@ -36,7 +36,7 @@ namespace Rat.Commands.Projects.CreateProject
 
 			var command = new CommandDefinition(
 				SqlQuery,
-				new { Name = request.Name, ProjectTypeId = getProjectTypeByIdResponse.Id, UserId = getUserByUserIdResponse.Id },
+				new { Name = request.Name, ProjectTypeId = getProjectTypeByIdResponse.Id, MemberId = getUserByUserIdResponse.Id },
 				cancellationToken: cancellationToken);
 
 			var projectId = await connection.QuerySingleAsync<int>(command);

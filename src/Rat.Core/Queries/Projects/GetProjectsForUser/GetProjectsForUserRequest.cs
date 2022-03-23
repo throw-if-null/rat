@@ -6,18 +6,18 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal record GetProjectsForUserRequest : IRequest<GetProjectsForUserResponse>
     {
-        internal const string UserId_Signature = nameof(GetProjectsForUserRequest) + "." + nameof(UserId);
+        internal const string UserId_Signature = nameof(GetProjectsForUserRequest) + "." + nameof(MemberId);
 
         public RatContext Context { get; init; } = new();
 
-        public string UserId { get; init; }
+        public string MemberId { get; init; }
     }
 
     internal static class GetProjectsForUserRequestExtensions
     {
         public static void Validate(this GetProjectsForUserRequest request)
         {
-            var validationErrors = Validators.ValidateUserId(request.UserId);
+            var validationErrors = Validators.ValidateUserId(request.MemberId);
 
 			if (validationErrors.Length == 0)
 				return;

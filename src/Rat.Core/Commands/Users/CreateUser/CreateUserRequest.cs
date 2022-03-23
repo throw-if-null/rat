@@ -4,16 +4,16 @@ namespace Rat.Commands.Users.CreateUser
 {
 	internal record CreateUserRequest : IRequest<CreateUserResponse>
 	{
-		internal const string AuthProviderUserIdSignature = nameof(CreateUserRequest) + "." + nameof(AuthProviderUserId);
+		internal const string AuthProviderUserIdSignature = nameof(CreateUserRequest) + "." + nameof(AuthProviderId);
 
-		public string AuthProviderUserId { get; init; }
+		public string AuthProviderId { get; init; }
 	}
 
 	internal static class CreateUserRequestExtensions
 	{
 		public static void Validate(this CreateUserRequest request)
 		{
-			var validationErrors = Validators.ValidateId(request.AuthProviderUserId);
+			var validationErrors = Validators.ValidateId(request.AuthProviderId);
 
 		}
 	}

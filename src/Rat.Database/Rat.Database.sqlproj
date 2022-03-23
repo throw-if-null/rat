@@ -65,10 +65,10 @@
     <Build Include="Tables\ConfigurationType.sql" />
     <Build Include="Tables\ConfigurationEntry.sql" />
     <Build Include="Tables\ConfigurationRoot.sql" />
-    <Build Include="Tables\User.sql" />
+    <Build Include="Tables\Member.sql" />
     <Build Include="Tables\ProjectType.sql" />
     <Build Include="Tables\Project.sql" />
-    <Build Include="Tables\UserProject.sql" />
+    <Build Include="Tables\MemberProject.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />

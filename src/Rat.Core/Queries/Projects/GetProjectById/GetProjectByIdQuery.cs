@@ -23,8 +23,8 @@ namespace Rat.Queries.Projects.GetProjectById
 			request.Validate();
 
 			await using var connection = _connectionFactory.CreateConnection();
-
-			var project = await connection.QuerySingleOrDefaultAsync<ProjectEntity>(SQL_QUERY, cancellationToken);
+			var command = new CommandDefinition(SQL_QUERY, new {Id = request.Id}, cancellationToken: cancellationToken);
+			var project = await connection.QuerySingleOrDefaultAsync<ProjectEntity>(command);
 
 			return project == null
 				? null

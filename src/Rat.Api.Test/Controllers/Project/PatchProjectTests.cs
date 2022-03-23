@@ -38,7 +38,7 @@ namespace Rat.Api.Test.Controllers.Project
             var csharpType = projectTypes.First(x => x.Name == "csharp");
 
 			command = new CommandDefinition(
-				"",
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
 				new { Name = "Patch", ProjectTypeId = jsType.Id });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
@@ -74,7 +74,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)",
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
 				new { Name = "Patch", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
@@ -102,7 +102,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)",
+				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
 				new { Name = "Patch", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
