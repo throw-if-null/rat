@@ -13,8 +13,8 @@ SET NUMERIC_ROUNDABORT OFF;
 
 
 GO
-:setvar DatabaseName "Rat.Database"
-:setvar DefaultFilePrefix "Rat.Database"
+:setvar DatabaseName "RatDb"
+:setvar DefaultFilePrefix "RatDb"
 :setvar DefaultDataPath ""
 :setvar DefaultLogPath ""
 
@@ -24,7 +24,7 @@ GO
 /*
 Detect SQLCMD mode and disable script execution if SQLCMD mode is not supported.
 To re-enable the script after enabling SQLCMD mode, execute the following:
-SET NOEXEC OFF; 
+SET NOEXEC OFF;
 */
 :setvar __IsSqlCmdEnabled "True"
 GO
@@ -45,11 +45,11 @@ DECLARE  @job_state INT = 0;
 DECLARE  @index INT = 0;
 DECLARE @EscapedDBNameLiteral sysname = N'$(DatabaseName)'
 WAITFOR DELAY '00:00:30';
-WHILE (@index < 60) 
+WHILE (@index < 60)
 BEGIN
 	SET @job_state = ISNULL( (SELECT SUM (result)  FROM (
 		SELECT TOP 1 [state] AS result
-		FROM sys.dm_operation_status WHERE resource_type = 0 
+		FROM sys.dm_operation_status WHERE resource_type = 0
 		AND operation = 'CREATE DATABASE' AND major_resource_id = @EscapedDBNameLiteral AND [state] = 2
 		ORDER BY start_time DESC
 		) r), -1);
@@ -58,7 +58,7 @@ BEGIN
 
 	IF @job_state = 0 /* pending */ OR @job_state = 1 /* in progress */ OR @job_state = -1 /* job not found */ OR (SELECT [state] FROM sys.databases WHERE name = @EscapedDBNameLiteral) <> 0
 		WAITFOR DELAY '00:00:30';
-	ELSE 
+	ELSE
     	BREAK;
 END
 GO
@@ -80,7 +80,7 @@ IF EXISTS (SELECT 1
                 AUTO_CREATE_STATISTICS ON,
                 AUTO_SHRINK OFF,
                 AUTO_UPDATE_STATISTICS ON,
-                RECURSIVE_TRIGGERS OFF 
+                RECURSIVE_TRIGGERS OFF
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -102,7 +102,7 @@ IF EXISTS (SELECT 1
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
             SET AUTO_UPDATE_STATISTICS_ASYNC OFF,
-                DATE_CORRELATION_OPTIMIZATION OFF 
+                DATE_CORRELATION_OPTIMIZATION OFF
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -113,7 +113,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET AUTO_CREATE_STATISTICS ON(INCREMENTAL = OFF) 
+            SET AUTO_CREATE_STATISTICS ON(INCREMENTAL = OFF)
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -124,7 +124,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE (QUERY_CAPTURE_MODE = ALL, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 367), MAX_STORAGE_SIZE_MB = 100) 
+            SET QUERY_STORE (QUERY_CAPTURE_MODE = ALL, DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_PLANS_PER_QUERY = 200, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 367), MAX_STORAGE_SIZE_MB = 100)
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -135,7 +135,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET QUERY_STORE = OFF 
+            SET QUERY_STORE = OFF
             WITH ROLLBACK IMMEDIATE;
     END
 
@@ -162,7 +162,7 @@ IF EXISTS (SELECT 1
            WHERE  [name] = N'$(DatabaseName)')
     BEGIN
         ALTER DATABASE [$(DatabaseName)]
-            SET TEMPORAL_HISTORY_RETENTION ON 
+            SET TEMPORAL_HISTORY_RETENTION ON
             WITH ROLLBACK IMMEDIATE;
     END
 
