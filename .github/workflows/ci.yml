@@ -107,7 +107,7 @@ jobs:
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
 
       - name: Prepare docker tag
         id: docker-prepareTags
@@ -120,7 +120,7 @@ jobs:
           fi
 
       - name: Docker tag
-        id: docker-pringTag
+        id: docker-printTag
         run: echo "Docker tag ${{ env.DOCKER_TAG }}"
 
       - name: Set docker image metadata
@@ -132,7 +132,7 @@ jobs:
 
       - name: Docker build and publish
         id: docker-buildAndPublish
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@vv2.10.0
         with:
           context: .
           file: ./src/Rat.Api/Dockerfile
