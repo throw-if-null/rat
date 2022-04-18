@@ -21,20 +21,6 @@ namespace Rat.Api.Test
 {
 	internal class TestApplication : WebApplicationFactory<Program>
 	{
-		private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
-		private const string DefaultDatabaseEngine = "sqllite";
-
-		private const string LocalDbConnectionString = "Host=localhost;Database=RatDb;Username=sa;Password=Password1!";
-
-		private static readonly Func<string> GetDatabaseEngine = delegate () {
-			var engine = Environment.GetEnvironmentVariable(DatabaseEngineEnvironmentVariable);
-
-			if (string.IsNullOrWhiteSpace(engine))
-				engine = DefaultDatabaseEngine;
-
-			return engine;
-		};
-
 		public TestApplication() : base()
 		{
 		}

@@ -17,31 +17,17 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      #sqlserver:
-      #  image: mcr.microsoft.com/mssql/server:2019-latest
-      #  env:
-      #    ACCEPT_EULA: Y
-      #    SA_PASSWORD: Password1!
-      #  ports:
-      #    - 1433:1433
-
-      postgres:
-        image: postgres
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          POSTGRES_USER: sa
-          POSTGRES_PASSWORD: Password1!
-          POSTGRES_DB: RatDb
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Password1!
         ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          - 1433:1433
 
     steps:
       - name: Setup .NET Core SDK
-        id: install-dotnet-50x
+        id: install-dotnet-6xx
         uses: actions/setup-dotnet@v1.8.1
         with:
           dotnet-version: '6.0.x'
@@ -67,10 +53,23 @@ jobs:
         id: dotnet-build
         run: dotnet build ./src/Rat.sln --configuration Release --no-restore
 
+      - uses: azure/sql-action@v1.2
+        with:
+          connection-string: 'Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;'
+          # optional for SQL project deployment - project-file, build-arguments
+          project-file: '.src/Rat.Database/Rat.Database.sqlproj'
+          #build-arguments: ''
+          # optional for dacpac deployment - dacpac-package
+          #dacpac-package: ''
+          # optional for SQL scripts deployment - sql-file
+          #sql-file: ''
+          # optional for all deployments - arguments
+          #arguments: ''
+
       - name: Test
         id: dotnet-test
         env:
-          DATABASE_ENGINE: postgres
+          DATABASE_ENGINE: sql
         run: dotnet test ./src/Rat.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
       - name: Run CodeQL Analysis

@@ -24,19 +24,6 @@ services:
       retries: 3
       start_period: 3s
 
-  #postgresql:
-  #  <<: *base-service-template
-  #  container_name: postgresql
-  #  image: postgres
-  #  environment:
-  #    - POSTGRES_USER=sa
-  #    - POSTGRES_PASSWORD=Password1!
-  #    - POSTGRES_DB=RatDb
-  #  ports:
-  #    - "5432:5432"
-  #  volumes:
-  #    - database-data:/var/lib/postgresql/data/
-
   rat-api:
     <<: *base-service-template
     container_name: rat-api
@@ -50,8 +37,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       # SQL Connection string:
       - ConnectionStrings__RatDb=Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;
-      # Postgres connection string:
-      #- ConnectionStrings__RatDb=Host=postgresql;Database=RatDb;Username=sa;Password=Password1!
     healthcheck:
       test: curl --max-time "5" --no-buffer --fail http://rat-api/health/ready || exit 1
       interval: 2s
