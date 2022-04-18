@@ -30,6 +30,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 			await connection.ChangeDatabaseAsync("RatDb");
+			await connection.OpenAsync();
 
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
@@ -77,6 +78,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 			await connection.ChangeDatabaseAsync("RatDb");
+			await connection.OpenAsync();
 
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
