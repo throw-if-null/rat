@@ -2,8 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +16,6 @@ using Rat.Api.Auth;
 using Rat.Api.Test.Auth;
 using Rat.Api.Test.Mocks;
 using Rat.DataAccess;
-using Snapshooter;
 
 namespace Rat.Api.Test
 {
@@ -62,33 +59,25 @@ namespace Rat.Api.Test
 				var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
-				try
-				{
-					using var connection = connectionFactory.CreateConnection();
+				using var connection = connectionFactory.CreateConnection();
 
-					connection.Open();
+				connection.Open();
 
-					if (connection.DatabaseExists("RatDb"))
-						connection.DropDatabase("RatDb");
+				if (connection.DatabaseExists("RatDb"))
+					connection.DropDatabase("RatDb");
 
-					connection.CreateDatabase("RatDb");
-					connection.CreateTable("RatDb", "ProjectType.sql");
-					connection.CreateTable("RatDb", "Project.sql");
-					connection.CreateTable("RatDb", "ConfigurationType.sql");
-					connection.CreateTable("RatDb", "ConfigurationRoot.sql");
-					connection.CreateTable("RatDb", "ConfigurationEntry.sql");
-					connection.CreateTable("RatDb", "Member.sql");
-					connection.CreateTable("RatDb", "MemberProject.sql");
+				connection.CreateDatabase("RatDb");
+				connection.CreateTable("RatDb", "ProjectType.sql");
+				connection.CreateTable("RatDb", "Project.sql");
+				connection.CreateTable("RatDb", "ConfigurationType.sql");
+				connection.CreateTable("RatDb", "ConfigurationRoot.sql");
+				connection.CreateTable("RatDb", "ConfigurationEntry.sql");
+				connection.CreateTable("RatDb", "Member.sql");
+				connection.CreateTable("RatDb", "MemberProject.sql");
 
-					AddProjectType(connection, "RatDb", "js");
-					AddProjectType(connection, "RatDb", "csharp");
-					AddUser(connection, "RatDb");
-				}
-				catch (Exception ex)
-				{
-
-					throw;
-				}
+				AddProjectType(connection, "RatDb", "js");
+				AddProjectType(connection, "RatDb", "csharp");
+				AddUser(connection, "RatDb");
 			});
 
 			return base.CreateHost(builder);
