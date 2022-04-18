@@ -162,7 +162,7 @@ namespace Rat.Api.Test.Controllers.Project
                         content,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                Assert.NotNull(projects.UserId);
+                Assert.NotEqual(0, projects.UserId);
                 Assert.Empty(projects.ProjectStats);
             }
         }
