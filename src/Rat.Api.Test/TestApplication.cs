@@ -60,7 +60,7 @@ namespace Rat.Api.Test
 				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
 				using var connection = connectionFactory.CreateConnection();
-
+				connection.ChangeDatabase("master");
 				connection.Open();
 
 				if (connection.DatabaseExists("RatDb"))
