@@ -107,7 +107,7 @@ jobs:
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare docker tag
         id: docker-prepareTags
