@@ -34,8 +34,6 @@ namespace Rat.Api.Test.Controllers.Project
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 
 			await using var connection = connectionFactory.CreateConnection();
-			await connection.ChangeDatabaseAsync("RatDb");
-			await connection.OpenAsync();
 
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
@@ -61,8 +59,6 @@ namespace Rat.Api.Test.Controllers.Project
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 
 			await using var connection = connectionFactory.CreateConnection();
-			await connection.ChangeDatabaseAsync("RatDb");
-			await connection.OpenAsync();
 
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
