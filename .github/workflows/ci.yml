@@ -55,14 +55,18 @@ jobs:
 
       - uses: azure/sql-action@v1.2
         with:
+          server-name: 'sqlserver'
           connection-string: 'Data Source=sqlserver;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;'
           # optional for SQL project deployment - project-file, build-arguments
-          project-file: '.src/Rat.Database/Rat.Database.sqlproj'
-          build-arguments: '-c Release'
+          #project-file: '.src/Rat.Database/Rat.Database.sqlproj'
+          #build-arguments: '-c Release'
+
           # optional for dacpac deployment - dacpac-package
           #dacpac-package: ''
+
           # optional for SQL scripts deployment - sql-file
-          #sql-file: './src/Rat.Database_Create.sql'
+          sql-file: './src/Rat.Database_Create.sql'
+
           # optional for all deployments - arguments
           arguments: '/p:DropObjectsNotInSource=true'
 
