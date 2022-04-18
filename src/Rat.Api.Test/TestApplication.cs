@@ -42,7 +42,7 @@ namespace Rat.Api.Test
 					.AddEnvironmentVariables();
 			});
 
-			builder.ConfigureServices(async services =>
+			builder.ConfigureServices(services =>
 			{
 				services.AddHttpClient();
 
