@@ -158,9 +158,9 @@ namespace Rat.Api.Test
 
 		public static void CreateTable(this SqlConnection connection, string database, string name)
 		{
-			var path = Environment.GetEnvironmentVariable("DATABASE_PROJECT_PATH");
+			var path = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
 
-			var query = File.ReadAllText(Path.Combine(path, "Tables", name));
+			var query = File.ReadAllText(Path.Combine(path, "src/Rat.Database/Tables", name));
 
 			connection.ChangeDatabase(database);
 			connection.Execute(new CommandDefinition(query));
