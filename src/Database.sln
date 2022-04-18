@@ -5,6 +5,11 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Rat.Database", "Rat.Database\Rat.Database.sqlproj", "{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6BC2725E-D4C0-43BE-8BA8-AABE24082B3A}"
+	ProjectSection(SolutionItems) = preProject
+		Rat.Database_Create.sql = Rat.Database_Create.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

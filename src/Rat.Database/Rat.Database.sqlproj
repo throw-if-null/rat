@@ -1,32 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build">
-	<Sdk Name="Microsoft.Build.Sql" Version="0.1.3-preview" />
-	<PropertyGroup>
-		<Name>reactions</Name>
-		<DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
-		<ModelCollation>1033, CI</ModelCollation>
-		<TargetDatabaseSet>True</TargetDatabaseSet>
-		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-		<TargetFrameworkProfile />
-		<ProjectGuid>{59e69db5-aeed-4cc8-bf9d-860d8c3ab50c}</ProjectGuid>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<RunSqlCodeAnalysis>True</RunSqlCodeAnalysis>
-	</PropertyGroup>
-	<ItemGroup>
-		<Folder Include="Properties" />
-		<Folder Include="Tables" />
-	</ItemGroup>
-	<ItemGroup>
-		<Build Include="Tables\ConfigurationType.sql" />
-		<Build Include="Tables\ConfigurationEntry.sql" />
-		<Build Include="Tables\ConfigurationRoot.sql" />
-		<Build Include="Tables\Member.sql" />
-		<Build Include="Tables\ProjectType.sql" />
-		<Build Include="Tables\Project.sql" />
-		<Build Include="Tables\MemberProject.sql" />
-	</ItemGroup>
-	<ItemGroup>
-		<RefactorLog Include="Rat.Database.refactorlog" />
-	</ItemGroup>
+  <Sdk Name="Microsoft.Build.Sql" Version="0.1.3-preview" />
+  <PropertyGroup>
+    <Name>reactions</Name>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <ProjectGuid>{59e69db5-aeed-4cc8-bf9d-860d8c3ab50c}</ProjectGuid>
+    <GenerateCreateScript>True</GenerateCreateScript>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <RunSqlCodeAnalysis>True</RunSqlCodeAnalysis>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Tables" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\ConfigurationType.sql" />
+    <Build Include="Tables\ConfigurationEntry.sql" />
+    <Build Include="Tables\ConfigurationRoot.sql" />
+    <Build Include="Tables\Member.sql" />
+    <Build Include="Tables\ProjectType.sql" />
+    <Build Include="Tables\Project.sql" />
+    <Build Include="Tables\MemberProject.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Rat.Database.refactorlog" />
+  </ItemGroup>
 </Project>
