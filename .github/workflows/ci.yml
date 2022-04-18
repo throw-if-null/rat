@@ -62,7 +62,7 @@ jobs:
           # optional for dacpac deployment - dacpac-package
           #dacpac-package: ''
           # optional for SQL scripts deployment - sql-file
-          #sql-file: './src/Rat.Database_Create.sql'
+          sql-file: './src/Rat.Database_Create.sql'
           # optional for all deployments - arguments
           #arguments: ''
 
