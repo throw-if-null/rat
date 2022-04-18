@@ -55,7 +55,7 @@ jobs:
 
       - uses: azure/sql-action@v1.2
         with:
-          connection-string: 'Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;'
+          connection-string: 'Data Source=sqlserver;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;'
           # optional for SQL project deployment - project-file, build-arguments
           #project-file: '.src/Rat.Database/Rat.Database.sqlproj'
           #build-arguments: ''
