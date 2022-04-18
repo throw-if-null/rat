@@ -53,27 +53,10 @@ jobs:
         id: dotnet-build
         run: dotnet build ./src/Rat.sln --configuration Release --no-restore
 
-      - uses: azure/sql-action@v1.2
-        with:
-          server-name: 'sqlserver'
-          connection-string: 'Data Source=sqlserver;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;'
-          # optional for SQL project deployment - project-file, build-arguments
-          #project-file: '.src/Rat.Database/Rat.Database.sqlproj'
-          #build-arguments: '-c Release'
-
-          # optional for dacpac deployment - dacpac-package
-          #dacpac-package: ''
-
-          # optional for SQL scripts deployment - sql-file
-          sql-file: './src/Rat.Database_Create.sql'
-
-          # optional for all deployments - arguments
-          arguments: '/p:DropObjectsNotInSource=true'
-
       - name: Test
         id: dotnet-test
         env:
-          DATABASE_ENGINE: sql
+          DATABASE_PROJECT_PATH: './src/Rat.Database'
         run: dotnet test ./src/Rat.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
       - name: Run CodeQL Analysis
