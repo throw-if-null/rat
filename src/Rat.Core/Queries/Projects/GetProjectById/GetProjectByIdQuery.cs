@@ -9,7 +9,7 @@ namespace Rat.Queries.Projects.GetProjectById
 {
 	internal class GetProjectByIdQuery : IRequestHandler<GetProjectByIdRequest, GetProjectByIdResponse>
 	{
-		private const string SQL_QUERY = "SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id";
+		private const string SQL_QUERY = "SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id and Deleted IS NULL";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 

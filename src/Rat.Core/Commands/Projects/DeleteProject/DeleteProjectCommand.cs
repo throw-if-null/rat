@@ -12,7 +12,7 @@ namespace Rat.Commands.Projects.DeleteProject
 {
 	internal class DeleteProjectCommand : IRequestHandler<DeleteProjectRequest, DeleteProjectResponse>
     {
-		private const string SqlQuery = "DELETE FROM Project WHERE Id = @Id";
+		private const string SqlQuery = "UPDATE Project SET Deleted = GETUTCDATE() WHERE Id = @Id";
 
         private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly IMediator _mediator;

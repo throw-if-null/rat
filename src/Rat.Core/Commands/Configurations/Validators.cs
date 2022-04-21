@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Rat.Core.Properties;
-
 using static Rat.DataAccess.DatabaseSchema;
 
-namespace Rat.Commands.Projects
+namespace Rat.Core.Commands.Configurations
 {
 	internal static class Validators
 	{
@@ -27,7 +26,7 @@ namespace Rat.Commands.Projects
 				return new KeyValuePair<string, string>[1] { new("Name", Resources.MustNotBeNullOrEmpty) };
 			}
 
-			if (name.Length > ProjectSchema.Max_Name_Length)
+			if (name.Length > ConfigurationRootSchema.Max_Name_Length)
 			{
 				return new KeyValuePair<string, string>[1]
 				{
@@ -38,21 +37,11 @@ namespace Rat.Commands.Projects
 			return Empty;
 		}
 
-		public static KeyValuePair<string, string>[] ValidateAuthProviderUserId(string authProviderUserId)
-		{
-			if (string.IsNullOrWhiteSpace(authProviderUserId))
-			{
-				return new KeyValuePair<string, string>[1] { new("AuthProviderId", Resources.NotFound) };
-			}
-
-			return Empty;
-		}
-
-		public static KeyValuePair<string, string>[] ValidateProjectTypeId(int projectTypeId)
+		public static KeyValuePair<string, string>[] ValidateConfigurationTypeId(int projectTypeId)
 		{
 			if (projectTypeId <= 0)
 			{
-				return new KeyValuePair<string, string>[1] { new("ProjectTypeId", Resources.NotFound) };
+				return new KeyValuePair<string, string>[1] { new("ConfigurationTypeId", Resources.NotFound) };
 			}
 
 			return Empty;

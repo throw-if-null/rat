@@ -8,6 +8,7 @@
 
 	[Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(), 
     [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(), 
+    [Deleted] DATETIMEOFFSET NULL, 
     CONSTRAINT [PK_ConfigurationEntry_Id] PRIMARY KEY ([Id] ASC),
     CONSTRAINT [FK_ConfigurationEntry_ConfigurationRoot] FOREIGN KEY ([ConfigurationRootId]) REFERENCES [ConfigurationRoot]([Id])
 )

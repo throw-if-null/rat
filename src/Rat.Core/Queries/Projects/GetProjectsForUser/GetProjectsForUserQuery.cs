@@ -12,7 +12,10 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal class GetProjectsForUserQuery : IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>
 	{
-		private const string SqlQuery = "SELECT mp.MemberId, mp.ProjectId, p.Name FROM MemberProject mp INNER JOIN Project p ON mp.ProjectId = p.Id WHERE mp.MemberId = @MemberId";
+		private const string SqlQuery =
+			@"SELECT mp.MemberId, mp.ProjectId, p.Name FROM MemberProject mp 
+INNER JOIN Project p ON mp.ProjectId = p.Id 
+WHERE mp.MemberId = @MemberId AND mp.Deleted IS NULL";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly IMediator _mediator;

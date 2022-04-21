@@ -8,7 +8,7 @@ on:
 
 env:
   DEFAULT_BRANCH: branch0
-  VERSION: 0.2.4
+  VERSION: 0.3.0
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:
@@ -143,7 +143,6 @@ jobs:
       - name: Print published docker image tags
         id: print-docker-image-tags
         run: echo '${{ steps.docker-metadata.outputs.tags }}'
-
 
   azure:
     name: Deploy to Azure

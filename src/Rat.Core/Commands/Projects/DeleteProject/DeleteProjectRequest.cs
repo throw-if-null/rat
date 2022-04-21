@@ -6,8 +6,6 @@ namespace Rat.Commands.Projects.DeleteProject
 {
 	internal record DeleteProjectRequest : IRequest<DeleteProjectResponse>
     {
-        internal const string ID_SIGNATURE = nameof(DeleteProjectRequest) + "." + nameof(Id);
-
         public int Id { get; init; }
     }
 

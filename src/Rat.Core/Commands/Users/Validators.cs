@@ -15,7 +15,7 @@ namespace Rat.Commands.Users
 			{
 				return new KeyValuePair<string, string>[1]
 				{
-					new KeyValuePair<string, string>(CreateUserRequest.AuthProviderUserIdSignature, Resources.MustNotBeNullOrEmpty)
+					new KeyValuePair<string, string>("AuthProviderId", Resources.MustNotBeNullOrEmpty)
 				};
 			}
 

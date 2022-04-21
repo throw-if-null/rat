@@ -4,8 +4,6 @@ namespace Rat.Commands.Users.CreateUser
 {
 	internal record CreateUserRequest : IRequest<CreateUserResponse>
 	{
-		internal const string AuthProviderUserIdSignature = nameof(CreateUserRequest) + "." + nameof(AuthProviderId);
-
 		public string AuthProviderId { get; init; }
 	}
 

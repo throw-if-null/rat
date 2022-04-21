@@ -6,11 +6,6 @@ namespace Rat.Commands.Projects.PatchProject
 {
 	internal record PatchProjectRequest : IRequest<PatchProjectResponse>
     {
-        private const string Class_Name = nameof(PatchProjectRequest) + ".";
-        internal const string Id_Signature = Class_Name + nameof(Id);
-        internal const string Name_Signature = Class_Name + nameof(Name);
-        internal const string ProjectTypeId_Signature = Class_Name + nameof(ProjectTypeId);
-
         public int Id { get; init; }
 
         public string Name { get; init; }
