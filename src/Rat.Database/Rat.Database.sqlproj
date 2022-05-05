@@ -17,6 +17,14 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables" />
+    <Folder Include="Procedures" />
+    <Folder Include="Procedures\ConfigurationEntry" />
+    <Folder Include="Procedures\ConfigurationRoot" />
+    <Folder Include="Procedures\Member" />
+    <Folder Include="Procedures\MemberProject" />
+    <Folder Include="Procedures\Project" />
+    <Folder Include="Procedures\ProjectType" />
+    <Folder Include="_Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ConfigurationType.sql" />
@@ -26,6 +34,19 @@
     <Build Include="Tables\ProjectType.sql" />
     <Build Include="Tables\Project.sql" />
     <Build Include="Tables\MemberProject.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Insert.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Insert.sql" />
+    <Build Include="Procedures\Member\Member_Insert.sql" />
+    <Build Include="Procedures\MemberProject\MemberProject_Insert.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Insert.sql" />
+    <Build Include="Procedures\Project\Project_Insert.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetById.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_GetAll.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_GetById.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_UpdateName.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Delete.sql" />
+    <Build Include="Procedures\Project\Project_GetById.sql" />
+    <PostDeploy Include="_Scripts\SeedData.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />

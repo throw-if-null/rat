@@ -39,8 +39,6 @@
     <Folder Include="Commands\ConfigurationEntries\CreateConfigurationEntry\" />
     <Folder Include="Commands\ConfigurationEntries\DeleteConfigurationEntry\" />
     <Folder Include="Commands\ConfigurationEntries\PatchConfigurationEntry\" />
-    <Folder Include="Commands\Configurations\DeleteConfiguration\" />
-    <Folder Include="Commands\Configurations\PatchConfiguration\" />
   </ItemGroup>
 
 </Project>

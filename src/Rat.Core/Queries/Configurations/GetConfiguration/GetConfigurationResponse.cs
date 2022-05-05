@@ -1,9 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Rat.Core.Queries.Configurations.GetConfiguration
 {
-	internal class GetConfigurationResponse
+	internal record GetConfigurationResponse
 	{
+		public int ConfigurationId { get; init; }
+
+		public string Name { get; init; }
+
+		public int ConfigurationTypeId { get; init; }
+
+		public DateTimeOffset Created { get; init; }
+
+		public DateTimeOffset Modified { get; init; }
+
 		public IEnumerable<ConfigurationEntry> ConfigurationEntries { get; init; }
 	}
 
@@ -17,6 +28,6 @@ namespace Rat.Core.Queries.Configurations.GetConfiguration
 
 		public bool Disabled { get; init; }
 
-		public long Expiry { get; init; }
+		public long SecondsToLive { get; init; }
 	}
 }

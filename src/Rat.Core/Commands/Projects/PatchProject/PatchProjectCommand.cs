@@ -13,8 +13,10 @@ namespace Rat.Commands.Projects.PatchProject
 	internal class PatchProjectCommand : IRequestHandler<PatchProjectRequest, PatchProjectResponse>
 	{
 		private const string SqlQuery =
-			@"UPDATE Project SET Name = @Name, ProjectTypeId = @ProjectTypeId, Modified = GETUTCDATE() WHERE Id = @Id; 
-              SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id";
+			@"UPDATE Project 
+			SET Name = @Name, ProjectTypeId = @ProjectTypeId, Modified = GETUTCDATE() 
+            WHERE Id = @Id; 
+            SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id";
 
 		private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly IMediator _mediator;
@@ -29,9 +31,9 @@ namespace Rat.Commands.Projects.PatchProject
 		{
 			request.Validate();
 
-			var projectType = await _mediator.Send(new GetProjectTypeByIdRequest { Id = request.ProjectTypeId });
+			var getProjectTypeByIdResponse = await _mediator.Send(new GetProjectTypeByIdRequest { Id = request.ProjectTypeId });
 
-			if (projectType == null)
+			if (getProjectTypeByIdResponse == null)
 				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
 			var getProjectByIdResponse = await _mediator.Send(new GetProjectByIdRequest { Id = request.Id });
@@ -50,8 +52,8 @@ namespace Rat.Commands.Projects.PatchProject
 			return new()
 			{
 				Id = project.Id,
-				Name = request.Name,
-				TypeId = request.ProjectTypeId
+				Name = project.Name,
+				TypeId = project.ProjectTypeId
 			};
 		}
 	}
