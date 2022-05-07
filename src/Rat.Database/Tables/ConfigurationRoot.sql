@@ -3,6 +3,7 @@
 	[Id] INT NOT NULL IDENTITY(1, 1),
 	[Name] NVARCHAR(128) NOT NULL,
 	[ConfigurationTypeId] INT NOT NULL,
+    [ProjectId] INT NOT NULL,
 
     [Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
     [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
@@ -13,9 +14,9 @@
 	[ValidTo] datetime2 (0) GENERATED ALWAYS AS ROW END,
 	PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo),
 
-    [Deleted] DATETIMEOFFSET NULL,
     CONSTRAINT [PK_ConfigurationRoot_Id] PRIMARY KEY ([Id] ASC),
-    CONSTRAINT [FK_ConfigurationRoot_ConfigurationType] FOREIGN KEY ([ConfigurationTypeId]) REFERENCES [ConfigurationType]([Id])
+    CONSTRAINT [FK_ConfigurationRoot_ProjectId__Project_Id] FOREIGN KEY ([ProjectId]) REFERENCES [Project]([Id]),
+    CONSTRAINT [FK_ConfigurationRoot_ConfigurationTypeId__ConfigurationType_Id] FOREIGN KEY ([ConfigurationTypeId]) REFERENCES [ConfigurationType]([Id])
 )
 WITH
 (

@@ -13,6 +13,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <RunSqlCodeAnalysis>True</RunSqlCodeAnalysis>
+    <SqlCodeAnalysisRules>-Microsoft.Rules.Data.SR0014</SqlCodeAnalysisRules>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Properties" />
@@ -25,6 +26,7 @@
     <Folder Include="Procedures\Project" />
     <Folder Include="Procedures\ProjectType" />
     <Folder Include="_Scripts" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\ConfigurationType.sql" />
@@ -47,6 +49,18 @@
     <Build Include="Procedures\ProjectType\ProjectType_Delete.sql" />
     <Build Include="Procedures\Project\Project_GetById.sql" />
     <PostDeploy Include="_Scripts\SeedData.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Delete.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEnty_Update.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetById.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetByConfigurationRootId.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetByProjectId.sql" />
+    <Build Include="Functions\GetConfigurationEntryCount.sql" />
+    <Build Include="Functions\GetConfigurationRootCount.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Delete.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Update.sql" />
+    <Build Include="Procedures\Member\Member_Delete.sql" />
+    <Build Include="Functions\GetProjectConfigurationEntryCount.sql" />
+    <Build Include="Procedures\Project\Project_GetProjectsForMember.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />

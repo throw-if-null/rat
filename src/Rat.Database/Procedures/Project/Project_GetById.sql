@@ -1,6 +1,19 @@
 ﻿CREATE PROCEDURE [dbo].[Project_GetById]
-	@param1 int = 0,
-	@param2 int
+	@id int
 AS
-	SELECT @param1, @param2
-RETURN 0
+BEGIN
+	SELECT
+		[Id],
+		[Name],
+		[ProjectTypeId],
+		[Created],
+		[Modified],
+		[CreatedBy],
+		[ModifiedBy],
+		[ConfigurationCount] = [dbo].[GetConfigurationRootCount] ([Id]),
+		[EntriesCount] = [dbo].[GetProjectConfigurationEntryCount] ([Id])
+	FROM [dbo].[Project]
+	WHERE [Id] = @id
+END
+
+RETURN @@ROWCOUNT
