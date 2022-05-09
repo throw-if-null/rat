@@ -59,34 +59,34 @@ namespace Rat.Api.Test
 				var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
-				using var connection = connectionFactory.CreateConnection();
-				connection.ConnectionString = connection.ConnectionString.Replace("RatDb", "master");
-				connection.Open();
+				//using var connection = connectionFactory.CreateConnection();
+				//connection.ConnectionString = connection.ConnectionString.Replace("RatDb", "master");
+				//connection.Open();
 
-				if (connection.DatabaseExists("RatDb"))
-					connection.DropDatabase("RatDb");
+				//if (connection.DatabaseExists("RatDb"))
+				//	connection.DropDatabase("RatDb");
 
-				connection.CreateDatabase("RatDb");
-				connection.CreateTable("RatDb", "ProjectType.sql");
-				connection.CreateTable("RatDb", "Project.sql");
-				connection.CreateTable("RatDb", "ConfigurationType.sql");
-				connection.CreateTable("RatDb", "ConfigurationRoot.sql");
-				connection.CreateTable("RatDb", "ConfigurationEntry.sql");
-				connection.CreateTable("RatDb", "Member.sql");
-				connection.CreateTable("RatDb", "MemberProject.sql");
+				//connection.CreateDatabase("RatDb");
+				//connection.CreateTable("RatDb", "ProjectType.sql");
+				//connection.CreateTable("RatDb", "Member.sql");
+				//connection.CreateTable("RatDb", "Project.sql");
+				//connection.CreateTable("RatDb", "MemberProject.sql");
+				//connection.CreateTable("RatDb", "ConfigurationType.sql");
+				//connection.CreateTable("RatDb", "ConfigurationRoot.sql");
+				//connection.CreateTable("RatDb", "ConfigurationEntry.sql");
 
-				AddProjectType(connection, "RatDb", "js");
-				AddProjectType(connection, "RatDb", "csharp");
-				AddUser(connection, "RatDb");
+				//var userId = AddUser(connection, "RatDb");
+				//AddProjectType(connection, "RatDb", "js", userId);
+				//AddProjectType(connection, "RatDb", "csharp", userId);
 			});
 
 			return base.CreateHost(builder);
 		}
 
-		private static void AddProjectType(SqlConnection connection, string database, string name)
+		private static void AddProjectType(SqlConnection connection, string database, string name, int userId)
 		{
 			var getCommand = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = name });
-			var insertCommand = new CommandDefinition("INSERT INTO ProjectType (Name) VALUES(@Name)", new { Name = name });
+			var insertCommand = new CommandDefinition("INSERT INTO ProjectType (Name, CreatedBy, ModifiedBy) VALUES(@Name, @CreatedBy, @ModifiedBy)", new { Name = name, CreatedBy = userId, ModifiedBy = userId });
 
 			connection.ChangeDatabase(database);
 			var projectTypeId = connection.QuerySingleOrDefault<int?>(getCommand);
@@ -97,18 +97,22 @@ namespace Rat.Api.Test
 			connection.Execute(insertCommand);
 		}
 
-		private static void AddUser(SqlConnection connection, string database)
+		private static int AddUser(SqlConnection connection, string database)
 		{
 			var getCommand = new CommandDefinition("SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId", new { AuthProviderId = TestUserProvider.UserId });
-			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId)", new { AuthProviderId = TestUserProvider.UserId });
+			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId);", new { AuthProviderId = TestUserProvider.UserId });
 
 			connection.ChangeDatabase(database);
 			var userId = connection.QuerySingleOrDefault<int?>(getCommand);
 
 			if (userId.HasValue)
-				return;
+				return userId.Value;
 
 			connection.Execute(inserCommand);
+
+			userId = connection.QuerySingleOrDefault<int?>(getCommand);
+
+			return userId.Value;
 		}
 	}
 

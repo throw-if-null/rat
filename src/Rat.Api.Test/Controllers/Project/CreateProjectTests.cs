@@ -11,6 +11,7 @@ using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
 using Rat.Data;
 using Rat.DataAccess;
+using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -31,6 +32,10 @@ namespace Rat.Api.Test.Controllers.Project
         {
             using var scope = _fixture.Provider.CreateScope();
             var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			var c = connectionFactory.CreateConnection();
+			var result = await c.ProjectTypeInsert(Guid.NewGuid().ToString("N"), 1);
+			var noc = await c.ProjectTypeUpdate(result.Id, Guid.NewGuid().ToString("N"), 1);
+
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 
 			await using var connection = connectionFactory.CreateConnection();

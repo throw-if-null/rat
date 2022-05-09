@@ -2,7 +2,8 @@
 	@name nvarchar(64) = NULL,
 	@configurationTypeId int = NULL,
 	@modifiedBy int,
-	@id int
+	@id int,
+	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
 	UPDATE [dbo].[ConfigurationRoot]
@@ -14,6 +15,8 @@ BEGIN
 	WHERE
 		(@name IS NOT NULL OR @configurationTypeId IS NOT NULL) AND
 		[Id] = @id
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT

@@ -45,7 +45,7 @@
     <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetById.sql" />
     <Build Include="Procedures\ProjectType\ProjectType_GetAll.sql" />
     <Build Include="Procedures\ProjectType\ProjectType_GetById.sql" />
-    <Build Include="Procedures\ProjectType\ProjectType_UpdateName.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Update.sql" />
     <Build Include="Procedures\ProjectType\ProjectType_Delete.sql" />
     <Build Include="Procedures\Project\Project_GetById.sql" />
     <PostDeploy Include="_Scripts\SeedData.sql" />
@@ -61,6 +61,8 @@
     <Build Include="Procedures\Member\Member_Delete.sql" />
     <Build Include="Functions\GetProjectConfigurationEntryCount.sql" />
     <Build Include="Procedures\Project\Project_GetProjectsForMember.sql" />
+    <Build Include="Procedures\Project\Project_Delete.sql" />
+    <Build Include="Procedures\Project\Project_Update.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />

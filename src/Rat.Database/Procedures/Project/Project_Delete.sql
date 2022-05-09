@@ -1,9 +1,9 @@
-﻿CREATE PROCEDURE [dbo].[ProjectType_GetById]
+﻿CREATE PROCEDURE [dbo].[Project_Delete]
 	@id int,
 	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
-	SELECT [Id], [Name] FROM [dbo].[ProjectType] WHERE Id = @id
+	DELETE FROM [dbo].[Project] WHERE Id = @id
 
 	SELECT @numberOfChanges = @@ROWCOUNT
 END

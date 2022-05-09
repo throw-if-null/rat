@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[ConfigurationEntry_GetByConfigurationRootId]
-	@configurationRootId int
+	@configurationRootId int,
+	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
 	SELECT
@@ -15,6 +16,8 @@ BEGIN
 	FROM [dbo].[ConfigurationEntry] AS ce
 	WHERE [ConfigurationRootId] = @configurationRootId
 	ORDER BY ce.[Created] ASC
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT

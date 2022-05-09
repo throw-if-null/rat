@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[ConfigurationRoot_GetByProjectId]
-	@projectId int = 0
+	@projectId int = 0,
+	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
 	SELECT
@@ -13,6 +14,8 @@ BEGIN
 		[ConfigurationEntryCount] = [dbo].[GetConfigurationEntryCount] (cr.[Id])
 	FROM [dbo].[ConfigurationRoot] AS cr
 	WHERE cr.[ProjectId] = @projectId
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT

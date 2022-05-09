@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Project_GetProjectsForMember]
-	@memberId int
+	@memberId int,
+	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
 	SELECT
@@ -14,6 +15,8 @@ BEGIN
 	INNER JOIN [dbo].[Project] AS p
 	ON mp.[ProjectId] = p.[Id]
 	WHERE mp.[MemberId] = @memberId
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT

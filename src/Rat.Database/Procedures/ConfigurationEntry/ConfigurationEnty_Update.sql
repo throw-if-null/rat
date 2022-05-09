@@ -4,7 +4,8 @@
 	@secondsToLive int = NULL,
 	@disabled bit = NULL,
 	@modifiedBy int,
-	@id int
+	@id int,
+	@numberOfChanges int = null OUTPUT
 
 AS
 BEGIN
@@ -19,6 +20,8 @@ BEGIN
 	WHERE
 		(@key IS NOT NULL OR @value IS NOT NULL OR @secondsToLive IS NOT NULL OR @disabled IS NOT NULL) AND
 		[Id] = @id
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT
