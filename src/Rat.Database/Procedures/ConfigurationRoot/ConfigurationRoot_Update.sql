@@ -10,8 +10,9 @@ BEGIN
 	SET
 		[Name] = ISNULL(@name, [Name]),
 		[ConfigurationTypeId] = ISNULL(@configurationTypeId, [ConfigurationTypeId]),
-		[ModifiedBy] = @modifiedBy,
-		[Modified] = GETUTCDATE()
+		[Operator] = @modifiedBy,
+		[Operation] = N'update',
+		[Timestamp] = GETUTCDATE()
 	WHERE
 		(@name IS NOT NULL OR @configurationTypeId IS NOT NULL) AND
 		[Id] = @id

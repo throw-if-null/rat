@@ -4,16 +4,15 @@
 AS
 BEGIN
 	SELECT
-		[Id],
-		[Name],
-		[ProjectTypeId],
-		[Created],
-		[Modified],
-		[CreatedBy],
-		[ModifiedBy],
+		p.[Id],
+		p.[Name],
+		p.[ProjectTypeId],
+		p.[Operator],
+		p.[Operation],
+		p.[Timestamp],
 		[ConfigurationCount] = [dbo].[GetConfigurationRootCount] ([Id]),
 		[EntriesCount] = [dbo].[GetProjectConfigurationEntryCount] ([Id])
-	FROM [dbo].[Project]
+	FROM [dbo].[Project] AS p
 	WHERE [Id] = @id
 
 	SELECT @numberOfChanges = @@ROWCOUNT

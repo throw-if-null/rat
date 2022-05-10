@@ -9,13 +9,12 @@ BEGIN
 		ce.[Value],
 		ce.[Disabled],
 		ce.[SecondsToLive],
-		ce.[Created],
-		ce.[Modified],
-		ce.[CreatedBy],
-		ce.[ModifiedBy]
+		ce.[Operator],
+		ce.[Operation],
+		ce.[Timestamp]
 	FROM [dbo].[ConfigurationEntry] AS ce
 	WHERE [ConfigurationRootId] = @configurationRootId
-	ORDER BY ce.[Created] ASC
+	ORDER BY ce.[Timestamp] ASC
 
 	SELECT @numberOfChanges = @@ROWCOUNT
 END

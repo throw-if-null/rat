@@ -5,10 +5,9 @@
 	[ConfigurationTypeId] INT NOT NULL,
     [ProjectId] INT NOT NULL,
 
-    [Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [CreatedBy] INT NOT NULL,
-	[ModifiedBy] INT NOT NULL,
+    [Timestamp] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
+	[Operation] NVARCHAR(16) DEFAULT N'created',
+	[Operator] INT NOT NULL,
 
 	[ValidFrom] datetime2 (0) GENERATED ALWAYS AS ROW START,
 	[ValidTo] datetime2 (0) GENERATED ALWAYS AS ROW END,
@@ -16,7 +15,9 @@
 
     CONSTRAINT [PK_ConfigurationRoot_Id] PRIMARY KEY ([Id] ASC),
     CONSTRAINT [FK_ConfigurationRoot_ProjectId__Project_Id] FOREIGN KEY ([ProjectId]) REFERENCES [Project]([Id]),
-    CONSTRAINT [FK_ConfigurationRoot_ConfigurationTypeId__ConfigurationType_Id] FOREIGN KEY ([ConfigurationTypeId]) REFERENCES [ConfigurationType]([Id])
+    CONSTRAINT [FK_ConfigurationRoot_ConfigurationTypeId__ConfigurationType_Id] FOREIGN KEY ([ConfigurationTypeId]) REFERENCES [ConfigurationType]([Id]),
+	CONSTRAINT [FK_ConfigurationRoot_Member_Operator] FOREIGN KEY ([Operator]) REFERENCES [Member]([Id]),
+	CONSTRAINT [CH_ConfigurationRoot_Operation] CHECK ([Operation] IN (N'insert', N'update', N'delete'))
 )
 WITH
 (

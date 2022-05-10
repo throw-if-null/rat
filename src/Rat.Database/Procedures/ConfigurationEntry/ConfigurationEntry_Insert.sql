@@ -8,8 +8,8 @@
 	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
-    INSERT INTO [dbo].[ConfigurationEntry] ([ConfigurationRootId], [Key], [Value], [SecondsToLive], [Disabled], [CreatedBy], [ModifiedBy])
-    VALUES(@configurationRootId, @key, @value, @secondsToLive, @disabled, @createdBy, @createdBy)
+    INSERT INTO [dbo].[ConfigurationEntry] ([ConfigurationRootId], [Key], [Value], [SecondsToLive], [Disabled], [Operator], [Operation])
+    VALUES(@configurationRootId, @key, @value, @secondsToLive, @disabled, @createdBy, N'insert')
 
     SELECT SCOPE_IDENTITY() AS [Id]
 

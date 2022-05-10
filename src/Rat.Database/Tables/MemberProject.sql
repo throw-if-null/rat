@@ -3,10 +3,9 @@
 	[MemberId] INT NOT NULL,
 	[ProjectId] INT NOT NULL,
 
-	[Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [CreatedBy] INT NOT NULL,
-	[ModifiedBy] INT NOT NULL,
+	[Timestamp] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
+	[Operation] NVARCHAR(16) DEFAULT N'created',
+	[Operator] INT NOT NULL,
 
 	[ValidFrom] datetime2 (0) GENERATED ALWAYS AS ROW START,
 	[ValidTo] datetime2 (0) GENERATED ALWAYS AS ROW END,
@@ -14,7 +13,9 @@
 
     CONSTRAINT [PK_MemberProject_Id] PRIMARY KEY ([MemberId] ASC, [ProjectId] ASC),
     CONSTRAINT [FK_MemberProject_User] FOREIGN KEY ([MemberId]) REFERENCES [Member]([Id]),
-	CONSTRAINT [FK_MemberProject_Project] FOREIGN KEY ([ProjectId]) REFERENCES [Project]([Id])
+	CONSTRAINT [FK_MemberProject_Project] FOREIGN KEY ([ProjectId]) REFERENCES [Project]([Id]),
+	CONSTRAINT [FK_MemberProject_Member_Operator] FOREIGN KEY ([Operator]) REFERENCES [Member]([Id]),
+	CONSTRAINT [CH_MemberProject_Operation] CHECK ([Operation] IN (N'insert', N'update', N'delete'))
 )
 WITH
 (

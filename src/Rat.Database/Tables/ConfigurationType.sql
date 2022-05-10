@@ -3,16 +3,17 @@
 	[Id] INT NOT NULL IDENTITY(1, 1),
 	[Name] NVARCHAR(64) NOT NULL,
 
-	[Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [CreatedBy] INT NOT NULL,
-	[ModifiedBy] INT NOT NULL,
+	[Timestamp] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
+	[Operation] NVARCHAR(16) DEFAULT N'created',
+	[Operator] INT NOT NULL,
 
 	[ValidFrom] datetime2 (0) GENERATED ALWAYS AS ROW START,
 	[ValidTo] datetime2 (0) GENERATED ALWAYS AS ROW END,
 	PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo),
 
-	CONSTRAINT [PK_ConfigurationType_Id] PRIMARY KEY ([Id] ASC)
+	CONSTRAINT [PK_ConfigurationType_Id] PRIMARY KEY ([Id] ASC),
+	CONSTRAINT [FK_ConfigurationType_Member_Operator] FOREIGN KEY ([Operator]) REFERENCES [Member]([Id]),
+	CONSTRAINT [CH_ConfigurationType_Operation] CHECK ([Operation] IN (N'insert', N'update', N'delete'))
 )
 WITH
 (

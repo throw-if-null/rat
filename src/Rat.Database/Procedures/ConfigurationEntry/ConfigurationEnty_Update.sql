@@ -6,7 +6,6 @@
 	@modifiedBy int,
 	@id int,
 	@numberOfChanges int = null OUTPUT
-
 AS
 BEGIN
 	UPDATE [dbo].[ConfigurationEntry]
@@ -15,8 +14,9 @@ BEGIN
 		[Value] = ISNULL(@value, [Value]),
 		[SecondsToLive] = ISNULL(@secondsToLive, [SecondsToLive]),
 		[Disabled] = ISNULL(@disabled, [Disabled]),
-		[ModifiedBy] = @modifiedBy,
-		[Modified] = GETUTCDATE()
+		[Operator] = @modifiedBy,
+		[Operation] = N'update',
+		[Timestamp] = GETUTCDATE()
 	WHERE
 		(@key IS NOT NULL OR @value IS NOT NULL OR @secondsToLive IS NOT NULL OR @disabled IS NOT NULL) AND
 		[Id] = @id

@@ -10,8 +10,9 @@ BEGIN
 	SET
 		[Name] = ISNULL(@name, [Name]),
 		[ProjectTypeId] = ISNULL(@projectTypeId, [ProjectTypeId]),
-		[ModifiedBy] = @modifiedBy,
-		[Modified] = GETUTCDATE()
+		[Operator] = @modifiedBy,
+		[Operation] = N'update',
+		[Timestamp] = GETUTCDATE()
 	WHERE
 		[Id] = @id
 

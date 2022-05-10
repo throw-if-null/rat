@@ -58,7 +58,7 @@
     <Build Include="Functions\GetConfigurationRootCount.sql" />
     <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Delete.sql" />
     <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Update.sql" />
-    <Build Include="Procedures\Member\Member_Delete.sql" />
+    <Build Include="Procedures\Member\Member_SoftDelete.sql" />
     <Build Include="Functions\GetProjectConfigurationEntryCount.sql" />
     <Build Include="Procedures\Project\Project_GetProjectsForMember.sql" />
     <Build Include="Procedures\Project\Project_Delete.sql" />

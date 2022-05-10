@@ -3,7 +3,14 @@
 	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
-	SELECT [Id], [Name] FROM [dbo].[ProjectType] WHERE Id = @id
+	SELECT
+		pt.[Id],
+		pt.[Name],
+		pt.[Operator],
+		pt.[Operation],
+		pt.[Timestamp]
+	FROM [dbo].[ProjectType] AS pt
+	WHERE Id = @id
 
 	SELECT @numberOfChanges = @@ROWCOUNT
 END

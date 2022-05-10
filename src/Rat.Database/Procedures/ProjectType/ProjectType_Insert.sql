@@ -4,8 +4,8 @@
     @numberOfChanges int = null OUTPUT
 AS
 BEGIN
-    INSERT INTO [dbo].[ProjectType] ([Name], [CreatedBy], [ModifiedBy])
-    VALUES(@name, @createdBy, @createdBy)
+    INSERT INTO [dbo].[ProjectType] ([Name], [Operator], [Operation])
+    VALUES(@name, @createdBy, N'insert')
 
     SELECT SCOPE_IDENTITY() AS [Id]
 

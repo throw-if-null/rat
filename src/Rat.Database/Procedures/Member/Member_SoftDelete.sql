@@ -1,18 +1,16 @@
-﻿CREATE PROCEDURE [dbo].[ProjectType_Update]
-	@name nvarchar(64),
+﻿CREATE PROCEDURE [dbo].[Member_SoftDelete]
 	@id int,
 	@modifiedBy int,
 	@numberOfChanges int = null OUTPUT
 AS
 BEGIN
-	UPDATE [ProjectType]
+	UPDATE [dbo].[Member]
 	SET
-		[Name] = @name,
+		[Deleted] = 1,
 		[Operator] = @modifiedBy,
 		[Operation] = N'update',
 		[Timestamp] = GETUTCDATE()
-	WHERE
-		[Id] = @id
+	WHERE [Id] = @id
 
 	SELECT @numberOfChanges = @@ROWCOUNT
 END

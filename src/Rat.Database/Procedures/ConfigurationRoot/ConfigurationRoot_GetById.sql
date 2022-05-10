@@ -7,10 +7,9 @@ BEGIN
 		cr.[Id],
 		cr.[Name],
 		cr.[ConfigurationTypeId],
-		cr.[Created],
-		cr.[Modified],
-		cr.[CreatedBy],
-		cr.[ModifiedBy]
+		cr.[Operator],
+		cr.[Operation],
+		cr.[Timestamp]
 	FROM [dbo].[ConfigurationRoot] AS cr
 	WHERE cr.[Id] = @id
 

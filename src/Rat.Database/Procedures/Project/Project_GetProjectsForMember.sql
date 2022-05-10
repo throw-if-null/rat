@@ -7,13 +7,12 @@ BEGIN
 		p.[Id],
 		p.[Name],
 		p.[ProjectTypeId],
-		p.[Created],
-		p.[Modified],
-		p.[CreatedBy],
-		p.[ModifiedBy]
+		p.[Operator],
+		p.[Operation],
+		p.[Timestamp]
 	FROM [dbo].[MemberProject] AS mp
 	INNER JOIN [dbo].[Project] AS p
-	ON mp.[ProjectId] = p.[Id]
+		ON mp.[ProjectId] = p.[Id]
 	WHERE mp.[MemberId] = @memberId
 
 	SELECT @numberOfChanges = @@ROWCOUNT

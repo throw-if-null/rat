@@ -9,10 +9,9 @@ BEGIN
 		ce.[Value],
 		ce.[SecondsToLive],
 		ce.[Disabled],
-		ce.[Created],
-		ce.[Modified],
-		ce.[CreatedBy],
-		ce.[ModifiedBy]
+		ce.[Operator],
+		ce.[Operation],
+		ce.[Timestamp]
 	FROM [dbo].[ConfigurationEntry] AS ce
 	WHERE ce.[Id] = @id
 

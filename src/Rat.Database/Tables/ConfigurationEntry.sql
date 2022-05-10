@@ -7,10 +7,9 @@
 	[SecondsToLive] INT NOT NULL DEFAULT -1,
 	[Disabled] BIT NOT NULL DEFAULT 0,
 
-	[Created] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [Modified] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-    [CreatedBy] INT NOT NULL,
-	[ModifiedBy] INT NOT NULL,
+    [Timestamp] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
+	[Operation] NVARCHAR(16) DEFAULT N'created',
+	[Operator] INT NOT NULL,
 
 	[ValidFrom] datetime2 (0) GENERATED ALWAYS AS ROW START,
 	[ValidTo] datetime2 (0) GENERATED ALWAYS AS ROW END,
@@ -18,8 +17,8 @@
 
     CONSTRAINT [PK_ConfigurationEntry_Id] PRIMARY KEY ([Id] ASC),
     CONSTRAINT [FK_ConfigurationEntry_ConfigurationRootId-ConfigurationRoot_Id] FOREIGN KEY ([ConfigurationRootId]) REFERENCES [ConfigurationRoot]([Id]),
-	CONSTRAINT [FK_ConfigurationEntry_Member_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [Member]([Id]),
-	CONSTRAINT [FK_ConfigurationEntry_Member_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [Member]([Id])
+	CONSTRAINT [FK_ConfigurationEntry_Member_Operator] FOREIGN KEY ([Operator]) REFERENCES [Member]([Id]),
+	CONSTRAINT [CH_ConfigurationEntry_Operation] CHECK ([Operation] IN (N'insert', N'update', N'delete'))
 )
 WITH
 (
