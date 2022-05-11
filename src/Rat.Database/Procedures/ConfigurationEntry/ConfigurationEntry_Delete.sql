@@ -24,8 +24,6 @@ BEGIN
 		DELETE FROM [dbo].[ConfigurationEntry] WHERE Id = @id
 
 		COMMIT TRANSACTION
-
-		SELECT @numberOfChanges = @@ROWCOUNT
 	END TRY
 	BEGIN CATCH
 		IF @@TRANCOUNT > 0
@@ -34,8 +32,10 @@ BEGIN
 		END
 
 		DECLARE @error nvarchar(2048) = error_message()
-		RAISERROR (@error, 16, 1)
+		RAISERROR(@error, 16, 1)
 	END CATCH
+
+	SELECT @numberOfChanges = @@ROWCOUNT
 END
 
 RETURN @@ROWCOUNT
