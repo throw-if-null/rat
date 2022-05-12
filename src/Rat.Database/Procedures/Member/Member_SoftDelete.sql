@@ -8,7 +8,7 @@ BEGIN
 	SET
 		[Deleted] = 1,
 		[Operator] = @modifiedBy,
-		[Operation] = N'update',
+		[Operation] = N'delete',
 		[Timestamp] = GETUTCDATE()
 	WHERE [Id] = @id
 

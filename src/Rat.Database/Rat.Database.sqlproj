@@ -63,6 +63,7 @@
     <Build Include="Procedures\Project\Project_GetProjectsForMember.sql" />
     <Build Include="Procedures\Project\Project_Delete.sql" />
     <Build Include="Procedures\Project\Project_Update.sql" />
+    <Build Include="Procedures\MemberProject\MemberProject_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />
