@@ -44,5 +44,37 @@ namespace Rat.Sql
 
 			return numberOfChanges;
 		}
+
+		public static async Task<(dynamic ProjecTypes, int NumberOfChanges)> ProjectTypeGetAll(this SqlConnection connection)
+		{
+			var parameters = new DynamicParameters();
+			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+			var projectTypes = await connection.QueryAsync(
+				"ProjectType_GetAll",
+				parameters,
+				commandType: CommandType.StoredProcedure);
+
+			var numberOfChanges = parameters.Get<int>("@numberOfChanges");
+
+			return (projectTypes, numberOfChanges);
+		}
+
+		public static async Task<int> ProjectTypeDelete(this SqlConnection connection,
+			int id,
+			int deleteBy)
+		{
+			var parameters = new DynamicParameters();
+			parameters.Add("@id", id);
+			parameters.Add("@deletedBy", deleteBy);
+			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+			var numberOfChanges = await connection.ExecuteAsync(
+				"ProjectType_Delete",
+				parameters,
+				commandType: CommandType.StoredProcedure);
+
+			return numberOfChanges;
+		}
 	}
 }

@@ -5,11 +5,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
-using Rat.Data;
 using Rat.DataAccess;
 using Rat.Sql;
 using Snapshooter.Xunit;
@@ -35,6 +33,9 @@ namespace Rat.Api.Test.Controllers.Project
 			var c = connectionFactory.CreateConnection();
 			var result = await c.ProjectTypeInsert(Guid.NewGuid().ToString("N"), 1);
 			var noc = await c.ProjectTypeUpdate(result.Id, Guid.NewGuid().ToString("N"), 1);
+
+			var types = await c.ProjectTypeGetAll();
+			noc = await c.ProjectTypeDelete(result.Id, 1);
 
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 
