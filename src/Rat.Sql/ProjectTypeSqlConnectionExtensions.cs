@@ -1,78 +1,68 @@
-﻿using System.Data;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace Rat.Sql
 {
 	public static class ProjectTypeSqlConnectionExtensions
-    {
-		public static async Task<(int Id, int NumberOfChanges)> ProjectTypeInsert(
+	{
+		private const string NameParameter = "@name";
+
+		public async static Task<(int Id, int NumberOfChanges)> ProjectTypeInsert(
 			this SqlConnection connection,
 			string name,
 			int createdBy)
 		{
+			const string ProcedureName = "ProjectType_Insert";
+
 			var parameters = new DynamicParameters();
-			parameters.Add("@name", name);
-			parameters.Add("@createdBy", createdBy);
-			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+			parameters.Add(NameParameter, name);
+			parameters.AddCreatedBy(createdBy);
+			parameters.AddNoc();
 
-			var id = await connection.QuerySingleAsync<int>(
-				"ProjectType_Insert",
-				parameters,
-				commandType: CommandType.StoredProcedure);
-
-			var numberOfChanges = parameters.Get<int>("@numberOfChanges");
+			var id = await connection.QuerySingleEx<int>(ProcedureName, parameters);
+			var numberOfChanges = parameters.GetNoc();
 
 			return (id, numberOfChanges);
 		}
 
-		public static async Task<int> ProjectTypeUpdate(this SqlConnection connection,
-			int id,
-			string name,
-			int modifiedBy)
+		public async static Task<int> ProjectTypeUpdate(this SqlConnection connection, int id, string name, int modifiedBy)
 		{
-			var parameters = new DynamicParameters();
-			parameters.Add("@id", id);
-			parameters.Add("@name", name);
-			parameters.Add("@modifiedBy", modifiedBy);
-			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+			const string ProcedureName = "ProjectType_Update";
 
-			var numberOfChanges = await connection.ExecuteAsync(
-				"ProjectType_Update",
-				parameters,
-				commandType: CommandType.StoredProcedure);
+			var parameters = new DynamicParameters();
+			parameters.AddId(id);
+			parameters.Add(NameParameter, name);
+			parameters.AddModifiedBy(modifiedBy);
+			parameters.AddNoc();
+
+			var numberOfChanges = await connection.ExecuteEx(ProcedureName, parameters);
 
 			return numberOfChanges;
 		}
 
-		public static async Task<(dynamic ProjecTypes, int NumberOfChanges)> ProjectTypeGetAll(this SqlConnection connection)
+		public async static Task<(dynamic ProjecTypes, int NumberOfChanges)> ProjectTypeGetAll(this SqlConnection connection)
 		{
+			const string ProcedureName = "ProjectType_GetAll";
+
 			var parameters = new DynamicParameters();
-			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+			parameters.AddNoc();
 
-			var projectTypes = await connection.QueryAsync(
-				"ProjectType_GetAll",
-				parameters,
-				commandType: CommandType.StoredProcedure);
-
-			var numberOfChanges = parameters.Get<int>("@numberOfChanges");
+			var projectTypes = await connection.QueryEx<dynamic>(ProcedureName, parameters);
+			var numberOfChanges = parameters.GetNoc();
 
 			return (projectTypes, numberOfChanges);
 		}
 
-		public static async Task<int> ProjectTypeDelete(this SqlConnection connection,
-			int id,
-			int deleteBy)
+		public async static Task<int> ProjectTypeDelete(this SqlConnection connection, int id, int deleteBy)
 		{
-			var parameters = new DynamicParameters();
-			parameters.Add("@id", id);
-			parameters.Add("@deletedBy", deleteBy);
-			parameters.Add("@numberOfChanges", dbType: DbType.Int32, direction: ParameterDirection.Output);
+			const string ProcedureName = "ProjectType_Delete";
 
-			var numberOfChanges = await connection.ExecuteAsync(
-				"ProjectType_Delete",
-				parameters,
-				commandType: CommandType.StoredProcedure);
+			var parameters = new DynamicParameters();
+			parameters.AddId(id);
+			parameters.AddDeletedBy(deleteBy);
+			parameters.AddNoc();
+
+			var numberOfChanges = await connection.ExecuteEx(ProcedureName, parameters);
 
 			return numberOfChanges;
 		}
