@@ -40,6 +40,31 @@ namespace Rat.Sql
 			return numberOfChanges;
 		}
 
+		public async static Task<dynamic> ProjectTypeGetById(
+			this SqlConnection connection,
+			int id)
+		{
+			var projectType = await GetById(connection, id);
+
+			return projectType;
+		}
+
+		internal async static Task<(dynamic ProjectType, int Noc)> GetById(
+			SqlConnection connection,
+			int id)
+		{
+			const string ProcedureName = "ProjectType_GetById";
+
+			var parameters = new DynamicParameters();
+			parameters.AddId(id);
+			parameters.AddNoc();
+
+			var projectType = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters);
+			var noc = parameters.GetNoc();
+
+			return (projectType, noc);
+		}
+
 		public async static Task<(dynamic ProjecTypes, int NumberOfChanges)> ProjectTypeGetAll(this SqlConnection connection)
 		{
 			const string ProcedureName = "ProjectType_GetAll";

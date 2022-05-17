@@ -8,7 +8,9 @@ BEGIN
     INSERT INTO [dbo].[Project] ([Name], [ProjectTypeId], [Operator], [Operation])
     VALUES(@name, @projectTypeId, @createdBy, N'insert')
 
-    SELECT SCOPE_IDENTITY() AS [Id]
+    DECLARE @id int = SCOPE_IDENTITY()
+
+    EXEC [dbo].[Project_GetById] @id
 
     SELECT @numberOfChanges = @@ROWCOUNT
 END

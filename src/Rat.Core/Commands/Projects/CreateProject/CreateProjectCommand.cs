@@ -1,51 +1,43 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
-using Rat.Core.Queries.ProjectTypes;
+using Rat.Core.Exceptions;
 using Rat.DataAccess;
-using Rat.Queries.Users.GetUserByUserId;
+using Rat.Sql;
 
 namespace Rat.Commands.Projects.CreateProject
 {
 	internal class CreateProjectCommand : IRequestHandler<CreateProjectRequest, CreateProjectResponse>
 	{
-		private const string SqlQuery =
-			@"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId)
-            DECLARE @ProjectId INT = (SELECT SCOPE_IDENTITY())
-            INSERT INTO MemberProject (MemberId, ProjectId) VALUES (@MemberId, @ProjectId)
-			SELECT @ProjectId";
-
 		private readonly ISqlConnectionFactory _connectionFactory;
-		private readonly IMediator _mediator;
 
-		public CreateProjectCommand(ISqlConnectionFactory connectionFactory, IMediator mediator)
+		public CreateProjectCommand(ISqlConnectionFactory connectionFactory)
 		{
 			_connectionFactory = connectionFactory;
-			_mediator = mediator;
 		}
 
 		public async Task<CreateProjectResponse> Handle(CreateProjectRequest request, CancellationToken cancellationToken)
 		{
-			var getProjectTypeByIdResponse = await _mediator.Send(new GetProjectTypeByIdRequest { Id = request.ProjectTypeId });
-			var getUserByUserIdResponse = await _mediator.Send(new GetUserByUserIdRequest { AuthProviderId = request.UserId });
-
 			request.Validate();
 
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition(
-				SqlQuery,
-				new { Name = request.Name, ProjectTypeId = getProjectTypeByIdResponse.Id, MemberId = getUserByUserIdResponse.Id },
-				cancellationToken: cancellationToken);
+			var projectType = await connection.ProjectTypeGetById(request.ProjectTypeId);
+			if (projectType == null)
+				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
-			var projectId = await connection.QuerySingleAsync<int>(command);
+			var member = await connection.MemberGetByAuthProviderId(request.UserId);
+			if (member == null)
+				throw new ResourceNotFoundException($"Member: {request.UserId} does not exist");
+
+			int memberId = member.Id;
+			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, memberId);
 
 			return new()
 			{
-				Id = projectId,
-				Name = request.Name,
-				TypeId = getProjectTypeByIdResponse.Id
+				Id = project.Id,
+				Name = project.Name,
+				TypeId = project.ProjectTypeId
 			};
 		}
 	}

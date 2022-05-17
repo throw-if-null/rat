@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Rat.Sql
 {
-	internal static class MemberSqlConnectionExtensions
+	public static class MemberSqlConnectionExtensions
 	{
 		private const string AuthProviderIdParameter = "@authProviderId";
 
@@ -22,6 +22,25 @@ namespace Rat.Sql
 			var noc = parameters.GetNoc();
 
 			return (id, noc);
+		}
+
+		public async static Task<dynamic> MemberGetByAuthProviderId(
+			this SqlConnection connection,
+			string authProviderId)
+		{
+			const string ProcedureName = "Member_GetByAuthProviderId";
+
+			var parameters = new DynamicParameters();
+			parameters.Add(AuthProviderIdParameter, authProviderId);
+			parameters.AddNoc();
+
+			var projectType = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters);
+			var noc = parameters.GetNoc();
+
+			if (noc != 1)
+				throw new DatabaseException($"Expected number of rows: {noc} is not 1");
+
+			return projectType;
 		}
 
 		public async static Task<int> Member_SoftDelete(

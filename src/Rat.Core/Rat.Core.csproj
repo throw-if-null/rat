@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rat.DataAccess\Rat.DataAccess.csproj" />
+    <ProjectReference Include="..\Rat.Sql\Rat.Sql.csproj" />
     <!--<ProjectReference Include="..\Rat.Data\Rat.Data.csproj" />-->
   </ItemGroup>
 

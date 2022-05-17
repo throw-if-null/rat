@@ -9,8 +9,19 @@ namespace Rat.Sql
 		private const string ProjectTypeIdParameter = "@projectTypeId";
 		private const string MemberIdParameter = "@memberId";
 
-		public async static Task<(int Id, int NumberOfChanges)> ProjectInsert(
+		public async static Task<dynamic> ProjectInsert(
 			this SqlConnection connection,
+			string name,
+			int projectTypeId,
+			int createdBy)
+		{
+			var (project, _) = await Insert(connection, name, projectTypeId, createdBy);
+
+			return project;
+		}
+
+		internal async static Task<(dynamic Project, int NumberOfChanges)> Insert(
+			SqlConnection connection,
 			string name,
 			int projectTypeId,
 			int createdBy)
@@ -23,10 +34,10 @@ namespace Rat.Sql
 			parameters.AddCreatedBy(createdBy);
 			parameters.AddNoc();
 
-			var id = await connection.QuerySingleEx<int>(ProcedureName, parameters);
+			var project = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters);
 			var numberOfChanges = parameters.GetNoc();
 
-			return (id, numberOfChanges);
+			return (project, numberOfChanges);
 		}
 
 		public async static Task<int> ProjectUpdate(
