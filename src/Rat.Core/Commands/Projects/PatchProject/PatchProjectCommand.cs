@@ -7,6 +7,7 @@ using Rat.Core.Queries.ProjectTypes;
 using Rat.DataAccess;
 using Rat.DataAccess.Entities;
 using Rat.Queries.Projects.GetProjectById;
+using Rat.Sql;
 
 namespace Rat.Commands.Projects.PatchProject
 {
@@ -31,23 +32,27 @@ namespace Rat.Commands.Projects.PatchProject
 		{
 			request.Validate();
 
-			var getProjectTypeByIdResponse = await _mediator.Send(new GetProjectTypeByIdRequest { Id = request.ProjectTypeId });
-
-			if (getProjectTypeByIdResponse == null)
-				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
-
-			var getProjectByIdResponse = await _mediator.Send(new GetProjectByIdRequest { Id = request.Id });
-
-			if (getProjectByIdResponse  == null)
+			await using var connection = _connectionFactory.CreateConnection();
+			var project = await connection.ProjectGetById(request.Id);
+			if (project == null)
 				throw new ResourceNotFoundException($"Project: {request.Id} does not exist");
 
-			await using var connection = _connectionFactory.CreateConnection();
+			var projectType = await connection.ProjectTypeGetById(request.ProjectTypeId);
+			if (projectType == null)
+				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
 			var command = new CommandDefinition(
 				SqlQuery,
 				new { Id = request.Id, Name = request.Name, ProjectTypeId = request.ProjectTypeId });
 
-			var project = await connection.QuerySingleAsync<ProjectEntity>(command);
+			// TODO: replace 1 with UserId
+			await connection.ProjectUpdate(
+				project.Name == request.Name ? null : request.Name,
+				project.ProjectTypeId == request.ProjectTypeId ? null : request.ProjectTypeId,
+				request.Id,
+				1);
+
+			project = await connection.ProjectGetById(request.Id);
 
 			return new()
 			{

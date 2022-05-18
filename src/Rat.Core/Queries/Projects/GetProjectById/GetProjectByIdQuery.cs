@@ -1,16 +1,13 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
 using Rat.DataAccess;
-using Rat.DataAccess.Entities;
+using Rat.Sql;
 
 namespace Rat.Queries.Projects.GetProjectById
 {
 	internal class GetProjectByIdQuery : IRequestHandler<GetProjectByIdRequest, GetProjectByIdResponse>
 	{
-		private const string SQL_QUERY = "SELECT Id, Name, ProjectTypeId FROM Project WHERE Id = @Id and Deleted IS NULL";
-
 		private readonly ISqlConnectionFactory _connectionFactory;
 
 		public GetProjectByIdQuery(ISqlConnectionFactory connectionFactory)
@@ -23,8 +20,7 @@ namespace Rat.Queries.Projects.GetProjectById
 			request.Validate();
 
 			await using var connection = _connectionFactory.CreateConnection();
-			var command = new CommandDefinition(SQL_QUERY, new {Id = request.Id}, cancellationToken: cancellationToken);
-			var project = await connection.QuerySingleOrDefaultAsync<ProjectEntity>(command);
+			var project = await connection.ProjectGetById(request.Id);
 
 			return project == null
 				? null

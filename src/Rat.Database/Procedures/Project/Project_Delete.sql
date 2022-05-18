@@ -8,7 +8,7 @@ BEGIN
 	BEGIN TRANSACTION
 
 	BEGIN TRY
-		ALTER TABLE [dbo].[ProjectType] SET (SYSTEM_VERSIONING = OFF);
+		ALTER TABLE [dbo].[Project] SET (SYSTEM_VERSIONING = OFF);
 
 		UPDATE [dbo].[ProjectType]
 		SET
@@ -17,7 +17,7 @@ BEGIN
 			[Timestamp] = GETUTCDATE()
 		WHERE [Id] = @id
 
-		ALTER TABLE [dbo].[ProjectType] SET
+		ALTER TABLE [dbo].[Project] SET
 		(
 			SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[ProjectHistory])
 		);

@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
 using Rat.Core.Exceptions;
-using Rat.Core.Properties;
 using Rat.DataAccess;
-using Rat.Queries.Projects.GetProjectById;
+using Rat.Sql;
 
 namespace Rat.Commands.Projects.DeleteProject
 {
@@ -29,24 +27,13 @@ namespace Rat.Commands.Projects.DeleteProject
         {
 			request.Validate();
 
-			var getProjectByIdResponse = await _mediator.Send(new GetProjectByIdRequest { Id = request.Id }, cancellationToken);
-
-            if (getProjectByIdResponse == null)
-				throw new ResourceNotFoundException($"Project: {request.Id} does not exist");
-
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition(
-				SqlQuery,
-				new { Id = request.Id },
-				cancellationToken: cancellationToken);
+			var project = await connection.ProjectGetById(request.Id);
+			if (project == null)
+				throw new ResourceNotFoundException($"Project: {request.Id} does not exist");
 
-			var changes = await connection.ExecuteAsync(command);
-
-            var expectedNumberOfChanges = 1;
-
-            if (changes != expectedNumberOfChanges)
-                throw new RatDbException(string.Format(Resources.ExpactedAndActualNumberOfDatabaseChangesMismatch, changes, expectedNumberOfChanges));
+			await connection.ProjectDelete(request.Id, 1);
 
             return new();
         }

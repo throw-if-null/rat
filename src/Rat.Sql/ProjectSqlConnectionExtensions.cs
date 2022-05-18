@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Collections.Generic;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace Rat.Sql
@@ -40,8 +41,18 @@ namespace Rat.Sql
 			return (project, numberOfChanges);
 		}
 
-		public async static Task<int> ProjectUpdate(
+		public async static Task ProjectUpdate(
 			this SqlConnection connection,
+			string name,
+			int? projectTypeId,
+			int id,
+			int modifiedBy)
+		{
+			_ = await Update(connection, name, projectTypeId, id, modifiedBy);
+		}
+
+		internal async static Task<int> Update(
+			SqlConnection connection,
 			string name,
 			int? projectTypeId,
 			int id,
@@ -61,7 +72,14 @@ namespace Rat.Sql
 			return noc;
 		}
 
-		public async static Task<(dynamic Project, int NumberOfChanges)> ProjectGetById(this SqlConnection connection, int id)
+		public async static Task<dynamic> ProjectGetById(this SqlConnection connection, int id)
+		{
+			var (project, _) = await GetById(connection, id);
+
+			return project;
+		}
+
+		internal async static Task<(dynamic Project, int NumberOfChanges)> GetById(SqlConnection connection, int id)
 		{
 			const string ProcedureName = "Project_GetById";
 
@@ -75,8 +93,17 @@ namespace Rat.Sql
 			return (project, noc);
 		}
 
-		public async static Task<(dynamic Projects, int NumberOfChanges)> ProjectGetProjectsForMember(
+		public async static Task<IEnumerable<dynamic>> ProjectGetProjectsForMember(
 			this SqlConnection connection,
+			int memberId)
+		{
+			var (projects, _) = await GetProjectsForMember(connection, memberId);
+
+			return projects;
+		}
+
+		internal async static Task<(dynamic Projects, int NumberOfChanges)> GetProjectsForMember(
+			SqlConnection connection,
 			int memberId)
 		{
 			const string ProcedureName = "Project_GetProjectsForMember";
@@ -91,12 +118,18 @@ namespace Rat.Sql
 			return (projects, noc);
 		}
 
-		public async static Task<int> ProjectDelete(this SqlConnection connection, int id)
+		public async static Task ProjectDelete(this SqlConnection connection, int id, int deletedBy)
+		{
+			_ = await Delete(connection, id, deletedBy);
+		}
+
+		internal async static Task<int> Delete(SqlConnection connection, int id, int deletedBy)
 		{
 			const string ProcedureName = "Project_Delete";
 
 			var parameters = new DynamicParameters();
 			parameters.AddId(id);
+			parameters.AddDeletedBy(deletedBy);
 			parameters.AddNoc();
 
 			var noc = await connection.ExecuteEx(ProcedureName, parameters);

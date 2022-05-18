@@ -34,7 +34,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY();",
+				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Should_Get_Project_By_Id", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
@@ -80,31 +80,31 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Member(AuthProviderId) VALUES(@AuthProviderId); SELECT SCOPE_IDENTITY()",
+				"INSERT INTO Member(AuthProviderId, Operator, Operation) VALUES(@AuthProviderId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { AuthProviderId = authProviderUserId });
 
 			var userId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Project A", ProjectTypeId = projectTypeId });
 
 			var projectIdA = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES(@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Project B", ProjectTypeId = projectTypeId });
 
 			var projectIdB = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO MemberProject (MemberId, ProjectID) VALUES(@MemberId, @ProjectId)",
+				"INSERT INTO MemberProject (MemberId, ProjectId, Operator, Operation) VALUES(@MemberId, @ProjectId, 1, N'insert')",
 				new { MemberId = userId, ProjectId = projectIdA });
 
 			await connection.ExecuteAsync(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO MemberProject (MemberId, ProjectID) VALUES(@MemberId, @ProjectId)",
+				"INSERT INTO MemberProject (MemberId, ProjectId, Operator, Operation) VALUES(@MemberId, @ProjectId, 1, N'insert')",
 				new { MemberId = userId, ProjectId = projectIdB });
 
 			await connection.ExecuteAsync(command);

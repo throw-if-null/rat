@@ -7,7 +7,17 @@ namespace Rat.Sql
 	{
 		private const string AuthProviderIdParameter = "@authProviderId";
 
-		public async static Task<(int Id, int NoC)> MemberInsert(
+		public async static Task<int> MemberInsert(
+			this SqlConnection connection,
+			string authProviderId,
+			int createdBy)
+		{
+			var (id, _) = await Insert(connection, authProviderId, createdBy);
+
+			return id;
+		}
+
+		internal async static Task<(int Id, int NoC)> Insert(
 			this SqlConnection connection,
 			string authProviderId,
 			int createdBy)
@@ -34,10 +44,10 @@ namespace Rat.Sql
 			parameters.Add(AuthProviderIdParameter, authProviderId);
 			parameters.AddNoc();
 
-			var projectType = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters);
+			var projectType = await connection.QuerySingleOrDefaultEx<dynamic>(ProcedureName, parameters);
 			var noc = parameters.GetNoc();
 
-			if (noc != 1)
+			if (noc > 1)
 				throw new DatabaseException($"Expected number of rows: {noc} is not 1");
 
 			return projectType;

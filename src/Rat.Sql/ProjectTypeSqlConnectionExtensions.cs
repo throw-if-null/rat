@@ -44,7 +44,7 @@ namespace Rat.Sql
 			this SqlConnection connection,
 			int id)
 		{
-			var projectType = await GetById(connection, id);
+			var (projectType, _) = await GetById(connection, id);
 
 			return projectType;
 		}

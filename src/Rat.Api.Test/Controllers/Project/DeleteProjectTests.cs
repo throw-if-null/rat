@@ -42,7 +42,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES (@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES (@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Test", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
@@ -68,7 +68,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
 			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId) VALUES (@Name, @ProjectTypeId); SELECT SCOPE_IDENTITY()",
+				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES (@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Test", ProjectTypeId = projectTypeId });
 
 			var projectId = await connection.QuerySingleAsync<int>(command);
