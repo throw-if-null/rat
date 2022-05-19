@@ -12,7 +12,8 @@ namespace Rat.Sql
 			this SqlConnection connection,
 			int memberId,
 			int projectId,
-			int createdBy)
+			int createdBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "MemberProject_Insert";
 
@@ -22,7 +23,7 @@ namespace Rat.Sql
 			parameters.AddCreatedBy(createdBy);
 			parameters.AddNoc();
 
-			var noc = await connection.ExecuteEx(ProcedureName, parameters);
+			var noc = await connection.ExecuteEx(ProcedureName, parameters, ct);
 
 			return noc;
 		}
@@ -31,7 +32,8 @@ namespace Rat.Sql
 			this SqlConnection connection,
 			int memberId,
 			int projectId,
-			int deletedBy)
+			int deletedBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "MemberProject_Delete";
 
@@ -41,7 +43,7 @@ namespace Rat.Sql
 			parameters.AddDeletedBy(deletedBy);
 			parameters.AddNoc();
 
-			var noc = await connection.ExecuteEx(ProcedureName, parameters);
+			var noc = await connection.ExecuteEx(ProcedureName, parameters, ct);
 
 			return noc;
 		}

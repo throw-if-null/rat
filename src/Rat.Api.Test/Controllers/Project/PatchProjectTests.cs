@@ -8,8 +8,7 @@ using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
-using Rat.DataAccess;
-using Rat.DataAccess.Entities;
+using Rat.Sql;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project
@@ -32,7 +31,7 @@ namespace Rat.Api.Test.Controllers.Project
 			await using var connection = connectionFactory.CreateConnection();
 
 			var command = new CommandDefinition("SELECT Id, Name FROM ProjectType");
-			var projectTypes = await connection.QueryAsync<ProjectTypeEntity>(command);
+			var projectTypes = await connection.QueryAsync<dynamic>(command);
 
 			var jsType = projectTypes.First(x => x.Name == "js");
             var csharpType = projectTypes.First(x => x.Name == "csharp");

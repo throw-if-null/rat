@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using MediatR;
 using Rat.Core.Exceptions;
-using Rat.DataAccess;
 using Rat.Sql;
 
 namespace Rat.Commands.Projects.CreateProject
@@ -22,16 +21,16 @@ namespace Rat.Commands.Projects.CreateProject
 
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var projectType = await connection.ProjectTypeGetById(request.ProjectTypeId);
+			var projectType = await connection.ProjectTypeGetById(request.ProjectTypeId, cancellationToken);
 			if (projectType == null)
 				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
-			var member = await connection.MemberGetByAuthProviderId(request.UserId);
+			var member = await connection.MemberGetByAuthProviderId(request.UserId, cancellationToken);
 			if (member == null)
 				throw new ResourceNotFoundException($"Member: {request.UserId} does not exist");
 
 			int memberId = member.Id;
-			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, memberId);
+			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, memberId, cancellationToken);
 
 			return new()
 			{

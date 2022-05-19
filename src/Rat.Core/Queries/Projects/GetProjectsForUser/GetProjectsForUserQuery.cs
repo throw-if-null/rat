@@ -1,32 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
-using Rat.Core.Exceptions;
-using Rat.DataAccess;
-using Rat.DataAccess.Entities;
-using Rat.DataAccess.Views;
-using Rat.Queries.Users.GetUserByUserId;
+using Rat.Core.Queries.Projects;
 using Rat.Sql;
 
 namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal class GetProjectsForUserQuery : IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>
 	{
-		private const string SqlQuery =
-			@"SELECT mp.MemberId, mp.ProjectId, p.Name FROM MemberProject mp 
-INNER JOIN Project p ON mp.ProjectId = p.Id 
-WHERE mp.MemberId = @MemberId AND mp.Deleted IS NULL";
-
 		private readonly ISqlConnectionFactory _connectionFactory;
-		private readonly IMediator _mediator;
 
-		public GetProjectsForUserQuery(ISqlConnectionFactory connectionFactory, IMediator mediator)
+		public GetProjectsForUserQuery(ISqlConnectionFactory connectionFactory)
 		{
 			_connectionFactory = connectionFactory;
-			_mediator = mediator;
 		}
 
 		public async Task<GetProjectsForUserResponse> Handle(GetProjectsForUserRequest request, CancellationToken cancellationToken)
@@ -35,15 +22,15 @@ WHERE mp.MemberId = @MemberId AND mp.Deleted IS NULL";
 
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var member = await connection.MemberGetByAuthProviderId(request.MemberId);
+			var member = await connection.MemberGetByAuthProviderId(request.MemberId, cancellationToken);
 
 			if (member == null)
 			{
 				member = new { Id = 0 };
-				member.Id = await connection.MemberInsert(request.MemberId, 1);
+				member.Id = await connection.MemberInsert(request.MemberId, 1, cancellationToken);
 			}
 
-			var projects = await ProjectSqlConnectionExtensions.ProjectGetProjectsForMember(connection, member.Id);
+			var projects = await ProjectSqlConnectionExtensions.ProjectGetProjectsForMember(connection, member.Id, cancellationToken);
 
 			var projectStats = new List<ProjectStatsView>();
 

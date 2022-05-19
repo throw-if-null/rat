@@ -1,8 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
-using Rat.DataAccess;
+using Rat.Sql;
 
 namespace Rat.Core.Queries.ProjectTypes
 {
@@ -19,16 +18,10 @@ namespace Rat.Core.Queries.ProjectTypes
 		public async Task<GetProjectTypeByIdResponse> Handle(GetProjectTypeByIdRequest request, CancellationToken cancellationToken)
 		{
 			await using var connection = _connectionFactory.CreateConnection();
+			var projectType = await connection.ProjectTypeGetById(request.Id, cancellationToken);
 
-			var command = new CommandDefinition(
-				SqlQuery,
-				new { Id = request.Id },
-				cancellationToken: cancellationToken);
-
-			var id = await connection.QuerySingleOrDefaultAsync<int?>(command);
-
-			return id.HasValue
-				? new() { Id = id.Value }
+			return projectType != null
+				? new() { Id = projectType.Id }
 				: null;
 		}
 	}

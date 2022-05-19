@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Rat.DataAccess;
 using Rat.Sql;
 
 namespace Rat.Queries.Projects.GetProjectById
@@ -20,7 +19,7 @@ namespace Rat.Queries.Projects.GetProjectById
 			request.Validate();
 
 			await using var connection = _connectionFactory.CreateConnection();
-			var project = await connection.ProjectGetById(request.Id);
+			var project = await connection.ProjectGetById(request.Id, cancellationToken);
 
 			return project == null
 				? null

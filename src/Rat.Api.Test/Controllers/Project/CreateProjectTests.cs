@@ -8,7 +8,6 @@ using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
-using Rat.DataAccess;
 using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;

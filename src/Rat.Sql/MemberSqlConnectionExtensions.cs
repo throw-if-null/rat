@@ -10,9 +10,10 @@ namespace Rat.Sql
 		public async static Task<int> MemberInsert(
 			this SqlConnection connection,
 			string authProviderId,
-			int createdBy)
+			int createdBy,
+			CancellationToken ct)
 		{
-			var (id, _) = await Insert(connection, authProviderId, createdBy);
+			var (id, _) = await Insert(connection, authProviderId, createdBy, ct);
 
 			return id;
 		}
@@ -20,7 +21,8 @@ namespace Rat.Sql
 		internal async static Task<(int Id, int NoC)> Insert(
 			this SqlConnection connection,
 			string authProviderId,
-			int createdBy)
+			int createdBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Member_Insert";
 
@@ -28,7 +30,7 @@ namespace Rat.Sql
 			parameters.Add(AuthProviderIdParameter, authProviderId);
 			parameters.AddCreatedBy(createdBy);
 
-			var id = await connection.QuerySingleEx<int>(ProcedureName, parameters);
+			var id = await connection.QuerySingleEx<int>(ProcedureName, parameters, ct);
 			var noc = parameters.GetNoc();
 
 			return (id, noc);
@@ -36,7 +38,8 @@ namespace Rat.Sql
 
 		public async static Task<dynamic> MemberGetByAuthProviderId(
 			this SqlConnection connection,
-			string authProviderId)
+			string authProviderId,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Member_GetByAuthProviderId";
 
@@ -44,7 +47,7 @@ namespace Rat.Sql
 			parameters.Add(AuthProviderIdParameter, authProviderId);
 			parameters.AddNoc();
 
-			var projectType = await connection.QuerySingleOrDefaultEx<dynamic>(ProcedureName, parameters);
+			var projectType = await connection.QuerySingleOrDefaultEx<dynamic>(ProcedureName, parameters, ct);
 			var noc = parameters.GetNoc();
 
 			if (noc > 1)
@@ -56,7 +59,8 @@ namespace Rat.Sql
 		public async static Task<int> Member_SoftDelete(
 			this SqlConnection connection,
 			int id,
-			int modifiedBy)
+			int modifiedBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Member_SoftDelete";
 
@@ -64,7 +68,7 @@ namespace Rat.Sql
 			parameters.AddId(id);
 			parameters.AddModifiedBy(modifiedBy);
 
-			var noc = await connection.ExecuteEx(ProcedureName, parameters);
+			var noc = await connection.ExecuteEx(ProcedureName, parameters, ct);
 
 			return noc;
 		}

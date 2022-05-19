@@ -7,7 +7,7 @@ using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
-using Rat.DataAccess;
+using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;
 

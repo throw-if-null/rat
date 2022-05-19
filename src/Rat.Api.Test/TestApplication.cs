@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Rat.Api.Auth;
 using Rat.Api.Test.Auth;
 using Rat.Api.Test.Mocks;
-using Rat.DataAccess;
+using Rat.Sql;
 
 namespace Rat.Api.Test
 {

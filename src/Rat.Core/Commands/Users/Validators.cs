@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Rat.Commands.Users.CreateUser;
 using Rat.Core.Properties;
 
 namespace Rat.Commands.Users

@@ -1,4 +1,4 @@
-﻿namespace Rat.DataAccess
+﻿namespace Rat.Sql
 {
     public static class DatabaseSchema
     {

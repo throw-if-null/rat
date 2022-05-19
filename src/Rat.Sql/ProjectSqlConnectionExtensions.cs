@@ -14,9 +14,10 @@ namespace Rat.Sql
 			this SqlConnection connection,
 			string name,
 			int projectTypeId,
-			int createdBy)
+			int createdBy,
+			CancellationToken ct)
 		{
-			var (project, _) = await Insert(connection, name, projectTypeId, createdBy);
+			var (project, _) = await Insert(connection, name, projectTypeId, createdBy, ct);
 
 			return project;
 		}
@@ -25,7 +26,8 @@ namespace Rat.Sql
 			SqlConnection connection,
 			string name,
 			int projectTypeId,
-			int createdBy)
+			int createdBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Project_Insert";
 
@@ -35,7 +37,7 @@ namespace Rat.Sql
 			parameters.AddCreatedBy(createdBy);
 			parameters.AddNoc();
 
-			var project = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters);
+			var project = await connection.QuerySingleEx<dynamic>(ProcedureName, parameters, ct);
 			var numberOfChanges = parameters.GetNoc();
 
 			return (project, numberOfChanges);
@@ -46,9 +48,10 @@ namespace Rat.Sql
 			string name,
 			int? projectTypeId,
 			int id,
-			int modifiedBy)
+			int modifiedBy,
+			CancellationToken ct)
 		{
-			_ = await Update(connection, name, projectTypeId, id, modifiedBy);
+			_ = await Update(connection, name, projectTypeId, id, modifiedBy, ct);
 		}
 
 		internal async static Task<int> Update(
@@ -56,7 +59,8 @@ namespace Rat.Sql
 			string name,
 			int? projectTypeId,
 			int id,
-			int modifiedBy)
+			int modifiedBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Project_Update";
 
@@ -67,19 +71,25 @@ namespace Rat.Sql
 			parameters.AddId(id);
 			parameters.AddNoc();
 
-			var noc = await connection.ExecuteEx(ProcedureName, parameters);
+			var noc = await connection.ExecuteEx(ProcedureName, parameters, ct);
 
 			return noc;
 		}
 
-		public async static Task<dynamic> ProjectGetById(this SqlConnection connection, int id)
+		public async static Task<dynamic> ProjectGetById(
+			this SqlConnection connection,
+			int id,
+			CancellationToken ct)
 		{
-			var (project, _) = await GetById(connection, id);
+			var (project, _) = await GetById(connection, id, ct);
 
 			return project;
 		}
 
-		internal async static Task<(dynamic Project, int NumberOfChanges)> GetById(SqlConnection connection, int id)
+		internal async static Task<(dynamic Project, int NumberOfChanges)> GetById(
+			SqlConnection connection,
+			int id,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Project_GetById";
 
@@ -87,7 +97,7 @@ namespace Rat.Sql
 			parameters.AddId(id);
 			parameters.AddNoc();
 
-			var project = await connection.QuerySingleOrDefaultEx<dynamic>(ProcedureName, parameters);
+			var project = await connection.QuerySingleOrDefaultEx<dynamic>(ProcedureName, parameters, ct);
 			var noc = parameters.GetNoc();
 
 			return (project, noc);
@@ -95,16 +105,18 @@ namespace Rat.Sql
 
 		public async static Task<IEnumerable<dynamic>> ProjectGetProjectsForMember(
 			this SqlConnection connection,
-			int memberId)
+			int memberId,
+			CancellationToken ct)
 		{
-			var (projects, _) = await GetProjectsForMember(connection, memberId);
+			var (projects, _) = await GetProjectsForMember(connection, memberId, ct);
 
 			return projects;
 		}
 
 		internal async static Task<(dynamic Projects, int NumberOfChanges)> GetProjectsForMember(
 			SqlConnection connection,
-			int memberId)
+			int memberId,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Project_GetProjectsForMember";
 
@@ -112,18 +124,26 @@ namespace Rat.Sql
 			parameters.Add(MemberIdParameter, memberId);
 			parameters.AddNoc();
 
-			var projects = await connection.QueryEx<dynamic>(ProcedureName, parameters);
+			var projects = await connection.QueryEx<dynamic>(ProcedureName, parameters, ct);
 			var noc = parameters.GetNoc();
 
 			return (projects, noc);
 		}
 
-		public async static Task ProjectDelete(this SqlConnection connection, int id, int deletedBy)
+		public async static Task ProjectDelete(
+			this SqlConnection connection,
+			int id,
+			int deletedBy,
+			CancellationToken ct)
 		{
-			_ = await Delete(connection, id, deletedBy);
+			_ = await Delete(connection, id, deletedBy, ct);
 		}
 
-		internal async static Task<int> Delete(SqlConnection connection, int id, int deletedBy)
+		internal async static Task<int> Delete(
+			SqlConnection connection,
+			int id,
+			int deletedBy,
+			CancellationToken ct)
 		{
 			const string ProcedureName = "Project_Delete";
 
@@ -132,7 +152,7 @@ namespace Rat.Sql
 			parameters.AddDeletedBy(deletedBy);
 			parameters.AddNoc();
 
-			var noc = await connection.ExecuteEx(ProcedureName, parameters);
+			var noc = await connection.ExecuteEx(ProcedureName, parameters, ct);
 
 			return noc;
 		}

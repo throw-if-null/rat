@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Rat.Core.Properties;
-using static Rat.DataAccess.DatabaseSchema;
+using static Rat.Sql.DatabaseSchema;
 
 namespace Rat.Core.Commands.Configurations
 {

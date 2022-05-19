@@ -1,15 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using MediatR;
-using Rat.DataAccess;
+using Rat.Sql;
 
 namespace Rat.Commands.Users.CreateUser
 {
 	internal class CreateUserCommand : IRequestHandler<CreateUserRequest, CreateUserResponse>
 	{
-		private const string SqlQuery = "INSERT INTO Member (AuthProviderId) VALUES (@AuthProviderId); SELECT SCOPE_IDENTITY()";
-
 		private readonly ISqlConnectionFactory _connectionFactory;
 
 		public CreateUserCommand(ISqlConnectionFactory connectionFactory)
@@ -22,13 +19,7 @@ namespace Rat.Commands.Users.CreateUser
 			request.Validate();
 
 			await using var connection = _connectionFactory.CreateConnection();
-
-			var command = new CommandDefinition(
-				SqlQuery,
-				new { AuthProviderId = request.AuthProviderId },
-				cancellationToken: cancellationToken);
-
-			var id = await connection.QuerySingleAsync<int>(command);
+			var id = await connection.MemberInsert(request.AuthProviderId, 1, cancellationToken);
 
 			return new() { Id = id };
 		}

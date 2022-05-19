@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.DataAccess;
+using Rat.Sql;
 using Xunit;
 
 namespace Rat.Api.Test.Controllers.Project

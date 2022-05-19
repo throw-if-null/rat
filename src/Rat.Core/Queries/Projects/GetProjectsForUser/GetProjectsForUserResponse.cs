@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Rat.DataAccess.Views;
+using Rat.Core.Queries.Projects;
 
 namespace Rat.Queries.Projects.GetProjectsForUser
 {

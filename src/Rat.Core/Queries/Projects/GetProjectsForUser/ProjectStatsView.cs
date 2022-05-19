@@ -1,4 +1,4 @@
-﻿namespace Rat.DataAccess.Views
+﻿namespace Rat.Core.Queries.Projects
 {
     public record ProjectStatsView
     {

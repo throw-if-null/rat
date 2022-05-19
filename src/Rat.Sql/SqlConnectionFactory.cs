@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
-namespace Rat.DataAccess
+namespace Rat.Sql
 {
 	public interface ISqlConnectionFactory
 	{

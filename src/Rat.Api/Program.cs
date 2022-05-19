@@ -7,7 +7,7 @@ using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
 using Rat.Api.Routes.Health;
 using Rat.Core;
-using Rat.DataAccess;
+using Rat.Sql;
 
 namespace Rat.Api
 {
