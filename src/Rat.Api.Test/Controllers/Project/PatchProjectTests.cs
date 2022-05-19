@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,8 @@ namespace Rat.Api.Test.Controllers.Project
 				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Patch", ProjectTypeId = jsType.Id });
 
-			var projectId = await connection.QuerySingleAsync<int>(command);
+			var project = await connection.ProjectInsert("Patch", (int)jsType.Id, 1, CancellationToken.None);
+			int projectId = project.Id;
 
             var model = new PatchProjectRouteInput(projectId, "New test", csharpType.Id);
 
@@ -72,11 +74,8 @@ namespace Rat.Api.Test.Controllers.Project
 
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Patch", ProjectTypeId = projectTypeId });
-
-			var projectId = await connection.QuerySingleAsync<int>(command);
+			var project = await connection.ProjectInsert("Patch", projectTypeId, 1, CancellationToken.None);
+			int projectId = project.Id;
 
 			var model = new PatchProjectRouteInput(projectId, name, projectTypeId);
 
@@ -104,13 +103,9 @@ namespace Rat.Api.Test.Controllers.Project
 				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Patch", ProjectTypeId = projectTypeId });
 
-			var projectId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"DELETE FROM Project WHERE Id = @Id",
-				new { Id = projectId });
-
-			await connection.ExecuteAsync(command);
+			var project = await connection.ProjectInsert("Patch", projectTypeId, 1, CancellationToken.None);
+			int projectId = project.Id;
+			await connection.ProjectDelete(projectId, 1, CancellationToken.None);
 
 			var model = new PatchProjectRouteInput(projectId, "Rat", projectTypeId);
 

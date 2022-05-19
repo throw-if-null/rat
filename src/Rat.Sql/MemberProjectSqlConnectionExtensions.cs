@@ -3,13 +3,23 @@ using Microsoft.Data.SqlClient;
 
 namespace Rat.Sql
 {
-	internal static class MemberProjectSqlConnectionExtensions
+	public static class MemberProjectSqlConnectionExtensions
 	{
 		private const string MemberIdParameter = "@memberId";
 		private const string ProjectIdParameter = "@projectId";
 
-		public async static Task<int> MemberProjectInsert(
+		public async static Task MemberProjectInsert(
 			this SqlConnection connection,
+			int memberId,
+			int projectId,
+			int createdBy,
+			CancellationToken ct)
+		{
+			_ = await Insert(connection, memberId, projectId, createdBy, ct);
+		}
+
+		internal async static Task<int> Insert(
+			SqlConnection connection,
 			int memberId,
 			int projectId,
 			int createdBy,
@@ -28,8 +38,18 @@ namespace Rat.Sql
 			return noc;
 		}
 
-		public async static Task<int> MemberProjectDelete(
+		public async static Task MemberProjectDelete(
 			this SqlConnection connection,
+			int memberId,
+			int projectId,
+			int deletedBy,
+			CancellationToken ct)
+		{
+			_ = await Delete(connection, memberId, projectId, deletedBy, ct);
+		}
+
+		internal async static Task<int> Delete(
+			SqlConnection connection,
 			int memberId,
 			int projectId,
 			int deletedBy,

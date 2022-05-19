@@ -9,8 +9,6 @@ BEGIN
 		BEGIN TRANSACTION
 
 		BEGIN TRY
-			ALTER TABLE [dbo].[MemberProject] SET (SYSTEM_VERSIONING = OFF);
-
 			UPDATE [dbo].[MemberProject]
 			SET
 				[Operator] = @deletedBy,
@@ -19,11 +17,6 @@ BEGIN
 			WHERE
 				[MemberId] = @memberId AND
 				[ProjectId] = @projectId
-
-			ALTER TABLE [dbo].[MemberProject] SET
-			(
-				SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[MemberProjectHistory])
-			);
 
 			DELETE FROM [dbo].[MemberProject] WHERE [MemberId] = @memberId AND [ProjectId] = @projectId
 

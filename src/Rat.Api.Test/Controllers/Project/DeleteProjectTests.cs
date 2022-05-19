@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
@@ -39,16 +40,9 @@ namespace Rat.Api.Test.Controllers.Project
 
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES (@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Test", ProjectTypeId = projectTypeId });
-
-			var projectId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"DELETE FROM Project WHERE Id = @Id",
-				new { Id = projectId });
+			var project = await connection.ProjectInsert("Test", projectTypeId, 1, CancellationToken.None);
+			int projectId = project.Id;
+			await connection.ProjectDelete(projectId, 1, CancellationToken.None);
 
 			await connection.ExecuteAsync(command);
 
@@ -66,11 +60,8 @@ namespace Rat.Api.Test.Controllers.Project
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES (@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Test", ProjectTypeId = projectTypeId });
-
-			var projectId = await connection.QuerySingleAsync<int>(command);
+			var project = await connection.ProjectInsert("Test", projectTypeId, 1, CancellationToken.None);
+			int projectId = project.Id;
 
 			var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

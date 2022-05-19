@@ -29,6 +29,7 @@ namespace Rat.Sql
 			var parameters = new DynamicParameters();
 			parameters.Add(AuthProviderIdParameter, authProviderId);
 			parameters.AddCreatedBy(createdBy);
+			parameters.AddNoc();
 
 			var id = await connection.QuerySingleEx<int>(ProcedureName, parameters, ct);
 			var noc = parameters.GetNoc();

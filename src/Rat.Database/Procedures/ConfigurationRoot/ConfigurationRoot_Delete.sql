@@ -7,19 +7,12 @@ BEGIN
 	BEGIN TRANSACTION
 
 	BEGIN TRY
-		ALTER TABLE [dbo].[ProjectType] SET (SYSTEM_VERSIONING = OFF);
-
 		UPDATE [dbo].[ConfigurationRoot]
 		SET
 			[Operator] = @deletedBy,
 			[Operation] = N'delete',
 			[Timestamp] = GETUTCDATE()
 		WHERE [Id] = @id
-
-		ALTER TABLE [dbo].[ConfigurationRoot] SET
-		(
-			SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[ConfigurationRootHistory])
-		);
 
 		DELETE FROM [dbo].[ConfigurationRoot] WHERE [Id] = @id
 

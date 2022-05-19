@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,8 @@ namespace Rat.Api.Test.Controllers.Project
 				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
 				new { Name = "Should_Get_Project_By_Id", ProjectTypeId = projectTypeId });
 
-			var projectId = await connection.QuerySingleAsync<int>(command);
+			var project = await connection.ProjectInsert("Should_Get_Project_By_Id", projectTypeId, 1, CancellationToken.None);
+			var projectId = project.Id;
 
             var response = await _fixture.Client.GetAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -79,35 +81,13 @@ namespace Rat.Api.Test.Controllers.Project
 			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
 			var projectTypeId = await connection.QuerySingleAsync<int>(command);
 
-			command = new CommandDefinition(
-				"INSERT INTO Member(AuthProviderId, Operator, Operation) VALUES(@AuthProviderId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { AuthProviderId = authProviderUserId });
-
-			var userId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Project A", ProjectTypeId = projectTypeId });
-
-			var projectIdA = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Project B", ProjectTypeId = projectTypeId });
-
-			var projectIdB = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO MemberProject (MemberId, ProjectId, Operator, Operation) VALUES(@MemberId, @ProjectId, 1, N'insert')",
-				new { MemberId = userId, ProjectId = projectIdA });
-
-			await connection.ExecuteAsync(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO MemberProject (MemberId, ProjectId, Operator, Operation) VALUES(@MemberId, @ProjectId, 1, N'insert')",
-				new { MemberId = userId, ProjectId = projectIdB });
-
-			await connection.ExecuteAsync(command);
+			var memberId = await connection.MemberInsert(authProviderUserId, 1, CancellationToken.None);
+			var projectA = await connection.ProjectInsert("Project A", projectTypeId, 1, CancellationToken.None);
+			int projectIdA = projectA.Id;
+			var projectB = await connection.ProjectInsert("Project B", projectTypeId, 1, CancellationToken.None);
+			int projectIdB = projectB.Id;
+			await connection.MemberProjectInsert(memberId, projectIdA, 1, CancellationToken.None);
+			await connection.MemberProjectInsert(memberId, projectIdB, 1, CancellationToken.None);
 
 			var request = new HttpRequestMessage
 			{

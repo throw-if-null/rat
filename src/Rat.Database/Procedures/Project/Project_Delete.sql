@@ -8,19 +8,12 @@ BEGIN
 	BEGIN TRANSACTION
 
 	BEGIN TRY
-		ALTER TABLE [dbo].[Project] SET (SYSTEM_VERSIONING = OFF);
-
-		UPDATE [dbo].[ProjectType]
+		UPDATE [dbo].[Project]
 		SET
 			[Operator] = @deletedBy,
 			[Operation] = N'delete',
 			[Timestamp] = GETUTCDATE()
 		WHERE [Id] = @id
-
-		ALTER TABLE [dbo].[Project] SET
-		(
-			SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[ProjectHistory])
-		);
 
 		DELETE FROM [dbo].[Project] WHERE Id = @id
 
