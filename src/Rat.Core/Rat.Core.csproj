@@ -36,10 +36,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\ConfigurationEntries\CreateConfigurationEntry\" />
-    <Folder Include="Commands\ConfigurationEntries\DeleteConfigurationEntry\" />
-    <Folder Include="Commands\ConfigurationEntries\PatchConfigurationEntry\" />
-  </ItemGroup>
-
 </Project>

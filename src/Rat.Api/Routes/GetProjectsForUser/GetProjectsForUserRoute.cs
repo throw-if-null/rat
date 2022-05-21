@@ -25,18 +25,18 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(IMediator mediator, IUserProvider userProvider, RouteExecutor executor)
+			async static Task<IResult> ProcessInput(IMediator mediator, IMemberProvider userProvider, RouteExecutor executor)
 			{
-				var userId = userProvider.GetUserId();
+				var memberId = await userProvider.GetMemberId(CancellationToken.None);
 
-				if (string.IsNullOrWhiteSpace(userId))
+				if (memberId == default)
 					return Results.Forbid();
 
 				var response =
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(new GetProjectsForUserRequest { MemberId = userId }),
+							() => mediator.Send(new GetProjectsForUserRequest { MemberId = memberId }),
 							x => Results.Ok(Output(x)));
 
 				return response;

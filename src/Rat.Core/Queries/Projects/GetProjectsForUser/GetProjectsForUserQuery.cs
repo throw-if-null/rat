@@ -22,15 +22,7 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var member = await connection.MemberGetByAuthProviderId(request.MemberId, cancellationToken);
-
-			if (member == null)
-			{
-				member = new { Id = 0 };
-				member.Id = await connection.MemberInsert(request.MemberId, 1, cancellationToken);
-			}
-
-			var projects = await ProjectSqlConnectionExtensions.ProjectGetProjectsForMember(connection, member.Id, cancellationToken);
+			var projects = await ProjectSqlConnectionExtensions.ProjectGetProjectsForMember(connection, request.MemberId, cancellationToken);
 
 			var projectStats = new List<ProjectStatsView>();
 
@@ -45,7 +37,7 @@ namespace Rat.Queries.Projects.GetProjectsForUser
 
 			return new()
 			{
-				UserId = member.Id,
+				UserId = request.MemberId,
 				ProjectStats = projectStats
 			};
 		}

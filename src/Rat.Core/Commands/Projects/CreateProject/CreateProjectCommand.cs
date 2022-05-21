@@ -25,12 +25,7 @@ namespace Rat.Commands.Projects.CreateProject
 			if (projectType == null)
 				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
-			var member = await connection.MemberGetByAuthProviderId(request.UserId, cancellationToken);
-			if (member == null)
-				throw new ResourceNotFoundException($"Member: {request.UserId} does not exist");
-
-			int memberId = member.Id;
-			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, memberId, cancellationToken);
+			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, request.CreatedBy, cancellationToken);
 
 			return new()
 			{

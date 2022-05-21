@@ -1,33 +1,37 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Rat.Api.Auth;
 
 namespace Rat.Api.Test.Mocks
 {
-    public class TestUserProvider : IUserProvider
+	public class TestMemberProvider : IMemberProvider
     {
-		public const string UserId = "3feslrj3ssd111";
+		public const int MemberId = 42;
 
 		private readonly IHttpContextAccessor _contextAccessor;
 
-        public TestUserProvider(IHttpContextAccessor contextAccessor)
+        public TestMemberProvider(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;
         }
 
-        public string GetUserId()
+        public async Task<int> GetMemberId(CancellationToken ct)
         {
+			await Task.CompletedTask;
+
             if (_contextAccessor.HttpContext.Request.Headers.ContainsKey("test-user"))
             {
                 _contextAccessor.HttpContext.Request.Headers.TryGetValue("test-user", out var values);
                 var value = values[0];
 
                 if (value.Equals("null"))
-                    return null;
+                    return default;
 
-                return value;
+                return int.Parse(value);
             }
 
-            return UserId;
+            return MemberId;
         }
     }
 }

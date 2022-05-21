@@ -29,7 +29,7 @@ namespace Rat.Commands.Projects.DeleteProject
 			if (project == null)
 				throw new ResourceNotFoundException($"Project: {request.Id} does not exist");
 
-			await connection.ProjectDelete(request.Id, 1, cancellationToken);
+			await connection.ProjectDelete(request.Id, request.DeletedBy, cancellationToken);
 
             return new();
         }

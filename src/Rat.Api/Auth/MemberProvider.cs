@@ -1,23 +1,29 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Rat.Sql;
 
 namespace Rat.Api.Auth
 {
-	public sealed class UserProvider : IUserProvider
+	public sealed class MemberProvider : IMemberProvider
 	{
-		private static readonly string Method = $"{nameof(UserProvider)}.{nameof(GetUserId)}";
+		private static readonly string Method = $"{nameof(MemberProvider)}.{nameof(GetMemberId)}";
 
 		private readonly IHttpContextAccessor _contextAccessor;
+		private readonly ISqlConnectionFactory _connectionFactory;
 		private readonly ILogger _logger;
 
-		public UserProvider(IHttpContextAccessor contextAccessor, ILogger<UserProvider> logger)
+		public MemberProvider(
+			IHttpContextAccessor contextAccessor,
+			ISqlConnectionFactory connectionFactory,
+			ILogger<MemberProvider> logger)
 		{
 			_contextAccessor = contextAccessor;
+			_connectionFactory = connectionFactory;
 			_logger = logger;
 		}
 
-		public string GetUserId()
+		public async Task<int> GetMemberId(CancellationToken ct)
 		{
 			ClaimsPrincipal user = _contextAccessor.HttpContext.User;
 
@@ -28,14 +34,14 @@ namespace Rat.Api.Auth
 			{
 				_logger.UserInHttpContexIsNullWarning();
 
-				return null;
+				return default;
 			}
 
 			if (user.Identity == null)
 			{
 				_logger.IdentityInUserIsNullWarning();
 
-				return null;
+				return default;
 			}
 
 			var name = user.Identity.Name;
@@ -48,7 +54,7 @@ namespace Rat.Api.Auth
 				{
 					_logger.NameClaimIsNullOrEmptyWarning();
 
-					return null;
+					return default;
 				}
 
 				using var clientNameClaimScope = _logger.AppendClientNameClaim(nameIdentifierClaim.Value);
@@ -57,13 +63,13 @@ namespace Rat.Api.Auth
 				{
 					var clientName = nameIdentifierClaim.Value.Split('@')[0];
 
-					return clientName;
+					return 1;
 				}
 				else
 				{
 					_logger.NameClientClaimIsInvalidWarning();
 
-					return null;
+					return default;
 				}
 			}
 
@@ -73,15 +79,22 @@ namespace Rat.Api.Auth
 			{
 				_logger.NameClaimShouldContainPipeWarning();
 
-				return null;
+				return default;
 			}
 
-			var userId = name.Split('|')[1];
+			var authProviderId = name.Split('|')[1];
 
-			using var userIdScope = _logger.AppendUserId(userId);
+			using var userIdScope = _logger.AppendUserId(authProviderId);
 			_logger.ProcessingFinishedDebug();
 
-			return userId;
+			await using var connection = _connectionFactory.CreateConnection();
+
+			var member = await connection.MemberGetByAuthProviderId(authProviderId, ct);
+
+			if (member == null)
+				return default;
+
+			return member.Id;
 		}
 	}
 }

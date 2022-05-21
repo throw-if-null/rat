@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Rat.Api.Auth;
 using Rat.Commands.Projects.DeleteProject;
 
 namespace Rat.Api.Routes
@@ -22,13 +23,22 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(int id, IMediator mediator, RouteExecutor executor)
-			{
+			async static Task<IResult> ProcessInput(
+				int id,
+				IMediator mediator,
+				IMemberProvider memberProvider,
+				RouteExecutor executor)
+{
+				var memberId = await memberProvider.GetMemberId(CancellationToken.None);
+
+				if (memberId == default)
+					return Results.Forbid();
+
 				var response =
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(new DeleteProjectRequest { Id = id }),
+							() => mediator.Send(new DeleteProjectRequest { Id = id, DeletedBy = memberId}),
 							_ => Results.NoContent());
 
 				return response;

@@ -17,6 +17,8 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 
 		public async Task<PatchConfigurationResponse> Handle(PatchConfigurationRequest request, CancellationToken cancellationToken)
 		{
+			request.Validate();
+
 			await using var connection = _connectionFactory.CreateConnection();
 
 			var configuration = await connection.ConfigurationRootGetById(request.ConfigurationId, cancellationToken);
@@ -28,7 +30,7 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 			await connection.ConfigurationRootUpdate(
 				request.Name == configuration.Name ? null : request.Name,
 				request.ConfigurationTypeId == configuration.ConfigurationTypeId ? null : request.ConfigurationTypeId,
-				1,
+				request.ModifiedBy,
 				request.ConfigurationId,
 				cancellationToken);
 

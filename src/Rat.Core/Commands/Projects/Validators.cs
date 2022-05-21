@@ -9,16 +9,6 @@ namespace Rat.Commands.Projects
 	{
 		private static readonly KeyValuePair<string, string>[] Empty = Array.Empty<KeyValuePair<string, string>>();
 
-		public static KeyValuePair<string, string>[] ValidateId(int id)
-		{
-			if (id <= 0)
-			{
-				return new KeyValuePair<string, string>[1] { new("Id", Resources.IdMustBeLargerThenZero) };
-			}
-
-			return Empty;
-		}
-
 		public static KeyValuePair<string, string>[] ValidateName(string name)
 		{
 			if (string.IsNullOrWhiteSpace(name))

@@ -17,9 +17,15 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 
 		public async Task<CreateConfigurationResponse> Handle(CreateConfigurationRequest request, CancellationToken cancellationToken)
 		{
+			request.Validate();
+
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var id = await connection.ConfigurationRootInsert(request.Name, request.ConfigurationTypeId, 1, cancellationToken);
+			var id = await connection.ConfigurationRootInsert(
+				request.Name, 
+				request.ConfigurationTypeId, 
+				request.CreatedBy, 
+				cancellationToken);
 			var configuration = await connection.ConfigurationRootGetById(id, cancellationToken);
 
 			return new()

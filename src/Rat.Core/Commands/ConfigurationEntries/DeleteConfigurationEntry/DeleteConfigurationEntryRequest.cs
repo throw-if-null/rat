@@ -3,21 +3,21 @@ using MediatR;
 using Rat.Core.Exceptions;
 using static Rat.Core.Commands.Validators;
 
-namespace Rat.Core.Commands.Configurations.DeleteConfiguration
+namespace Rat.Core.Commands.ConfigurationEntries.DeleteConfigurationEntry
 {
-	internal record DeleteConfigurationRequest : IRequest<DeleteConfigurationResponse>
+	internal class DeleteConfigurationEntryRequest : IRequest<DeleteConfigurationEntryResponse>
 	{
-		public int ConfigurationId { get; init; }
+		public int Id { get; init; }
 
 		public int DeletedBy { get; init; }
 	}
 
-	internal static class DeleteConfigurationRequestExtensions
+	internal static class DeleteConfigurationEntryRequestExtensions
 	{
-		public static void Validate(this DeleteConfigurationRequest request)
+		public static void Validate(this DeleteConfigurationEntryRequest request)
 		{
 			var validationErrors =
-				ValidateId(request.ConfigurationId)
+				ValidateId(request.Id)
 				.Union(ValidateDeletedBy(request.DeletedBy))
 				.ToArray();
 

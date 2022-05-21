@@ -8,7 +8,7 @@ namespace Rat.Commands.Users
 	{
 		private static readonly KeyValuePair<string, string>[] Empty = Array.Empty<KeyValuePair<string, string>>();
 
-		public static KeyValuePair<string, string>[] ValidateId(string authProviderUserId)
+		public static KeyValuePair<string, string>[] ValidateAuthProviderId(string authProviderUserId)
 		{
 			if (string.IsNullOrWhiteSpace(authProviderUserId))
 			{

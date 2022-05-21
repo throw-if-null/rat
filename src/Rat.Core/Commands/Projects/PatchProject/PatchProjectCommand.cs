@@ -34,7 +34,7 @@ namespace Rat.Commands.Projects.PatchProject
 				project.Name == request.Name ? null : request.Name,
 				project.ProjectTypeId == request.ProjectTypeId ? null : request.ProjectTypeId,
 				request.Id,
-				1,
+				request.ModifiedBy,
 				cancellationToken);
 
 			project = await connection.ProjectGetById(request.Id, cancellationToken);

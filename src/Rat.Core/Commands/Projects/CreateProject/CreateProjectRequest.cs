@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using MediatR;
 using Rat.Core.Exceptions;
+using static Rat.Core.Commands.Validators;
 
 namespace Rat.Commands.Projects.CreateProject
 {
 	internal record CreateProjectRequest : IRequest<CreateProjectResponse>
     {
-		public string UserId { get; init; }
-
         public string Name { get; set; }
 
         public int ProjectTypeId { get; set; }
+
+		public int CreatedBy { get; init; }
 	}
 
     internal static class CreateProjectRequestExtensions
@@ -20,7 +21,7 @@ namespace Rat.Commands.Projects.CreateProject
 			var validationErrors =
 				Validators.ValidateName(request.Name)
 				.Union(Validators.ValidateProjectTypeId(request.ProjectTypeId))
-				.Union(Validators.ValidateAuthProviderUserId(request.UserId))
+				.Union(ValidateCreatedBy(request.CreatedBy))
 				.ToArray();
 
 			if (validationErrors.Length == 0)

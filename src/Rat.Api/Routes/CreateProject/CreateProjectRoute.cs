@@ -30,25 +30,25 @@ namespace Rat.Api.Routes
 				CreateProjectRouteInput input,
 				RouteExecutor executor,
 				IMediator mediator,
-				IUserProvider userProvider)
+				IMemberProvider memberProvider)
 			{
-				var userId = userProvider.GetUserId();
+				var memberId = await memberProvider.GetMemberId(CancellationToken.None);
 
-				if (string.IsNullOrWhiteSpace(userId))
+				if (memberId == default)
 					return Results.Forbid();
 
 				var response =
 					await executor.Execute(
 						ROUTE_NAME,
-						() => mediator.Send(Request(input, userId), CancellationToken.None),
+						() => mediator.Send(Request(input, memberId), CancellationToken.None),
 						x => Results.CreatedAtRoute(ROUTE_NAME, null, CreateOutput(x)));
 
 				return response;
 			}
 
-			static CreateProjectRequest Request(CreateProjectRouteInput input, string userId)
+			static CreateProjectRequest Request(CreateProjectRouteInput input, int memberId)
 			{
-				return new CreateProjectRequest { Name = input.Name, ProjectTypeId = input.TypeId, UserId = userId };
+				return new CreateProjectRequest { Name = input.Name, ProjectTypeId = input.TypeId, CreatedBy = memberId };
 			}
 
 			static CreateProjectRouteOutput CreateOutput(CreateProjectResponse response)

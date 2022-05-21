@@ -39,7 +39,7 @@ namespace Rat.Api
 			builder.Services.AddCors(options => { options.AddPolicy("AllowAllPolicy", BuildCorsPolicy); });
 
 			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			builder.Services.AddSingleton<IUserProvider, UserProvider>();
+			builder.Services.AddSingleton<IMemberProvider, MemberProvider>();
 			builder.Services.AddSingleton<RouteExecutor>();
 			builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 

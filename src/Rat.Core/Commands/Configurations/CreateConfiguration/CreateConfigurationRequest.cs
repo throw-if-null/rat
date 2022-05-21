@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using MediatR;
 using Rat.Core.Exceptions;
+using static Rat.Core.Commands.Validators;
 
 namespace Rat.Core.Commands.Configurations.CreateConfiguration
 {
@@ -9,6 +10,8 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 		public int ConfigurationTypeId { get; init; }
 
 		public string Name { get; init; }
+
+		public int CreatedBy { get; init; }
 	}
 
 	internal static class CreateConfigurationRequestExtensions
@@ -18,6 +21,7 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 			var validationErrors =
 				Validators.ValidateName(request.Name)
 				.Union(Validators.ValidateConfigurationTypeId(request.ConfigurationTypeId))
+				.Union(ValidateCreatedBy(request.CreatedBy))
 				.ToArray();
 
 			if (validationErrors.Length == 0)

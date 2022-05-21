@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Rat.Core.Exceptions;
 
 namespace Rat.Commands.Users.CreateUser
 {
@@ -11,8 +12,12 @@ namespace Rat.Commands.Users.CreateUser
 	{
 		public static void Validate(this CreateUserRequest request)
 		{
-			var validationErrors = Validators.ValidateId(request.AuthProviderId);
+			var validationErrors = Validators.ValidateAuthProviderId(request.AuthProviderId);
 
+			if (validationErrors.Length == 0)
+				return;
+
+			throw new InvalidRequestDataException(validationErrors);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using MediatR;
 using Rat.Core.Exceptions;
+using static Rat.Core.Commands.Validators;
 
 namespace Rat.Commands.Projects.PatchProject
 {
@@ -11,6 +12,8 @@ namespace Rat.Commands.Projects.PatchProject
         public string Name { get; init; }
 
         public int ProjectTypeId { get; init; }
+
+		public int ModifiedBy { get; init; }
     }
 
     internal static class PatchProjectRequestExtensions
@@ -18,7 +21,8 @@ namespace Rat.Commands.Projects.PatchProject
         public static void Validate(this PatchProjectRequest request)
         {
 			var validationErrors =
-				Validators.ValidateId(request.Id)
+				ValidateId(request.Id)
+				.Union(ValidateModifiedBy(request.ModifiedBy))
 				.Union(Validators.ValidateName(request.Name))
 				.Union(Validators.ValidateProjectTypeId(request.ProjectTypeId))
 				.ToArray();

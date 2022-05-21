@@ -46,7 +46,7 @@ namespace Rat.Api.Test
 			{
 				services.AddHttpClient();
 
-				services.AddSingleton<IUserProvider, TestUserProvider>();
+				services.AddSingleton<IMemberProvider, TestMemberProvider>();
 
 				services
 					.AddAuthentication("Test")
@@ -99,8 +99,8 @@ namespace Rat.Api.Test
 
 		private static int AddUser(SqlConnection connection, string database)
 		{
-			var getCommand = new CommandDefinition("SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId", new { AuthProviderId = TestUserProvider.UserId });
-			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId);", new { AuthProviderId = TestUserProvider.UserId });
+			var getCommand = new CommandDefinition("SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId", new { AuthProviderId = TestMemberProvider.MemberId });
+			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId);", new { AuthProviderId = TestMemberProvider.MemberId });
 
 			connection.ChangeDatabase(database);
 			var userId = connection.QuerySingleOrDefault<int?>(getCommand);

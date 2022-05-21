@@ -9,16 +9,6 @@ namespace Rat.Core.Commands.Configurations
 	{
 		private static readonly KeyValuePair<string, string>[] Empty = Array.Empty<KeyValuePair<string, string>>();
 
-		public static KeyValuePair<string, string>[] ValidateId(int id)
-		{
-			if (id <= 0)
-			{
-				return new KeyValuePair<string, string>[1] { new("Id", Resources.IdMustBeLargerThenZero) };
-			}
-
-			return Empty;
-		}
-
 		public static KeyValuePair<string, string>[] ValidateName(string name)
 		{
 			if (string.IsNullOrWhiteSpace(name))
@@ -30,16 +20,16 @@ namespace Rat.Core.Commands.Configurations
 			{
 				return new KeyValuePair<string, string>[1]
 				{
-					new ("Name", string.Format(Resources.MaximumLengthLimitExceeded, name.Length, ProjectSchema.Max_Name_Length))
+					new ("Name", string.Format(Resources.MaximumLengthLimitExceeded, name.Length, ConfigurationRootSchema.Max_Name_Length))
 				};
 			}
 
 			return Empty;
 		}
 
-		public static KeyValuePair<string, string>[] ValidateConfigurationTypeId(int projectTypeId)
+		public static KeyValuePair<string, string>[] ValidateConfigurationTypeId(int configurationTypeId)
 		{
-			if (projectTypeId <= 0)
+			if (configurationTypeId <= 0)
 			{
 				return new KeyValuePair<string, string>[1] { new("ConfigurationTypeId", Resources.NotFound) };
 			}

@@ -76,10 +76,10 @@ namespace Rat.Api.Test.Controllers.Project
 		}
 
         [Theory]
-        [InlineData("", "1", TestUserProvider.UserId)]
-        [InlineData(null, "2", TestUserProvider.UserId)]
-		[InlineData("Test", "1", "unknown-user")]
-		public async Task Should_Return_BadRequest(string name, string version, string userId)
+        [InlineData("", "1", TestMemberProvider.MemberId)]
+        [InlineData(null, "2", TestMemberProvider.MemberId)]
+		[InlineData("Test", "1", 31)]
+		public async Task Should_Return_BadRequest(string name, string version, int memberId)
         {
             var model = new CreateProjectRouteInput(name, 0);
 
@@ -90,7 +90,7 @@ namespace Rat.Api.Test.Controllers.Project
 				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
 			};
 
-			request.Headers.Add("test-user", userId);
+			request.Headers.Add("test-user", memberId.ToString());
 
 			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 			Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
