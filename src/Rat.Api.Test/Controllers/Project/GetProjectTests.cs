@@ -95,7 +95,7 @@ namespace Rat.Api.Test.Controllers.Project
 				RequestUri = new Uri("/api/projects/", uriKind: UriKind.Relative)
 			};
 
-			request.Headers.Add("test-user", authProviderUserId);
+			request.Headers.Add("test-user", memberId.ToString());
 
 			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
@@ -129,7 +129,7 @@ namespace Rat.Api.Test.Controllers.Project
                 RequestUri = new Uri("/api/projects", UriKind.Relative)
             };
 
-            request.Headers.Add("test-user", "test-user");
+            request.Headers.Add("test-user", "31");
 
             var response = await _fixture.Client.SendAsync(request);
 
