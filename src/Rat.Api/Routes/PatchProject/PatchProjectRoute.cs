@@ -28,13 +28,14 @@ namespace Rat.Api.Routes
 			return builder;
 
 			async Task<IResult> ProcessInput(
+				HttpContext context,
 				int id,
 				PatchProjectRouteInput input,
 				IMediator mediator,
 				IMemberProvider memberProvider,
 				RouteExecutor executor)
 			{
-				var memberId = await memberProvider.GetMemberId(CancellationToken.None);
+				var memberId = await memberProvider.GetMemberId(context.RequestAborted);
 
 				if (memberId == default)
 					return Results.Forbid();

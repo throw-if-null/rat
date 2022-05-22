@@ -25,7 +25,11 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async static Task<IResult> ProcessInput(int id, IMediator mediator, RouteExecutor executor)
+			async static Task<IResult> ProcessInput(
+				HttpContext context,
+				int id,
+				IMediator mediator,
+				RouteExecutor executor)
 			{
 				var response =
 					await

@@ -1,4 +1,6 @@
-﻿namespace Rat.Commands.Projects.PatchProject
+﻿using System;
+
+namespace Rat.Commands.Projects.PatchProject
 {
 	internal record PatchProjectResponse
     {
@@ -7,5 +9,9 @@
 		public string Name { get; init; }
 
 		public int TypeId { get; init; }
+
+		public int ModifiedBy { get; init; }
+
+		public DateTimeOffset ModifiedOn { get; init; }
 	}
 }

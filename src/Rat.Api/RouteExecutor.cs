@@ -12,7 +12,10 @@ namespace Rat.Api
 			_logger = logger;
 		}
 
-		public async Task<IResult> Execute<T>(string routeName, Func<Task<T>> routeProcess, Func<T, IResult> successfulResponse)
+		public async Task<IResult> Execute<T>(
+			string routeName,
+			Func<Task<T>> routeProcess,
+			Func<T, IResult> successfulResponse)
 		{
 			var watch = ValueStopwatch.StartNew();
 

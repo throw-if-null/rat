@@ -27,12 +27,13 @@ namespace Rat.Api.Routes
 			return builder;
 
 			static async Task<IResult> ProcessInput(
+				HttpContext context,
 				CreateProjectRouteInput input,
 				RouteExecutor executor,
 				IMediator mediator,
 				IMemberProvider memberProvider)
 			{
-				var memberId = await memberProvider.GetMemberId(CancellationToken.None);
+				var memberId = await memberProvider.GetMemberId(context.RequestAborted);
 
 				if (memberId == default)
 					return Results.Forbid();
@@ -40,7 +41,7 @@ namespace Rat.Api.Routes
 				var response =
 					await executor.Execute(
 						ROUTE_NAME,
-						() => mediator.Send(Request(input, memberId), CancellationToken.None),
+						() => mediator.Send(Request(input, memberId), context.RequestAborted),
 						x => Results.CreatedAtRoute(ROUTE_NAME, null, CreateOutput(x)));
 
 				return response;

@@ -28,6 +28,6 @@ namespace Rat.Core.Queries.Configurations.GetConfiguration
 
 		public bool Disabled { get; init; }
 
-		public long SecondsToLive { get; init; }
+		public int SecondsToLive { get; init; }
 	}
 }

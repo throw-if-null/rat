@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using Rat.Api.Auth;
 using Rat.Commands.Projects.DeleteProject;
+using Rat.Core.Commands.Configurations.DeleteConfiguration;
 
-namespace Rat.Api.Routes
+namespace Rat.Api.Routes.DeleteConfiguration
 {
-	internal static class DeleteProjectRoute
+	public static class DeleteConfigurationRoute
 	{
-		private const string ROUTE_NAME = "DeleteProject";
-		private const string ROUTE_PATH = "/api/projects/{id:int}";
+		private const string ROUTE_NAME = "DeleteConfiguration";
+		private const string ROUTE_PATH = "/api/configurations/{id:int}";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -23,14 +24,13 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-
 			async static Task<IResult> ProcessInput(
 				HttpContext context,
 				int id,
 				IMediator mediator,
 				IMemberProvider memberProvider,
 				RouteExecutor executor)
-{
+			{
 				var memberId = await memberProvider.GetMemberId(context.RequestAborted);
 
 				if (memberId == default)
@@ -40,7 +40,7 @@ namespace Rat.Api.Routes
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(new DeleteProjectRequest { Id = id, DeletedBy = memberId}),
+							() => mediator.Send(new DeleteConfigurationRequest { ConfigurationId = id, DeletedBy = memberId }),
 							_ => Results.NoContent());
 
 				return response;

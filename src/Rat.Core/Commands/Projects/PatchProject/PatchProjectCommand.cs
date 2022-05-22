@@ -29,7 +29,6 @@ namespace Rat.Commands.Projects.PatchProject
 			if (projectType == null)
 				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
-			// TODO: replace 1 with UserId
 			await connection.ProjectUpdate(
 				project.Name == request.Name ? null : request.Name,
 				project.ProjectTypeId == request.ProjectTypeId ? null : request.ProjectTypeId,
@@ -43,7 +42,9 @@ namespace Rat.Commands.Projects.PatchProject
 			{
 				Id = project.Id,
 				Name = project.Name,
-				TypeId = project.ProjectTypeId
+				TypeId = project.ProjectTypeId,
+				ModifiedBy = project.Operator,
+				ModifiedOn = project.Timestamp
 			};
 		}
 	}
