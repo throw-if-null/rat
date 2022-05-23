@@ -5,7 +5,13 @@ using Microsoft.OpenApi.Models;
 using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
+using Rat.Api.Routes.CreateConfiguration;
+using Rat.Api.Routes.CreateConfigurationEntry;
+using Rat.Api.Routes.DeleteConfiguration;
+using Rat.Api.Routes.DeleteConfigurationEntry;
 using Rat.Api.Routes.Health;
+using Rat.Api.Routes.PatchConfiguration;
+using Rat.Api.Routes.PatchConfigurationEntry;
 using Rat.Core;
 using Rat.Sql;
 
@@ -136,6 +142,12 @@ namespace Rat.Api
 			GetProjectRoute.Map(app);
 			PatchProjectRoute.Map(app);
 			DeleteProjectRoute.Map(app);
+			CreateConfigurationRoute.Map(app);
+			PatchConfigurationRoute.Map(app);
+			DeleteConfigurationRoute.Map(app);
+			CreateConfigurationEntryRoute.Map(app);
+			PatchConfigurationEntryRoute.Map(app);
+			DeleteConfigurationEntryRoute.Map(app);
 
 			app.Run();
 

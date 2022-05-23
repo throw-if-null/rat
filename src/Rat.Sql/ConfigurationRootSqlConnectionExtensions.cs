@@ -11,18 +11,20 @@ namespace Rat.Sql
 
 		public async static Task<int> ConfigurationRootInsert(
 			this SqlConnection connection,
+			int projectId,
 			string name,
 			int configurationTypeId,
 			int createdBy,
 			CancellationToken ct)
 		{
-			var (id, _) = await Insert(connection, name, configurationTypeId, createdBy, ct);
+			var (id, _) = await Insert(connection, projectId, name, configurationTypeId, createdBy, ct);
 
 			return id;
 		}
 
 		internal async static Task<(int Id, int Noc)> Insert(
 			SqlConnection connection,
+			int projectId,
 			string name,
 			int configurationTypeId,
 			int createdBy,
@@ -31,6 +33,7 @@ namespace Rat.Sql
 			const string ProcedureName = "ConfigurationRoot_Insert";
 
 			var parameters = new DynamicParameters();
+			parameters.Add(ProjectIdParameter, projectId);
 			parameters.Add(NameParameter, name);
 			parameters.Add(ConfigurationTypeIdParameter, configurationTypeId);
 			parameters.AddCreatedBy(createdBy);

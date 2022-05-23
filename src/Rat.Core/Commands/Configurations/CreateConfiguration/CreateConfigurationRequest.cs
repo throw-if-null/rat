@@ -7,6 +7,8 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 {
 	internal record CreateConfigurationRequest : IRequest<CreateConfigurationResponse>
 	{
+		public int ProjectId { get; init; }
+
 		public int ConfigurationTypeId { get; init; }
 
 		public string Name { get; init; }
@@ -20,6 +22,7 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 		{
 			var validationErrors =
 				Validators.ValidateName(request.Name)
+				.Union(Validators.ValidateProjectId(request.ProjectId))
 				.Union(Validators.ValidateConfigurationTypeId(request.ConfigurationTypeId))
 				.Union(ValidateCreatedBy(request.CreatedBy))
 				.ToArray();

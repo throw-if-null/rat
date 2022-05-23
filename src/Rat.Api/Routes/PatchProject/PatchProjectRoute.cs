@@ -3,7 +3,6 @@ using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.PatchProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {

@@ -50,7 +50,7 @@
     <Build Include="Procedures\Project\Project_GetById.sql" />
     <PostDeploy Include="_Scripts\SeedData.sql" />
     <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Delete.sql" />
-    <Build Include="Procedures\ConfigurationEntry\ConfigurationEnty_Update.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Update.sql" />
     <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetById.sql" />
     <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetByConfigurationRootId.sql" />
     <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetByProjectId.sql" />

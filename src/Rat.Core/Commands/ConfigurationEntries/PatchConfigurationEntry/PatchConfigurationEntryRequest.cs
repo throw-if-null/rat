@@ -16,9 +16,11 @@ namespace Rat.Core.Commands.ConfigurationEntries.PatchConfigurationEntry
 
 		public int? SecondsToLive { get; init; }
 
-		public bool? Disabled { get; set; }
+		public bool? Disabled { get; init; }
 
-		public int ModifiedBy { get; set; }
+		public int ConfigurationRootId { get; init; }
+
+		public int ModifiedBy { get; init; }
 	}
 
 	internal static class PatchConfigurationEntryRequestExtensions
@@ -27,6 +29,7 @@ namespace Rat.Core.Commands.ConfigurationEntries.PatchConfigurationEntry
 		{
 			var validationErrors =
 				ValidateId(request.Id)
+				.Union(Validators.ValidateConfigurationRootId(request.ConfigurationRootId))
 				.Union(ValidateModifiedBy(request.ModifiedBy))
 				.Union(Validators.AllNull(request)).ToList();
 

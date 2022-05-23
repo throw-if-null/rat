@@ -11,7 +11,7 @@ namespace Rat.Api.Routes.CreateConfiguration
 	public static class CreateConfigurationRoute
 	{
 		private const string ROUTE_NAME = "CreateConfiguration";
-		private const string ROUTE_PATH = @"/api/configurations";
+		private const string ROUTE_PATH = @"/api/projects/{projectId:int}/configurations";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -28,6 +28,7 @@ namespace Rat.Api.Routes.CreateConfiguration
 			return builder;
 
 			static async Task<IResult> ProcessInput(
+				int projectId,
 				HttpContext context,
 				CreateConfigurationRouteInput input,
 				RouteExecutor executor,
@@ -42,15 +43,20 @@ namespace Rat.Api.Routes.CreateConfiguration
 				var response =
 					await executor.Execute(
 						ROUTE_NAME,
-						() => mediator.Send(Request(input, memberId), context.RequestAborted),
+						() => mediator.Send(Request(input, projectId, memberId), context.RequestAborted),
 						x => Results.CreatedAtRoute(ROUTE_NAME, null, CreateOutput(x)));
 
 				return response;
 			}
 
-			static CreateConfigurationRequest Request(CreateConfigurationRouteInput input, int memberId)
+			static CreateConfigurationRequest Request(CreateConfigurationRouteInput input, int projectId, int memberId)
 			{
-				return new CreateConfigurationRequest { Name = input.Name, ConfigurationTypeId = input.TypeId, CreatedBy = memberId };
+				return new CreateConfigurationRequest
+				{
+					ProjectId = projectId,
+					Name = input.Name,
+					ConfigurationTypeId = input.TypeId,
+					CreatedBy = memberId };
 			}
 
 			static CreateConfigurationRouteOutput CreateOutput(CreateConfigurationResponse response)

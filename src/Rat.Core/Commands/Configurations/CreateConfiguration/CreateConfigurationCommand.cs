@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Rat.Core.Exceptions;
 using Rat.Sql;
 
 namespace Rat.Core.Commands.Configurations.CreateConfiguration
@@ -21,7 +22,13 @@ namespace Rat.Core.Commands.Configurations.CreateConfiguration
 
 			await using var connection = _connectionFactory.CreateConnection();
 
+			var project = await connection.ProjectGetById(request.ProjectId, cancellationToken);
+
+			if (project == null)
+				throw new ResourceNotFoundException($"Project: {request.ProjectId} doesn't exist");
+
 			var id = await connection.ConfigurationRootInsert(
+				request.ProjectId,
 				request.Name, 
 				request.ConfigurationTypeId, 
 				request.CreatedBy, 

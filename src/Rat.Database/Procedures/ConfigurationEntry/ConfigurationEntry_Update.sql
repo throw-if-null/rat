@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[ConfigurationEnty_Update]
+﻿CREATE PROCEDURE [dbo].[ConfigurationEntry_Update]
 	@key nvarchar(128) = NULL,
 	@value nvarchar(2096) = NULL,
 	@secondsToLive int = NULL,

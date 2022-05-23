@@ -11,7 +11,8 @@ BEGIN
 		ce.[Disabled],
 		ce.[Operator],
 		ce.[Operation],
-		ce.[Timestamp]
+		ce.[Timestamp],
+		ce.[ConfigurationRootId]
 	FROM [dbo].[ConfigurationEntry] AS ce
 	WHERE ce.[Id] = @id
 
