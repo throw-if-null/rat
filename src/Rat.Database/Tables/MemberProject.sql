@@ -4,7 +4,7 @@
 	[ProjectId] INT NOT NULL,
 
 	[Timestamp] DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
-	[Operation] NVARCHAR(16) DEFAULT N'created',
+	[Operation] NVARCHAR(16) DEFAULT N'insert',
 	[Operator] INT NOT NULL,
 
 	[ValidFrom] datetime2 (0) GENERATED ALWAYS AS ROW START,

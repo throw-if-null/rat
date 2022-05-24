@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Rat.Core.Exceptions;
 using Rat.Sql;
 
 namespace Rat.Queries.Projects.GetProjectById
@@ -21,14 +22,17 @@ namespace Rat.Queries.Projects.GetProjectById
 			await using var connection = _connectionFactory.CreateConnection();
 			var project = await connection.ProjectGetById(request.Id, cancellationToken);
 
-			return project == null
-				? null
-				: new()
-				{
-					Id = project.Id,
-					Name = project.Name,
-					TypeId = project.ProjectTypeId
-				};
+			if (project == null)
+				throw new ResourceNotFoundException($"Project: {request.Id} doesn't exist");
+
+			return new()
+			{
+				Id = project.Id,
+				Name = project.Name,
+				TypeId = project.ProjectTypeId,
+				ConfigurationsCount = project.ConfigurationCount,
+				EntriesCount = project.EntriesCount
+			};
 		}
 	}
 }

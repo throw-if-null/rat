@@ -11,10 +11,6 @@ namespace Rat.Core.Queries.Configurations.GetConfiguration
 
 		public int ConfigurationTypeId { get; init; }
 
-		public DateTimeOffset Created { get; init; }
-
-		public DateTimeOffset Modified { get; init; }
-
 		public IEnumerable<ConfigurationEntry> ConfigurationEntries { get; init; }
 	}
 

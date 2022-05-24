@@ -36,7 +36,7 @@ namespace Rat.Api.Routes
 						executor.Execute(
 							ROUTE_NAME,
 							() => mediator.Send(new GetProjectByIdRequest { Id = id }),
-							x => Results.Ok(new GetProjectRouteOutput(x.Id, x.Name, x.TypeId)));
+							x => Results.Ok(new GetProjectRouteOutput(x.Id, x.Name, x.TypeId, x.ConfigurationsCount, x.EntriesCount)));
 
 				return response;
 			}

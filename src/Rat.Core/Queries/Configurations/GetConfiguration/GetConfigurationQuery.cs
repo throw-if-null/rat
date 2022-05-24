@@ -31,8 +31,6 @@ namespace Rat.Core.Queries.Configurations.GetConfiguration
 				ConfigurationId = configuration.Id,
 				Name = configuration.Name,
 				ConfigurationTypeId = configuration.ConfigurationTypeId,
-				Created = configuration.Created,
-				Modified = configuration.Modified,
 				ConfigurationEntries = entries.Select(x => new ConfigurationEntry
 				{
 					Id = x.Id,

@@ -1,6 +1,4 @@
-﻿using Rat.Core;
-
-namespace Rat.Queries.Projects.GetProjectById
+﻿namespace Rat.Queries.Projects.GetProjectById
 {
 	internal record GetProjectByIdResponse
     {
@@ -9,5 +7,7 @@ namespace Rat.Queries.Projects.GetProjectById
 		public string Name { get; init; }
 
 		public int TypeId { get; init; }
+		public int ConfigurationsCount { get; init; }
+		public int EntriesCount { get; init; }
 	}
 }
