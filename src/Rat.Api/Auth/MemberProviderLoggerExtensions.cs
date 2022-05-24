@@ -2,7 +2,7 @@
 
 namespace Rat.Api.Auth
 {
-	internal static class UserProviderLoggerExtensions
+	internal static class MemberProviderLoggerExtensions
 	{
 		private static readonly Func<EventId> _getEvent = () => new EventId(LogEvents.ExtractUserIdFromHttpContext, nameof(LogEvents.ExtractUserIdFromHttpContext));
 

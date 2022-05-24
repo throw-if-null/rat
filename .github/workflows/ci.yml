@@ -8,7 +8,7 @@ on:
 
 env:
   DEFAULT_BRANCH: branch0
-  VERSION: 0.3.0
+  VERSION: 0.3.1
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:
@@ -171,15 +171,6 @@ jobs:
         uses: azure/appservice-settings@v1
         with:
           app-name: 'rattus'
-          connection-strings-json: |
-            [
-              {
-                "name": "RatDb",
-                "value": "${{ secrets.RAT_DATABASE_CONNECTION_STRING }}",
-                "type": "Custom",
-                "slotSetting": false
-              }
-            ]
           app-settings-json: |
             [
               {
@@ -211,5 +202,10 @@ jobs:
                 "name": "DOCKER_IMAGE_TAG",
                 "value": "${{ needs.docker.outputs.dockerTag }}",
                 "slotSetting": false
+              },
+              {
+                "name": "SqlConnectionFactoryOptions__ConnectionString",
+                "value": "${{ secrets.RAT_DATABASE_CONNECTION_STRING }}",
+                "slotSettings": false
               }
             ]
