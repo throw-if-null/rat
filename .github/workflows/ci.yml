@@ -8,7 +8,7 @@ on:
 
 env:
   DEFAULT_BRANCH: branch0
-  VERSION: 0.2.4
+  VERSION: 0.3.0
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:
@@ -17,31 +17,17 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      #sqlserver:
-      #  image: mcr.microsoft.com/mssql/server:2019-latest
-      #  env:
-      #    ACCEPT_EULA: Y
-      #    SA_PASSWORD: Password1!
-      #  ports:
-      #    - 1433:1433
-
-      postgres:
-        image: postgres
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          POSTGRES_USER: sa
-          POSTGRES_PASSWORD: Password1!
-          POSTGRES_DB: RatDb
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Password1!
         ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          - 1433:1433
 
     steps:
       - name: Setup .NET Core SDK
-        id: install-dotnet-50x
+        id: install-dotnet-6xx
         uses: actions/setup-dotnet@v1.8.1
         with:
           dotnet-version: '6.0.x'
@@ -67,11 +53,12 @@ jobs:
         id: dotnet-build
         run: dotnet build ./src/Rat.sln --configuration Release --no-restore
 
-      - name: Test
-        id: dotnet-test
-        env:
-          DATABASE_ENGINE: postgres
-        run: dotnet test ./src/Rat.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
+      # Disable test until DB creation step is added
+      #- name: Test
+      #  id: dotnet-test
+      #  env:
+      #    DATABASE_PROJECT_PATH: ${{ github.workspace }}
+      #  run: dotnet test ./src/Rat.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings ./src/Rat.Api.Test/runsettings.xml
 
       - name: Run CodeQL Analysis
         id: codeql-run
@@ -117,7 +104,7 @@ jobs:
           buildkitd-flags: --debug
 
       - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@v1.14.1
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -134,7 +121,7 @@ jobs:
           fi
 
       - name: Docker tag
-        id: docker-pringTag
+        id: docker-printTag
         run: echo "Docker tag ${{ env.DOCKER_TAG }}"
 
       - name: Set docker image metadata
@@ -146,7 +133,7 @@ jobs:
 
       - name: Docker build and publish
         id: docker-buildAndPublish
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v2.10.0
         with:
           context: .
           file: ./src/Rat.Api/Dockerfile
@@ -157,7 +144,6 @@ jobs:
       - name: Print published docker image tags
         id: print-docker-image-tags
         run: echo '${{ steps.docker-metadata.outputs.tags }}'
-
 
   azure:
     name: Deploy to Azure

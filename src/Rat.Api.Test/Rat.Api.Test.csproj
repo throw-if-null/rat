@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rat.Api\Rat.Api.csproj" />
+    <ProjectReference Include="..\Rat.Sql\Rat.Sql.csproj" />
   </ItemGroup>
 
 </Project>

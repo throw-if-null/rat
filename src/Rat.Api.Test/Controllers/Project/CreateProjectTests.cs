@@ -4,11 +4,11 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
-using Rat.Data;
+using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -28,10 +28,13 @@ namespace Rat.Api.Test.Controllers.Project
         public async Task Should_Return_Created()
         {
             using var scope = _fixture.Provider.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-            var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
+            var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			await using var connection = connectionFactory.CreateConnection();
 
-            var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+
+            var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
             var response = await _fixture.Client.PostAsync(
                 "/api/projects",
@@ -49,10 +52,14 @@ namespace Rat.Api.Test.Controllers.Project
 		public async Task Should_Return_Forbidden()
 		{
 			using var scope = _fixture.Provider.CreateScope();
-			using var context = scope.ServiceProvider.GetRequiredService<RatDbContext>();
-			var projectType = await context.ProjectTypes.FirstOrDefaultAsync(x => x.Name == "js");
+			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
 
-			var model = new CreateProjectRouteInput("Rat Api", projectType.Id);
+			await using var connection = connectionFactory.CreateConnection();
+
+			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+
+			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
 			var request = new HttpRequestMessage
 			{
@@ -69,10 +76,10 @@ namespace Rat.Api.Test.Controllers.Project
 		}
 
         [Theory]
-        [InlineData("", "1", TestUserProvider.UserId)]
-        [InlineData(null, "2", TestUserProvider.UserId)]
-		[InlineData("Test", "1", "unknown-user")]
-		public async Task Should_Return_BadRequest(string name, string version, string userId)
+        [InlineData("", "1", TestMemberProvider.MemberId)]
+        [InlineData(null, "2", TestMemberProvider.MemberId)]
+		[InlineData("Test", "1", 31)]
+		public async Task Should_Return_BadRequest(string name, string version, int memberId)
         {
             var model = new CreateProjectRouteInput(name, 0);
 
@@ -83,7 +90,7 @@ namespace Rat.Api.Test.Controllers.Project
 				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
 			};
 
-			request.Headers.Add("test-user", userId);
+			request.Headers.Add("test-user", memberId.ToString());
 
 			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 			Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

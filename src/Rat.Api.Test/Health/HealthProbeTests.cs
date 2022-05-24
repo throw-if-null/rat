@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Rat.Api.Test
 {
-    [Collection("Integration")]
+	[Collection("Integration")]
     public class HealthProbeTests
     {
         private readonly HttpClient _client;

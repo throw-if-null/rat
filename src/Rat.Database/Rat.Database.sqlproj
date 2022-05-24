@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="0.1.3-preview" />
+  <PropertyGroup>
+    <Name>reactions</Name>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <ProjectGuid>{59e69db5-aeed-4cc8-bf9d-860d8c3ab50c}</ProjectGuid>
+    <GenerateCreateScript>True</GenerateCreateScript>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <RunSqlCodeAnalysis>True</RunSqlCodeAnalysis>
+    <SqlCodeAnalysisRules>-Microsoft.Rules.Data.SR0014</SqlCodeAnalysisRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Procedures" />
+    <Folder Include="Procedures\ConfigurationEntry" />
+    <Folder Include="Procedures\ConfigurationRoot" />
+    <Folder Include="Procedures\Member" />
+    <Folder Include="Procedures\MemberProject" />
+    <Folder Include="Procedures\Project" />
+    <Folder Include="Procedures\ProjectType" />
+    <Folder Include="_Scripts" />
+    <Folder Include="Functions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\ConfigurationType.sql" />
+    <Build Include="Tables\ConfigurationEntry.sql" />
+    <Build Include="Tables\ConfigurationRoot.sql" />
+    <Build Include="Tables\Member.sql" />
+    <Build Include="Tables\ProjectType.sql" />
+    <Build Include="Tables\Project.sql" />
+    <Build Include="Tables\MemberProject.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Insert.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Insert.sql" />
+    <Build Include="Procedures\Member\Member_Insert.sql" />
+    <Build Include="Procedures\MemberProject\MemberProject_Insert.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Insert.sql" />
+    <Build Include="Procedures\Project\Project_Insert.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetById.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_GetAll.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_GetById.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Update.sql" />
+    <Build Include="Procedures\ProjectType\ProjectType_Delete.sql" />
+    <Build Include="Procedures\Project\Project_GetById.sql" />
+    <PostDeploy Include="_Scripts\SeedData.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Delete.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_Update.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetById.sql" />
+    <Build Include="Procedures\ConfigurationEntry\ConfigurationEntry_GetByConfigurationRootId.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_GetByProjectId.sql" />
+    <Build Include="Functions\GetConfigurationEntryCount.sql" />
+    <Build Include="Functions\GetConfigurationRootCount.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Delete.sql" />
+    <Build Include="Procedures\ConfigurationRoot\ConfigurationRoot_Update.sql" />
+    <Build Include="Procedures\Member\Member_SoftDelete.sql" />
+    <Build Include="Functions\GetProjectConfigurationEntryCount.sql" />
+    <Build Include="Procedures\Project\Project_GetProjectsForMember.sql" />
+    <Build Include="Procedures\Project\Project_Delete.sql" />
+    <Build Include="Procedures\Project\Project_Update.sql" />
+    <Build Include="Procedures\MemberProject\MemberProject_Delete.sql" />
+    <Build Include="Procedures\Member\Member_GetByAuthProviderId.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Rat.Database.refactorlog" />
+  </ItemGroup>
+</Project>

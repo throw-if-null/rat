@@ -1,16 +1,20 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rat.Api.Auth;
 using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
+using Rat.Api.Routes.CreateConfiguration;
+using Rat.Api.Routes.CreateConfigurationEntry;
+using Rat.Api.Routes.DeleteConfiguration;
+using Rat.Api.Routes.DeleteConfigurationEntry;
+using Rat.Api.Routes.GetConfiguration;
 using Rat.Api.Routes.Health;
-using Rat.Commands;
+using Rat.Api.Routes.PatchConfiguration;
+using Rat.Api.Routes.PatchConfigurationEntry;
 using Rat.Core;
-using Rat.Data;
-using Rat.Queries;
+using Rat.Sql;
 
 namespace Rat.Api
 {
@@ -19,6 +23,8 @@ namespace Rat.Api
 		public static void Main(string[] args)
 		{
 			WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
+
+			builder.Services.Configure<SqlConnectionFactoryOptions>(builder.Configuration.GetSection($"{nameof(SqlConnectionFactoryOptions)}"));
 
 			builder.Services.AddLogging(x =>
 			{
@@ -40,13 +46,12 @@ namespace Rat.Api
 			builder.Services.AddCors(options => { options.AddPolicy("AllowAllPolicy", BuildCorsPolicy); });
 
 			builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			builder.Services.AddSingleton<IUserProvider, UserProvider>();
+			builder.Services.AddSingleton<IMemberProvider, MemberProvider>();
 			builder.Services.AddSingleton<RouteExecutor>();
+			builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
 			builder.Services.AddCommands();
 			builder.Services.AddQueries();
-
-			builder.Services.AddRatDbContext(builder.Configuration);
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen(options =>
@@ -74,7 +79,7 @@ namespace Rat.Api
 								Type = ReferenceType.SecurityScheme
 							}
 						},
-						new string[] {}
+						Array.Empty<string>()
 					}
 				});
 			});
@@ -138,6 +143,13 @@ namespace Rat.Api
 			GetProjectRoute.Map(app);
 			PatchProjectRoute.Map(app);
 			DeleteProjectRoute.Map(app);
+			CreateConfigurationRoute.Map(app);
+			GetConfigurationRoute.Map(app);
+			PatchConfigurationRoute.Map(app);
+			DeleteConfigurationRoute.Map(app);
+			CreateConfigurationEntryRoute.Map(app);
+			PatchConfigurationEntryRoute.Map(app);
+			DeleteConfigurationEntryRoute.Map(app);
 
 			app.Run();
 

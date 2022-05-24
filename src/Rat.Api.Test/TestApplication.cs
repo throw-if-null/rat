@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Dapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,27 +15,12 @@ using Microsoft.Extensions.Logging;
 using Rat.Api.Auth;
 using Rat.Api.Test.Auth;
 using Rat.Api.Test.Mocks;
-using Rat.Data;
-using Rat.Data.Entities;
+using Rat.Sql;
 
 namespace Rat.Api.Test
 {
 	internal class TestApplication : WebApplicationFactory<Program>
 	{
-		private const string DatabaseEngineEnvironmentVariable = "DATABASE_ENGINE";
-		private const string DefaultDatabaseEngine = "sqllite";
-
-		private const string LocalDbConnectionString = "Host=localhost;Database=RatDb;Username=sa;Password=Password1!";
-
-		private static readonly Func<string> GetDatabaseEngine = delegate () {
-			var engine = Environment.GetEnvironmentVariable(DatabaseEngineEnvironmentVariable);
-
-			if (string.IsNullOrWhiteSpace(engine))
-				engine = DefaultDatabaseEngine;
-
-			return engine;
-		};
-
 		public TestApplication() : base()
 		{
 		}
@@ -61,70 +46,117 @@ namespace Rat.Api.Test
 			{
 				services.AddHttpClient();
 
-				services.AddSingleton<IUserProvider, TestUserProvider>();
-
-				var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<RatDbContext>));
-				services.Remove(descriptor);
+				services.AddSingleton<IMemberProvider, TestMemberProvider>();
 
 				services
 					.AddAuthentication("Test")
 					.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
 
-				services.AddDbContext<RatDbContext>(options =>
-				{
-					if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-						options.UseSqlite("Data Source=RatDb.db");
-					else
-						options.UseNpgsql(LocalDbConnectionString);
-				});
-
 				using var provider = services.BuildServiceProvider();
 				using var scope = provider.CreateScope();
 
 				var scopedServices = scope.ServiceProvider;
-				var context = scopedServices.GetRequiredService<RatDbContext>();
+				var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 				var logger = scopedServices.GetRequiredService<ILogger<TestApplication>>();
 
-				context.Database.EnsureDeleted();
+				//using var connection = connectionFactory.CreateConnection();
+				//connection.ConnectionString = connection.ConnectionString.Replace("RatDb", "master");
+				//connection.Open();
 
-				if (GetDatabaseEngine().Equals(DefaultDatabaseEngine, StringComparison.InvariantCultureIgnoreCase))
-				{
-					context.Database.EnsureCreated();
+				//if (connection.DatabaseExists("RatDb"))
+				//	connection.DropDatabase("RatDb");
 
-					AddProjectType(context, "js");
-					AddProjectType(context, "csharp");
-				}
-				else
-				{
-					context.Database.Migrate();
-				}
+				//connection.CreateDatabase("RatDb");
+				//connection.CreateTable("RatDb", "ProjectType.sql");
+				//connection.CreateTable("RatDb", "Member.sql");
+				//connection.CreateTable("RatDb", "Project.sql");
+				//connection.CreateTable("RatDb", "MemberProject.sql");
+				//connection.CreateTable("RatDb", "ConfigurationType.sql");
+				//connection.CreateTable("RatDb", "ConfigurationRoot.sql");
+				//connection.CreateTable("RatDb", "ConfigurationEntry.sql");
 
-				AddUser(context);
+				//var userId = AddUser(connection, "RatDb");
+				//AddProjectType(connection, "RatDb", "js", userId);
+				//AddProjectType(connection, "RatDb", "csharp", userId);
 			});
 
 			return base.CreateHost(builder);
 		}
 
-		private static void AddProjectType(RatDbContext context, string name)
+		private static void AddProjectType(SqlConnection connection, string database, string name, int userId)
 		{
-			var projectType = context.ProjectTypes.FirstOrDefault(x => x.Name == name);
+			var getCommand = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = name });
+			var insertCommand = new CommandDefinition("INSERT INTO ProjectType (Name, CreatedBy, ModifiedBy) VALUES(@Name, @CreatedBy, @ModifiedBy)", new { Name = name, CreatedBy = userId, ModifiedBy = userId });
 
-			if (projectType == null)
-				context.ProjectTypes.Add(new ProjectTypeEntity { Name = name });
+			connection.ChangeDatabase(database);
+			var projectTypeId = connection.QuerySingleOrDefault<int?>(getCommand);
 
-			context.SaveChanges();
+			if (projectTypeId.HasValue)
+				return;
+
+			connection.Execute(insertCommand);
 		}
 
-		private static void AddUser(RatDbContext context)
+		private static int AddUser(SqlConnection connection, string database)
 		{
-			var user = context.Users.FirstOrDefault(x => x.UserId == TestUserProvider.UserId);
+			var getCommand = new CommandDefinition("SELECT Id FROM Member WHERE AuthProviderId = @AuthProviderId", new { AuthProviderId = TestMemberProvider.MemberId });
+			var inserCommand = new CommandDefinition("INSERT INTO Member (AuthProviderId) VALUES(@AuthProviderId);", new { AuthProviderId = TestMemberProvider.MemberId });
 
-			if (user == null)
-			{
-				context.Users.Add(new UserEntity { UserId = TestUserProvider.UserId });
+			connection.ChangeDatabase(database);
+			var userId = connection.QuerySingleOrDefault<int?>(getCommand);
 
-				context.SaveChanges();
-			}
+			if (userId.HasValue)
+				return userId.Value;
+
+			connection.Execute(inserCommand);
+
+			userId = connection.QuerySingleOrDefault<int?>(getCommand);
+
+			return userId.Value;
+		}
+	}
+
+	internal static class SqlConnectionExtensions
+	{
+		public static bool DatabaseExists(this SqlConnection connection, string name)
+		{
+			var command = new CommandDefinition(
+				"SELECT name FROM sys.databases WHERE name = @DatabaseName",
+				new { DatabaseName = name });
+
+			connection.ChangeDatabase("master");
+			var result = connection.QueryFirstOrDefault<string>(command);
+
+			return !string.IsNullOrWhiteSpace(result);
+		}
+
+		public static void DropDatabase(this SqlConnection connection, string name)
+		{
+			var query =
+				$@"ALTER DATABASE {name}
+				SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+				DROP DATABASE {name}";
+
+			connection.ChangeDatabase("master");
+			connection.Execute(new CommandDefinition(query));
+		}
+
+		public static void CreateDatabase(this SqlConnection connection, string name)
+		{
+			var query = $@"CREATE DATABASE {name}";
+
+			connection.ChangeDatabase("master");
+			connection.Execute(new CommandDefinition(query));
+		}
+
+		public static void CreateTable(this SqlConnection connection, string database, string name)
+		{
+			var path = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+
+			var query = File.ReadAllText(Path.Combine(path, "src/Rat.Database/Tables", name));
+
+			connection.ChangeDatabase(database);
+			connection.Execute(new CommandDefinition(query));
 		}
 	}
 }

@@ -8,34 +8,21 @@ x-base: &base-service-template
 
 services:
 
-  #sqlserver:
-  #  <<: *base-service-template
-  #  container_name: sqlserver
-  #  image: mcr.microsoft.com/mssql/server:2019-latest
-  #  environment:
-  #    - ACCEPT_EULA=Y
-  #    - SA_PASSWORD=${SQLSERVER_SA_PASSWORD:-Password1!}
-  #  ports:
-  #    - "1433:1433"
-  #  healthcheck:
-  #    test: ./opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Password1! -Q "SELECT 1" || exit 1
-  #    interval: 2s
-  #    timeout: 2s
-  #    retries: 3
-  #    start_period: 3s
-
-  postgresql:
+  sqlserver:
     <<: *base-service-template
-    container_name: postgresql
-    image: postgres
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=Password1!
-      - POSTGRES_DB=RatDb
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQLSERVER_SA_PASSWORD:-Password1!}
     ports:
-      - "5432:5432"
-    volumes:
-      - database-data:/var/lib/postgresql/data/
+      - "1433:1433"
+    healthcheck:
+      test: ./opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Password1! -Q "SELECT 1" || exit 1
+      interval: 2s
+      timeout: 2s
+      retries: 3
+      start_period: 3s
 
   rat-api:
     <<: *base-service-template
@@ -49,9 +36,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       # SQL Connection string:
-      #- ConnectionStrings__RatDb=Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;
-      # Postgres connection string:
-      - ConnectionStrings__RatDb=Host=postgresql;Database=RatDb;Username=sa;Password=Password1!
+      - ConnectionStrings__RatDb=Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;
     healthcheck:
       test: curl --max-time "5" --no-buffer --fail http://rat-api/health/ready || exit 1
       interval: 2s
@@ -59,9 +44,8 @@ services:
       retries: 3
       start_period: 1s
     depends_on:
-      - "postgresql"
-      #  sqlserver:
-      #    condition: service_healthy
+      sqlserver:
+        condition: service_healthy
     ports:
       - "8485:80"
 

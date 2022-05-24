@@ -1,8 +1,8 @@
 ﻿using System.Net.Mime;
 using MediatR;
+using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.PatchProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {
@@ -26,21 +26,33 @@ namespace Rat.Api.Routes
 
 			return builder;
 
-			async Task<IResult> ProcessInput(int id, PatchProjectRouteInput input, IMediator mediator, RouteExecutor executor)
+			async Task<IResult> ProcessInput(
+				HttpContext context,
+				int id,
+				PatchProjectRouteInput input,
+				IMediator mediator,
+				IMemberProvider memberProvider,
+				RouteExecutor executor)
 			{
+				var memberId = await memberProvider.GetMemberId(context.RequestAborted);
+
+				if (memberId == default)
+					return Results.Forbid();
+
+
 				var response =
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(Request(input)),
+							() => mediator.Send(Request(input, memberId)),
 							x => Results.Ok(Output(x)));
 
 				return response;
 			}
 
-			static PatchProjectRequest Request(PatchProjectRouteInput input)
+			static PatchProjectRequest Request(PatchProjectRouteInput input, int memberId)
 			{
-				return new PatchProjectRequest { Id = input.Id, Name = input.Name, ProjectTypeId = input.TypeId };
+				return new PatchProjectRequest { Id = input.Id, Name = input.Name, ProjectTypeId = input.TypeId, ModifiedBy = memberId };
 			}
 
 			static PatchProjectRouteOutput Output(PatchProjectResponse response)
