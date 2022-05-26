@@ -1,18 +1,15 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Sql;
 using Xunit;
 
-namespace Rat.Api.Test.Controllers.Project
+namespace Rat.Api.Test.Routes.Project
 {
 	[Collection("Integration")]
     public class PatchProjectTests
@@ -31,31 +28,24 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id, Name FROM ProjectType");
-			var projectTypes = await connection.QueryAsync<dynamic>(command);
+			var jsTypeId = await connection.ProjectTypeGetByName("js");
+			var csTypeId = await connection.ProjectTypeGetByName("csharp");
 
-			var jsType = projectTypes.First(x => x.Name == "js");
-            var csharpType = projectTypes.First(x => x.Name == "csharp");
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Patch", ProjectTypeId = jsType.Id });
-
-			var project = await connection.ProjectInsert("Patch", (int)jsType.Id, 1, CancellationToken.None);
+			var project = await connection.ProjectInsert("Patch", jsTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 
-            var model = new PatchProjectRouteInput(projectId, "New test", csharpType.Id);
+            var model = new PatchProjectRouteInput(projectId, "New test", csTypeId);
 
             var response = await _fixture.Client.PatchAsync(
                 $"/api/projects/{model.Id}",
                 new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<PatchProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var output = await JsonSerializer.DeserializeAsync<PatchProjectRouteOutput>(contentStream, _fixture.JsonSerializerOption);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("New test", content.Name);
-            Assert.Equal(csharpType.Id, content.TypeId);
+            Assert.Equal("New test", output.Name);
+            Assert.Equal(csTypeId, output.TypeId);
         }
 
         [Theory]
@@ -68,11 +58,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition(
-				"SELECT Id FROM ProjectType WHERE Name = @Name",
-				new { Name = "js" });
-
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
 			var project = await connection.ProjectInsert("Patch", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
@@ -93,16 +79,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition(
-				"SELECT Id FROM ProjectType WHERE Name = @Name",
-				new { Name = "js" });
-
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Patch", ProjectTypeId = projectTypeId });
-
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 			var project = await connection.ProjectInsert("Patch", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 			await connection.ProjectDelete(projectId, 1, CancellationToken.None);

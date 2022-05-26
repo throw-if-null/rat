@@ -4,15 +4,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;
 
-namespace Rat.Api.Test.Controllers.Project
+namespace Rat.Api.Test.Routes.Project
 {
 	[Collection("Integration")]
     public class GetProjectTests
@@ -31,12 +29,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
-
-			command = new CommandDefinition(
-				"INSERT INTO Project (Name, ProjectTypeId, Operator, Operation) VALUES(@Name, @ProjectTypeId, 1, N'insert'); SELECT SCOPE_IDENTITY()",
-				new { Name = "Should_Get_Project_By_Id", ProjectTypeId = projectTypeId });
+			var projectTypeId = await connection.ProjectTypeGetByName("csharp");
 
 			var project = await connection.ProjectInsert("Should_Get_Project_By_Id", projectTypeId, 1, CancellationToken.None);
 			var projectId = project.Id;
@@ -45,10 +38,10 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<GetProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var output = await JsonSerializer.DeserializeAsync<GetProjectRouteOutput>(contentStream, _fixture.JsonSerializerOption);
 
             Snapshot.Match(
-                content,
+                output,
                 x =>
                 {
                     x.IgnoreField<int>("Id");
@@ -78,8 +71,7 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "csharp" });
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
 			var memberId = await connection.MemberInsert(authProviderUserId, 1, CancellationToken.None);
 			var projectA = await connection.ProjectInsert("Project A", projectTypeId, 1, CancellationToken.None);
@@ -103,13 +95,13 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-                var projects =
+                var output =
                     await JsonSerializer.DeserializeAsync<GetProjectForUserRouteOutput>(
                         content,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _fixture.JsonSerializerOption);
 
                 Snapshot.Match(
-                    projects,
+                    output,
                     x =>
                     {
 						x.IgnoreFields<int>("UserId");
@@ -137,13 +129,13 @@ namespace Rat.Api.Test.Controllers.Project
 
             using (var content = await response.Content.ReadAsStreamAsync())
             {
-				var projects =
+				var output =
                     await JsonSerializer.DeserializeAsync<GetProjectForUserRouteOutput>(
                         content,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _fixture.JsonSerializerOption);
 
-                Assert.NotEqual(0, projects.UserId);
-                Assert.Empty(projects.ProjectStats);
+                Assert.NotEqual(0, output.UserId);
+                Assert.Empty(output.ProjectStats);
             }
         }
 

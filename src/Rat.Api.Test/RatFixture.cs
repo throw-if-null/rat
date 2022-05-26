@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,12 @@ namespace Rat.Api.Test
         public IConfiguration Configuration { get; }
         public IServiceProvider Provider { get; }
 
-        public RatFixture()
+		public JsonSerializerOptions JsonSerializerOption => new()
+		{
+			PropertyNameCaseInsensitive = true
+		};
+
+		public RatFixture()
         {
             Client = _application.CreateClient(new WebApplicationFactoryClientOptions
             {

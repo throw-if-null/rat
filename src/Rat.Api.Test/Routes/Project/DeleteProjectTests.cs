@@ -1,13 +1,11 @@
 ﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Sql;
 using Xunit;
 
-namespace Rat.Api.Test.Controllers.Project
+namespace Rat.Api.Test.Routes.Project
 {
 	[Collection("Integration")]
     public class DeleteProjectTests
@@ -38,13 +36,10 @@ namespace Rat.Api.Test.Controllers.Project
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 			var project = await connection.ProjectInsert("Test", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 			await connection.ProjectDelete(projectId, 1, CancellationToken.None);
-
-			await connection.ExecuteAsync(command);
 
             var response = await _fixture.Client.DeleteAsync($"/api/projects/{projectId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -57,8 +52,7 @@ namespace Rat.Api.Test.Controllers.Project
             var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
 			await using var connection = connectionFactory.CreateConnection();
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
 			var project = await connection.ProjectInsert("Test", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;

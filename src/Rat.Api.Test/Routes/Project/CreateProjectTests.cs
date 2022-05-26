@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Rat.Api.Routes.Data;
 using Rat.Api.Test.Mocks;
@@ -12,7 +11,7 @@ using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;
 
-namespace Rat.Api.Test.Controllers.Project
+namespace Rat.Api.Test.Routes.Project
 {
 	[Collection("Integration")]
     public class CreateProjectTests
@@ -29,12 +28,11 @@ namespace Rat.Api.Test.Controllers.Project
         {
             using var scope = _fixture.Provider.CreateScope();
             var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
+
 			await using var connection = connectionFactory.CreateConnection();
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
-
-            var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
+			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
             var response = await _fixture.Client.PostAsync(
                 "/api/projects",
@@ -43,9 +41,9 @@ namespace Rat.Api.Test.Controllers.Project
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
-            var content = await JsonSerializer.DeserializeAsync<CreateProjectRouteOutput>(contentStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var output = await JsonSerializer.DeserializeAsync<CreateProjectRouteOutput>(contentStream, _fixture.JsonSerializerOption);
 
-            Assert.True(content.Id > 0);
+            Assert.True(output.Id > 0);
         }
 
 		[Fact]
@@ -53,11 +51,8 @@ namespace Rat.Api.Test.Controllers.Project
 		{
 			using var scope = _fixture.Provider.CreateScope();
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
-			var command = new CommandDefinition("SELECT Id FROM ProjectType WHERE Name = @Name", new { Name = "js" });
-
 			await using var connection = connectionFactory.CreateConnection();
-
-			var projectTypeId = await connection.QuerySingleAsync<int>(command);
+			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
 			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
 

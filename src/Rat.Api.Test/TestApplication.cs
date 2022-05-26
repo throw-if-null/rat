@@ -115,48 +115,4 @@ namespace Rat.Api.Test
 			return userId.Value;
 		}
 	}
-
-	internal static class SqlConnectionExtensions
-	{
-		public static bool DatabaseExists(this SqlConnection connection, string name)
-		{
-			var command = new CommandDefinition(
-				"SELECT name FROM sys.databases WHERE name = @DatabaseName",
-				new { DatabaseName = name });
-
-			connection.ChangeDatabase("master");
-			var result = connection.QueryFirstOrDefault<string>(command);
-
-			return !string.IsNullOrWhiteSpace(result);
-		}
-
-		public static void DropDatabase(this SqlConnection connection, string name)
-		{
-			var query =
-				$@"ALTER DATABASE {name}
-				SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-				DROP DATABASE {name}";
-
-			connection.ChangeDatabase("master");
-			connection.Execute(new CommandDefinition(query));
-		}
-
-		public static void CreateDatabase(this SqlConnection connection, string name)
-		{
-			var query = $@"CREATE DATABASE {name}";
-
-			connection.ChangeDatabase("master");
-			connection.Execute(new CommandDefinition(query));
-		}
-
-		public static void CreateTable(this SqlConnection connection, string database, string name)
-		{
-			var path = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-
-			var query = File.ReadAllText(Path.Combine(path, "src/Rat.Database/Tables", name));
-
-			connection.ChangeDatabase(database);
-			connection.Execute(new CommandDefinition(query));
-		}
-	}
 }

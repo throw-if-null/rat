@@ -36,19 +36,19 @@ SET IDENTITY_INSERT [dbo].[ProjectType] OFF
 SET IDENTITY_INSERT [dbo].[ConfigurationType] ON
 
 INSERT INTO [dbo].[ConfigurationType] ([Id], [Name], [Operator], [Operation])
-SELECT 1, 'Web', 1, N'insert'
+SELECT 1, 'web', 1, N'insert'
 WHERE NOT EXISTS (SELECT 1 FROM [dbo].[ConfigurationType] WHERE Id = 1)
 
 INSERT INTO [dbo].[ConfigurationType] ([Id], [Name], [Operator], [Operation])
-SELECT 2, 'Desktop', 1, N'insert'
+SELECT 2, 'desktop', 1, N'insert'
 WHERE NOT EXISTS (SELECT 1 FROM [dbo].[ConfigurationType] WHERE Id = 2)
 
 INSERT INTO [dbo].[ConfigurationType] ([Id], [Name], [Operator], [Operation])
-SELECT 3, 'Mobile', 1, N'insert'
+SELECT 3, 'mobile', 1, N'insert'
 WHERE NOT EXISTS (SELECT 1 FROM [dbo].[ConfigurationType] WHERE Id = 3)
 
 INSERT INTO [dbo].[ConfigurationType] ([Id], [Name], [Operator], [Operation])
-SELECT 4, 'Backend', 1, N'insert'
+SELECT 4, 'api', 1, N'insert'
 WHERE NOT EXISTS (SELECT 1 FROM [dbo].[ConfigurationType] WHERE Id = 4)
 
 SET IDENTITY_INSERT [dbo].[ConfigurationType] OFF

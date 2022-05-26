@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Rat.Sql\Rat.Sql.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Routes\ConfigurationEntry\" />
+  </ItemGroup>
+
 </Project>
