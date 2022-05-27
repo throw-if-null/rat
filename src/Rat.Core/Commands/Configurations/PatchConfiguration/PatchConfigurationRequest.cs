@@ -7,7 +7,9 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 {
 	internal record PatchConfigurationRequest : IRequest<PatchConfigurationResponse>
 	{
-		public int ConfigurationId { get; init; }
+		public int ProjectId { get; init; }
+
+		public int Id { get; init; }
 
 		public string Name { get; init; }
 
@@ -21,10 +23,11 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 		public static void Validate(this PatchConfigurationRequest request)
 		{
 			var validationErrors =
-				ValidateId(request.ConfigurationId)
-				.Union(ValidateModifiedBy(request.ModifiedBy))
+				ValidateId(request.Id)
+				.Union(Validators.ValidateProjectId(request.ProjectId))
 				.Union(Validators.ValidateName(request.Name))
 				.Union(Validators.ValidateConfigurationTypeId(request.ConfigurationTypeId))
+				.Union(ValidateModifiedBy(request.ModifiedBy))
 				.ToArray();
 
 			if (validationErrors.Length == 0)

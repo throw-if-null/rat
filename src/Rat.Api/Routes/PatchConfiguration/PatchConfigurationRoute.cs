@@ -1,16 +1,15 @@
-﻿using MediatR;
+﻿using System.Net.Mime;
+using MediatR;
 using Rat.Api.Auth;
-using Rat.Api.Routes.Data;
 using Rat.Api.Routes.PatchConfiguration.Data;
-using Rat.Commands.Projects.PatchProject;
-using System.Net.Mime;
+using Rat.Core.Commands.Configurations.PatchConfiguration;
 
 namespace Rat.Api.Routes.PatchConfiguration
 {
 	public static class PatchConfigurationRoute
 	{
 		private const string ROUTE_NAME = "PatchConfiguration";
-		private const string ROUTE_PATH = "/api/configurations/{id:int}";
+		private const string ROUTE_PATH = "/api/projects/{projectId:int}/configurations/{id:int}";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -29,6 +28,7 @@ namespace Rat.Api.Routes.PatchConfiguration
 
 			async Task<IResult> ProcessInput(
 				HttpContext context,
+				int projectId,
 				int id,
 				PatchConfigurationRouteInput input,
 				IMediator mediator,
@@ -40,30 +40,34 @@ namespace Rat.Api.Routes.PatchConfiguration
 				if (memberId == default)
 					return Results.Forbid();
 
-
 				var response =
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(Request(input, memberId)),
+							() => mediator.Send(Request(input, projectId, memberId)),
 							x => Results.Ok(Output(x)));
 
 				return response;
 			}
 
-			static PatchProjectRequest Request(PatchConfigurationRouteInput input, int memberId)
+			static PatchConfigurationRequest Request(PatchConfigurationRouteInput input, int projectId, int memberId)
 			{
-				return new PatchProjectRequest { Id = input.Id, Name = input.Name, ProjectTypeId = input.ConfigurationTypeId, ModifiedBy = memberId };
+				return new PatchConfigurationRequest
+				{
+					Id = input.Id,
+					ConfigurationTypeId = input.ConfigurationTypeId,
+					Name = input.Name,
+					ProjectId = projectId,
+					ModifiedBy = memberId
+				};
 			}
 
-			static PatchConfigurationRouteOutput Output(PatchProjectResponse response)
+			static PatchConfigurationRouteOutput Output(PatchConfigurationResponse response)
 			{
 				return new PatchConfigurationRouteOutput(
-					response.Id,
+					response.ConfigurationId,
 					response.Name,
-					response.TypeId,
-					response.ModifiedBy,
-					response.ModifiedOn);
+					response.ConfigurationTypeId);
 			}
 		}
 	}

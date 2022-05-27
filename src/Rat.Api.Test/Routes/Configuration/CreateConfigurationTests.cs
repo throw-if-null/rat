@@ -35,11 +35,11 @@ namespace Rat.Api.Test.Controllers.Routes
 			var project = await connection.ProjectInsert("Project A", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 
-			var model = new CreateConfigurationRouteInput("Rat Api", configurationTypeId);
+			var input = new CreateConfigurationRouteInput("Rat Api", configurationTypeId);
 
 			var response = await _fixture.Client.PostAsync(
 				$"/api/projects/{projectId}/configurations",
-				new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+				new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
 
 			Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -52,13 +52,13 @@ namespace Rat.Api.Test.Controllers.Routes
 		[Fact]
 		public async Task Should_Return_Forbidden()
 		{
-			var model = new CreateConfigurationRouteInput("Rat Api", 0);
+			var input = new CreateConfigurationRouteInput("Rat Api", 0);
 
 			var request = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
 				RequestUri = new Uri("api/projects/0/configurations", UriKind.Relative),
-				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+				Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json")
 			};
 
 			request.Headers.Add("test-user", "null");
@@ -88,13 +88,13 @@ namespace Rat.Api.Test.Controllers.Routes
 				projectId = project.Id;
 			}
 
-			var model = new CreateConfigurationRouteInput(name, configurationTypeId);
+			var input = new CreateConfigurationRouteInput(name, configurationTypeId);
 
 			var request = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
 				RequestUri = new Uri($"api/projects/{projectId}/configurations", UriKind.Relative),
-				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+				Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json")
 			};
 
 			request.Headers.Add("test-user", createdBy.ToString());

@@ -7,6 +7,8 @@ namespace Rat.Commands.Projects.PatchProject
 {
 	internal record PatchProjectRequest : IRequest<PatchProjectResponse>
     {
+		public int ProjectId { get; init; }
+
         public int Id { get; init; }
 
         public string Name { get; init; }

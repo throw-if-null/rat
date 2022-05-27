@@ -32,11 +32,11 @@ namespace Rat.Api.Test.Routes.Project
 			await using var connection = connectionFactory.CreateConnection();
 			var projectTypeId = await connection.ProjectTypeGetByName("js");
 
-			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
+			var input = new CreateProjectRouteInput("Rat Api", projectTypeId);
 
             var response = await _fixture.Client.PostAsync(
                 "/api/projects",
-                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+                new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -49,13 +49,13 @@ namespace Rat.Api.Test.Routes.Project
 		[Fact]
 		public async Task Should_Return_Forbidden()
 		{
-			var model = new CreateProjectRouteInput("Rat Api", 0);
+			var input = new CreateProjectRouteInput("Rat Api", 0);
 
 			var request = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
 				RequestUri = new Uri("/api/projects", UriKind.Relative),
-				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+				Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json")
 			};
 
 			request.Headers.Add("test-user", "null");
@@ -72,13 +72,13 @@ namespace Rat.Api.Test.Routes.Project
 		[InlineData("Test", -1, TestMemberProvider.MemberId, "4")]
 		public async Task Should_Return_BadRequest(string name, int projectTypeId, int memberId, string version)
         {
-            var model = new CreateProjectRouteInput(name, projectTypeId);
+            var input = new CreateProjectRouteInput(name, projectTypeId);
 
 			var request = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
 				RequestUri = new Uri("/api/projects", UriKind.Relative),
-				Content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json")
+				Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json")
 			};
 
 			request.Headers.Add("test-user", memberId.ToString());

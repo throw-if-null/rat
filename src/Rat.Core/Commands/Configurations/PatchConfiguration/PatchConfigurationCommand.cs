@@ -21,9 +21,9 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 
 			await using var connection = _connectionFactory.CreateConnection();
 
-			var configuration = await connection.ConfigurationRootGetById(request.ConfigurationId, cancellationToken);
+			var configuration = await connection.ConfigurationRootGetById(request.Id, cancellationToken);
 			if (configuration == null)
-				throw new ResourceNotFoundException($"Configuration: {request.ConfigurationId} does not exist");
+				throw new ResourceNotFoundException($"Configuration: {request.Id} does not exist");
 
 			// TODO: Check if ConfigurationType exists
 
@@ -31,10 +31,10 @@ namespace Rat.Core.Commands.Configurations.PatchConfiguration
 				request.Name == configuration.Name ? null : request.Name,
 				request.ConfigurationTypeId == configuration.ConfigurationTypeId ? null : request.ConfigurationTypeId,
 				request.ModifiedBy,
-				request.ConfigurationId,
+				request.Id,
 				cancellationToken);
 
-			configuration = await configuration.ConfigurationRootGetById(request.ConfigurationId);
+			configuration = await connection.ConfigurationRootGetById(request.Id, CancellationToken.None);
 
 			return new()
 			{

@@ -3,9 +3,7 @@
 	public record PatchConfigurationRouteOutput(
 		int Id,
 		string Name,
-		int TypeId,
-		int ModifiedBy,
-		DateTimeOffset modifiedOn)
+		int TypeId)
 	{
 	}
 }

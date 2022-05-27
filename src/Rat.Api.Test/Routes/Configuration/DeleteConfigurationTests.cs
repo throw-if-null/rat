@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Rat.Api.Test.Controllers.Routes;
 using Rat.Sql;
 using Snapshooter.Xunit;
 using Xunit;

@@ -64,7 +64,7 @@ namespace Rat.Sql
 			int id,
 			CancellationToken ct)
 		{
-			const string ProcedureName = "ConfigurationRoot_Insert";
+			const string ProcedureName = "ConfigurationRoot_Update";
 
 			var parameters = new DynamicParameters();
 			parameters.Add(NameParameter, name);

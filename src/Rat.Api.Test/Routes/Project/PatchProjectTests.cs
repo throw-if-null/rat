@@ -34,11 +34,11 @@ namespace Rat.Api.Test.Routes.Project
 			var project = await connection.ProjectInsert("Patch", jsTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 
-            var model = new PatchProjectRouteInput(projectId, "New test", csTypeId);
+            var input = new PatchProjectRouteInput(projectId, "New test", csTypeId);
 
             var response = await _fixture.Client.PatchAsync(
-                $"/api/projects/{model.Id}",
-                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+                $"/api/projects/{projectId}",
+                new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
 
             var contentStream = await response.Content.ReadAsStreamAsync();
             var output = await JsonSerializer.DeserializeAsync<PatchProjectRouteOutput>(contentStream, _fixture.JsonSerializerOption);
@@ -63,11 +63,11 @@ namespace Rat.Api.Test.Routes.Project
 			var project = await connection.ProjectInsert("Patch", projectTypeId, 1, CancellationToken.None);
 			int projectId = project.Id;
 
-			var model = new PatchProjectRouteInput(projectId, name, projectTypeId);
+			var input = new PatchProjectRouteInput(projectId, name, projectTypeId);
 
 			var response = await _fixture.Client.PatchAsync(
-                $"/api/projects/{model.Id}",
-                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+                $"/api/projects/{projectId}",
+                new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -84,11 +84,11 @@ namespace Rat.Api.Test.Routes.Project
 			int projectId = project.Id;
 			await connection.ProjectDelete(projectId, 1, CancellationToken.None);
 
-			var model = new PatchProjectRouteInput(projectId, "Rat", projectTypeId);
+			var input = new PatchProjectRouteInput(projectId, "Rat", projectTypeId);
 
             var response = await _fixture.Client.PatchAsync(
-                $"/api/projects/{model.Id}",
-                new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json"));
+                $"/api/projects/{projectId}",
+                new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
