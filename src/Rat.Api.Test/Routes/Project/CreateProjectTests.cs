@@ -49,12 +49,7 @@ namespace Rat.Api.Test.Routes.Project
 		[Fact]
 		public async Task Should_Return_Forbidden()
 		{
-			using var scope = _fixture.Provider.CreateScope();
-			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
-			await using var connection = connectionFactory.CreateConnection();
-			var projectTypeId = await connection.ProjectTypeGetByName("js");
-
-			var model = new CreateProjectRouteInput("Rat Api", projectTypeId);
+			var model = new CreateProjectRouteInput("Rat Api", 0);
 
 			var request = new HttpRequestMessage
 			{
@@ -71,12 +66,13 @@ namespace Rat.Api.Test.Routes.Project
 		}
 
         [Theory]
-        [InlineData("", "1", TestMemberProvider.MemberId)]
-        [InlineData(null, "2", TestMemberProvider.MemberId)]
-		[InlineData("Test", "1", 31)]
-		public async Task Should_Return_BadRequest(string name, string version, int memberId)
+        [InlineData("", 1, TestMemberProvider.MemberId, "1")]
+        [InlineData(null, 1, TestMemberProvider.MemberId, "2")]
+		[InlineData("Test", 0, TestMemberProvider.MemberId, "3")]
+		[InlineData("Test", -1, TestMemberProvider.MemberId, "4")]
+		public async Task Should_Return_BadRequest(string name, int projectTypeId, int memberId, string version)
         {
-            var model = new CreateProjectRouteInput(name, 0);
+            var model = new CreateProjectRouteInput(name, projectTypeId);
 
 			var request = new HttpRequestMessage
 			{
@@ -90,7 +86,8 @@ namespace Rat.Api.Test.Routes.Project
 			var response = await _fixture.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 			Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-            Snapshot.Match(response.ReasonPhrase, $"{nameof(CreateProjectTests)}.{nameof(Should_Return_BadRequest)}.{version}");
+			var content = await response.Content.ReadAsStringAsync();
+            Snapshot.Match(content, $"{nameof(CreateProjectTests)}.{nameof(Should_Return_BadRequest)}.{version}");
         }
     }
 }

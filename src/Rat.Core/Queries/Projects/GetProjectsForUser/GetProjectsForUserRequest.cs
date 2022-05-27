@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using Rat.Core;
+using Rat.Core.Exceptions;
 
 namespace Rat.Queries.Projects.GetProjectsForUser
 {
 	internal record GetProjectsForUserRequest : IRequest<GetProjectsForUserResponse>
     {
-        internal const string UserId_Signature = nameof(GetProjectsForUserRequest) + "." + nameof(MemberId);
-
         public RatContext Context { get; init; } = new();
 
         public int MemberId { get; init; }
@@ -16,7 +15,12 @@ namespace Rat.Queries.Projects.GetProjectsForUser
     {
         public static void Validate(this GetProjectsForUserRequest request)
         {
-			return;
-        }
+			var validationErrors = Validators.ValidateMemberId(request.MemberId);
+
+			if (validationErrors.Length == 0)
+				return;
+
+			throw new InvalidRequestDataException(validationErrors);
+		}
     }
 }

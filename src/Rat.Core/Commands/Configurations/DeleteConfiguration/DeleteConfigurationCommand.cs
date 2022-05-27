@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Rat.Core.Exceptions;
@@ -21,9 +22,22 @@ namespace Rat.Core.Commands.Configurations.DeleteConfiguration
 
 			await using var connection = _connectionFactory.CreateConnection();
 
+			var project = await connection.ProjectGetById(request.ProjectId, cancellationToken);
+			if (project == null)
+				throw new ResourceNotFoundException($"Project: {request.ProjectId} doesn't exist");
+
 			var configuration = await connection.ConfigurationRootGetById(request.ConfigurationId, cancellationToken);
 			if (configuration == null)
 				throw new ResourceNotFoundException($"Configuration: {request.ConfigurationId} does not exist");
+
+			if (request.ProjectId != (int)configuration.ProjectId)
+			{
+				var kv = new KeyValuePair<string, string>(
+					"ProjectId",
+					$"Project: {request.ProjectId} does not match specified configuration: {request.ConfigurationId}");
+
+				throw new InvalidRequestDataException(kv);
+			}
 
 			await connection.ConfigurationRootDelete(request.ConfigurationId, request.DeletedBy, cancellationToken);
 

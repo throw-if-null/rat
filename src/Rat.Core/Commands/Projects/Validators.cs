@@ -31,7 +31,7 @@ namespace Rat.Commands.Projects
 		{
 			if (string.IsNullOrWhiteSpace(authProviderUserId))
 			{
-				return new KeyValuePair<string, string>[1] { new("AuthProviderId", Resources.NotFound) };
+				return new KeyValuePair<string, string>[1] { new("AuthProviderId", Resources.IdMustBeLargerThenZero) };
 			}
 
 			return Empty;
@@ -41,7 +41,7 @@ namespace Rat.Commands.Projects
 		{
 			if (projectTypeId <= 0)
 			{
-				return new KeyValuePair<string, string>[1] { new("ProjectTypeId", Resources.NotFound) };
+				return new KeyValuePair<string, string>[1] { new("ProjectTypeId", Resources.IdMustBeLargerThenZero) };
 			}
 
 			return Empty;

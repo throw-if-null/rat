@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Rat.Core.Exceptions;
+using static Rat.Core.Validators;
 
 namespace Rat.Queries.Projects.GetProjectById
 {
@@ -14,7 +15,7 @@ namespace Rat.Queries.Projects.GetProjectById
     {
         public static void Validate(this GetProjectByIdRequest request)
         {
-            var validationErrors = Validators.ValidateId(request.Id);
+            var validationErrors = ValidateId(request.Id);
 
 			if (validationErrors.Length == 0)
 				return;

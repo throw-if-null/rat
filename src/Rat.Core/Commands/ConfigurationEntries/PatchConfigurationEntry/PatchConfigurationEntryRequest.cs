@@ -2,7 +2,7 @@
 using MediatR;
 using Rat.Core.Commands.ConfigurationEntries.CreateConfigurationEntry;
 using Rat.Core.Exceptions;
-using static Rat.Core.Commands.Validators;
+using static Rat.Core.Validators;
 
 namespace Rat.Core.Commands.ConfigurationEntries.PatchConfigurationEntry
 {

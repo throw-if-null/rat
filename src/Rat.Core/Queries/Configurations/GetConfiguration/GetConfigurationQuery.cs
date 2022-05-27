@@ -18,6 +18,8 @@ namespace Rat.Core.Queries.Configurations.GetConfiguration
 
 		public async Task<GetConfigurationResponse> Handle(GetConfigurationRequest request, CancellationToken cancellationToken)
 		{
+			request.Validate();
+
 			await using var connection = _connectionFactory.CreateConnection();
 			var configuration = await connection.ConfigurationRootGetById(request.ConfigurationId, cancellationToken);
 

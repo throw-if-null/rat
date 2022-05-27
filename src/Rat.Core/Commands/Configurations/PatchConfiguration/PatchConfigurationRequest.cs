@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using MediatR;
 using Rat.Core.Exceptions;
-using static Rat.Core.Commands.Validators;
+using static Rat.Core.Validators;
 
 namespace Rat.Core.Commands.Configurations.PatchConfiguration
 {

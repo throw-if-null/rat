@@ -7,6 +7,7 @@ BEGIN
 		cr.[Id],
 		cr.[Name],
 		cr.[ConfigurationTypeId],
+		cr.[ProjectId],
 		cr.[Operator],
 		cr.[Operation],
 		cr.[Timestamp]

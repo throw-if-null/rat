@@ -19,6 +19,8 @@ namespace Rat.Core.Queries.Configurations.GetConfigurationsForProject
 
 		public async Task<GetConfigurationsForProjectResponse> Handle(GetConfigurationsForProjectRequest request, CancellationToken cancellationToken)
 		{
+			request.Validate();
+
 			using var connection = _connectionFactory.CreateConnection();
 
 			var project = await connection.ProjectGetById(request.ProjectId, cancellationToken);

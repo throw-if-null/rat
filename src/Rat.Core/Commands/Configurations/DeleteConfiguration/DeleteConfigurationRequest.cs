@@ -1,13 +1,15 @@
 ﻿using System.Linq;
 using MediatR;
 using Rat.Core.Exceptions;
-using static Rat.Core.Commands.Validators;
+using static Rat.Core.Validators;
 
 namespace Rat.Core.Commands.Configurations.DeleteConfiguration
 {
 	internal record DeleteConfigurationRequest : IRequest<DeleteConfigurationResponse>
 	{
 		public int ConfigurationId { get; init; }
+
+		public int ProjectId { get; init; }
 
 		public int DeletedBy { get; init; }
 	}
@@ -18,6 +20,7 @@ namespace Rat.Core.Commands.Configurations.DeleteConfiguration
 		{
 			var validationErrors =
 				ValidateId(request.ConfigurationId)
+				.Union(Validators.ValidateProjectId(request.ProjectId))
 				.Union(ValidateDeletedBy(request.DeletedBy))
 				.ToArray();
 

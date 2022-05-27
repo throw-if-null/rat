@@ -76,7 +76,7 @@ namespace Rat.Core.Commands.ConfigurationEntries
 		{
 			if (configurationRootId <= 0)
 			{
-				return new KeyValuePair<string, string>[1] { new("ConfigurationTypeId", Resources.NotFound) };
+				return new KeyValuePair<string, string>[1] { new("ConfigurationTypeId", Resources.IdMustBeLargerThenZero) };
 			}
 
 			return Empty;
@@ -86,7 +86,7 @@ namespace Rat.Core.Commands.ConfigurationEntries
 		{
 			if (secondsToLive < -1)
 			{
-				return new KeyValuePair<string, string>[1] { new("SecondstoLive", Resources.NotFound) };
+				return new KeyValuePair<string, string>[1] { new("SecondstoLive", Resources.IdMustBeLargerThenZero) };
 			}
 
 			return Empty;

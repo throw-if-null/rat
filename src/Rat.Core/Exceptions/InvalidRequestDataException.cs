@@ -8,6 +8,11 @@ namespace Rat.Core.Exceptions
 	[Serializable]
 	public sealed class InvalidRequestDataException : Exception
 	{
+		public InvalidRequestDataException(KeyValuePair<string, string> validationError)
+			: this(new[] { validationError })
+		{
+		}
+
 		public InvalidRequestDataException(KeyValuePair<string, string>[] validationErrors)
 			: this(validationErrors.ToDictionary(x => x.Key, x => x.Value))
 		{

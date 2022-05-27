@@ -5,10 +5,8 @@ using Rat.Commands.Projects.CreateProject;
 using Rat.Commands.Projects.DeleteProject;
 using Rat.Commands.Projects.PatchProject;
 using Rat.Commands.Users.CreateUser;
-using Rat.Core.Queries.ProjectTypes;
 using Rat.Queries.Projects.GetProjectById;
 using Rat.Queries.Projects.GetProjectsForUser;
-using Rat.Queries.Users.GetUserByUserId;
 
 namespace Rat.Core
 {
@@ -41,8 +39,6 @@ namespace Rat.Core
 
 			services.AddTransient<IRequestHandler<GetProjectsForUserRequest, GetProjectsForUserResponse>, GetProjectsForUserQuery>();
 			services.AddTransient<IRequestHandler<GetProjectByIdRequest, GetProjectByIdResponse>, GetProjectByIdQuery>();
-			services.AddTransient<IRequestHandler<GetProjectTypeByIdRequest, GetProjectTypeByIdResponse>, GetProjectTypeByIdQuery>();
-			services.AddTransient<IRequestHandler<GetUserByUserIdRequest, GetUserByUserIdResponse>, GetUserByUserIdQuery>();
 
 			return services;
 		}

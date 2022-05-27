@@ -8,7 +8,7 @@ namespace Rat.Api.Routes.DeleteConfiguration
 	public static class DeleteConfigurationRoute
 	{
 		private const string ROUTE_NAME = "DeleteConfiguration";
-		private const string ROUTE_PATH = "/api/configurations/{id:int}";
+		private const string ROUTE_PATH = "/api/projects/{projectId:int}/configurations/{id:int}";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -26,6 +26,7 @@ namespace Rat.Api.Routes.DeleteConfiguration
 
 			async static Task<IResult> ProcessInput(
 				HttpContext context,
+				int projectId,
 				int id,
 				IMediator mediator,
 				IMemberProvider memberProvider,
@@ -40,7 +41,7 @@ namespace Rat.Api.Routes.DeleteConfiguration
 					await
 						executor.Execute(
 							ROUTE_NAME,
-							() => mediator.Send(new DeleteConfigurationRequest { ConfigurationId = id, DeletedBy = memberId }),
+							() => mediator.Send(new DeleteConfigurationRequest { ConfigurationId = id, ProjectId = projectId, DeletedBy = memberId }),
 							_ => Results.NoContent());
 
 				return response;
