@@ -11,7 +11,7 @@ namespace Rat.Api.Routes.CreateConfigurationEntry
 	public static class CreateConfigurationEntryRoute
 	{
 		private const string ROUTE_NAME = "CreateConfigurationEntry";
-		private const string ROUTE_PATH = @"/api/configurations/{configurationId:int}/entry";
+		private const string ROUTE_PATH = @"/api/configurations/{configurationId:int}/entries";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{

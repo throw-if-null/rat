@@ -10,7 +10,7 @@ namespace Rat.Api.Routes.PatchConfigurationEntry
 	public static class PatchConfigurationEntryRoute
 	{
 		private const string ROUTE_NAME = "PatchConfigurationEntry";
-		private const string ROUTE_PATH = "/api/configuration{configurationId:int}/entry/{id:int}";
+		private const string ROUTE_PATH = "/api/configurations/{configurationId:int}/entries/{id:int}";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{

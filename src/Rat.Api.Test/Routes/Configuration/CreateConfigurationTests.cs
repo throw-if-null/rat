@@ -24,7 +24,7 @@ namespace Rat.Api.Test.Controllers.Routes
 		}
 
 		[Fact]
-		public async Task Should_Create_Project()
+		public async Task Should_Create_Configuration()
 		{
 			using var scope = _fixture.Provider.CreateScope();
 			var connectionFactory = scope.ServiceProvider.GetRequiredService<ISqlConnectionFactory>();
