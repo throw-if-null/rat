@@ -13,7 +13,8 @@ BEGIN
 		m.[Operation]
 	FROM [dbo].[Member] AS m
 	WHERE
-		m.[AuthProviderId] = @authProviderId
+		m.[AuthProviderId] = @authProviderId AND
+		m.[Deleted] = 0
 
 	SELECT @numberOfChanges = @@ROWCOUNT
 END

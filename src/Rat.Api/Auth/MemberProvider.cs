@@ -76,11 +76,14 @@ namespace Rat.Api.Auth
 			using var userIdScope = _logger.AppendUserId(authProviderId);
 
 			if (!string.IsNullOrWhiteSpace(authProviderId))
-			{	
+			{
 				_logger.ProcessingFinishedDebug();
 
 				await using var connection = _connectionFactory.CreateConnection();
 				var memberId = await GetMemberId(connection, authProviderId, ct);
+
+				if (memberId == default)
+					memberId = await connection.MemberInsert(authProviderId, 1, ct);
 
 				return memberId;
 			}
@@ -101,6 +104,9 @@ namespace Rat.Api.Auth
 
 				await using var connection = _connectionFactory.CreateConnection();
 				var memberId = await GetMemberId(connection, authProviderId, ct);
+
+				if (memberId == default)
+					memberId = await connection.MemberInsert(authProviderId, 1, ct);
 
 				return memberId;
 			}

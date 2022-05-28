@@ -27,12 +27,12 @@ services:
   rat-api:
     <<: *base-service-template
     container_name: rat-api
-    #image: throwifnull/rat:latest
-    build:
-      context: .
-      dockerfile: Rat.Api/Dockerfile
-      args:
-        - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
+    image: ghcr.io/throw-if-null/rat:latest
+    #build:
+    #  context: .
+    #  dockerfile: Rat.Api/Dockerfile
+    #  args:
+    #    - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - SqlConnectionFactoryOptions__ConnectionString=Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;
