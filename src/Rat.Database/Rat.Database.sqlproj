@@ -69,4 +69,7 @@
   <ItemGroup>
     <RefactorLog Include="Rat.Database.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Dockerfile" />
+  </ItemGroup>
 </Project>

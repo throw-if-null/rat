@@ -3,8 +3,12 @@ name: CI
 on:
   push:
     branches: [ branch0 ]
+    paths-ignore:
+      - 'src/Rat.Database/**'
   pull_request:
     branches: [ branch0 ]
+    paths:
+      - 'src/Rat.Database/**'
 
 env:
   DEFAULT_BRANCH: branch0

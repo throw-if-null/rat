@@ -1,0 +1,76 @@
+name: SQL SERVER
+
+on:
+  push:
+    branches: [ branch0 ]
+    paths:
+      - 'src/Rat.Database/Dockerfile'
+      - 'src/Rat.Database/RatDbFull.bak'
+
+env:
+  DEFAULT_BRANCH: branch0
+  VERSION: 0.0.1
+  CONTAINER_REGISTRY: ghcr.io
+
+jobs:
+  docker:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+
+    outputs:
+      dockerTag: ${{ env.DOCKER_TAG }}
+
+    steps:
+      - name: Checkout
+        id: git-checkhot
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Docker Buildx
+        id: docker-buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
+
+      - name: Prepare docker tag
+        id: docker-prepareTags
+        run: |
+          if [[ $GITHUB_REF != 'refs/heads/${{ env.DEFAULT_BRANCH }}' ]]
+          then
+            echo "DOCKER_TAG=$(echo $VERSION-$GITHUB_RUN_ID)" >> $GITHUB_ENV
+          else
+            echo "DOCKER_TAG=$VERSION" >> $GITHUB_ENV
+          fi
+
+      - name: Docker tag
+        id: docker-printTag
+        run: echo "Docker tag ${{ env.DOCKER_TAG }}"
+
+      - name: Set docker image metadata
+        id: docker-metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}db
+          tags: type=semver,pattern={{version}},value=${{ env.DOCKER_TAG }}
+
+      - name: Docker build and publish
+        id: docker-buildAndPublish
+        uses: docker/build-push-action@v2.10.0
+        with:
+          context: .
+          file: ./src/Rat.Database/Dockerfile
+          build-args: BAK_PATH=./src/Rat.Database/RatDbFull.bak
+          push: true
+          tags: ${{ steps.docker-metadata.outputs.tags }}
+
+      - name: Print published docker image tags
+        id: print-docker-image-tags
+        run: echo '${{ steps.docker-metadata.outputs.tags }}'
