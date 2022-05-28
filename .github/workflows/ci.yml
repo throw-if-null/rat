@@ -5,10 +5,12 @@ on:
     branches: [ branch0 ]
     paths-ignore:
       - 'src/Rat.Database/**'
+      - '.github/workflow/sqlserver.yml'
   pull_request:
     branches: [ branch0 ]
     paths:
       - 'src/Rat.Database/**'
+      - '.github/workflow/sqlserver.yml'
 
 env:
   DEFAULT_BRANCH: branch0

@@ -4,6 +4,7 @@ on:
   push:
     branches: [ branch0 ]
     paths:
+      - '.github/workflow/sqlserver.yml'
       - 'src/Rat.Database/Dockerfile'
       - 'src/Rat.Database/RatDbFull.bak'
 
