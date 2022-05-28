@@ -4,6 +4,11 @@
 		int Id,
 		string Name,
 		int TypeId,
-		int ConfigurationsCount,
+		IEnumerable<ConfigurationInfo> Configurations);
+
+	public record ConfigurationInfo(
+		int Id,
+		string Name,
+		int TypeId,
 		int EntriesCount);
 }

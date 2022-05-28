@@ -1,7 +1,6 @@
 ﻿{
-  "Id": 1,
+  "Id": 3287,
   "Name": "Should_Get_Project_By_Id",
   "TypeId": 2,
-  "ConfigurationsCount": 0,
-  "EntriesCount": 0
+  "Configurations": []
 }

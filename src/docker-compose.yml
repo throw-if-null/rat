@@ -27,15 +27,14 @@ services:
   rat-api:
     <<: *base-service-template
     container_name: rat-api
-    image: throwifnull/rat:latest
-    #build:
-    #  context: .
-    #  dockerfile: Rat.Api/Dockerfile
-    #  args:
-    #    - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
+    #image: throwifnull/rat:latest
+    build:
+      context: .
+      dockerfile: Rat.Api/Dockerfile
+      args:
+        - PUBLISH_RESULT_PATH=Rat.Api/bin/Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      # SQL Connection string:
       - SqlConnectionFactoryOptions__ConnectionString=Data Source=localhost;Initial Catalog=RatDb;User ID=sa;Password=Password1!;Connect Timeout=30;
     healthcheck:
       test: curl --max-time "5" --no-buffer --fail http://rat-api/health/ready || exit 1
