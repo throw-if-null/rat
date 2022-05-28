@@ -26,30 +26,28 @@ namespace Rat.Api.Auth
 
 		public async Task<int> GetMemberId(CancellationToken ct)
 		{
-			ClaimsPrincipal user = _contextAccessor.HttpContext.User;
-
-			using var methodScope = _logger.AppendMethodScope(Method);
-			_logger.ProcessingStartedDebug();
-
-			if (user == null)
+			try
 			{
-				_logger.UserInHttpContexIsNullWarning();
+				ClaimsPrincipal user = _contextAccessor.HttpContext.User;
 
-				return default;
-			}
+				using var methodScope = _logger.AppendMethodScope(Method);
+				_logger.ProcessingStartedDebug();
 
-			if (user.Identity == null)
-			{
-				_logger.IdentityInUserIsNullWarning();
+				if (user == null)
+				{
+					_logger.UserInHttpContexIsNullWarning();
 
-				return default;
-			}
+					return default;
+				}
 
-			var name = user.Identity.Name;
-			var authProviderId = string.Empty;
+				if (user.Identity == null)
+				{
+					_logger.IdentityInUserIsNullWarning();
 
-			if (string.IsNullOrWhiteSpace(name))
-			{
+					return default;
+				}
+
+				var authProviderId = string.Empty;
 				var nameIdentifierClaim = user.Claims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
 
 				if (nameIdentifierClaim == null)
@@ -65,50 +63,31 @@ namespace Rat.Api.Auth
 				{
 					authProviderId = nameIdentifierClaim.Value.Split('@')[0];
 				}
-				else
+				else if (nameIdentifierClaim.Value.Contains('|', StringComparison.InvariantCultureIgnoreCase))
 				{
-					_logger.NameClientClaimIsInvalidWarning();
-
-					return default;
-				}
-			}
-
-			using var userIdScope = _logger.AppendUserId(authProviderId);
-
-			if (!string.IsNullOrWhiteSpace(authProviderId))
-			{
-				_logger.ProcessingFinishedDebug();
-
-				await using var connection = _connectionFactory.CreateConnection();
-				var memberId = await GetMemberId(connection, authProviderId, ct);
-
-				if (memberId == default)
-					memberId = await connection.MemberInsert(authProviderId, 1, ct);
-
-				return memberId;
-			}
-			else
-			{
-				using var nameClaimScope = _logger.AppendNameClaim(name);
-
-				if (!name.Contains('|'))
-				{
-					_logger.NameClaimShouldContainPipeWarning();
-
-					return default;
+					authProviderId = nameIdentifierClaim.Value.Split('|')[1];
 				}
 
-				authProviderId = name.Split('|')[1];
+				if (!string.IsNullOrWhiteSpace(authProviderId))
+				{
+					using var userIdScope = _logger.AppendUserId(authProviderId);
 
+					await using var connection = _connectionFactory.CreateConnection();
+					var memberId = await GetMemberId(connection, authProviderId, ct);
+
+					if (memberId == default)
+						memberId = await connection.MemberInsert(authProviderId, 1, ct);
+
+					return memberId;
+				}
+
+				_logger.NameClientClaimIsInvalidWarning();
+
+				return default;
+			}
+			finally
+			{
 				_logger.ProcessingFinishedDebug();
-
-				await using var connection = _connectionFactory.CreateConnection();
-				var memberId = await GetMemberId(connection, authProviderId, ct);
-
-				if (memberId == default)
-					memberId = await connection.MemberInsert(authProviderId, 1, ct);
-
-				return memberId;
 			}
 		}
 
