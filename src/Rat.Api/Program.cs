@@ -9,6 +9,7 @@ using Rat.Api.Routes.CreateConfiguration;
 using Rat.Api.Routes.CreateConfigurationEntry;
 using Rat.Api.Routes.DeleteConfiguration;
 using Rat.Api.Routes.DeleteConfigurationEntry;
+using Rat.Api.Routes.Empty;
 using Rat.Api.Routes.GetConfiguration;
 using Rat.Api.Routes.Health;
 using Rat.Api.Routes.PatchConfiguration;
@@ -136,6 +137,7 @@ namespace Rat.Api
 				}
 			});
 
+			EmptyRoute.Map(app);
 			LivenessRoute.Map(app);
 			ReadinessRoute.Map(app);
 			CreateProjectRoute.Map(app);
