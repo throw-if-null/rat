@@ -21,6 +21,10 @@ INSERT INTO [dbo].[Member] ([Id], [AuthProviderId], [Operator], [Operation])
 SELECT 2, '114662313698141434676', 1, N'insert'
 WHERE NOT EXISTS (SELECT 1 FROM [dbo].[Member] WHERE Id = 2)
 
+INSERT INTO [dbo].[Member] ([Id], [AuthProviderId], [Operator], [Operation])
+SELECT 42, 'tests', 1, N'insert'
+WHERE NOT EXISTS (SELECT 1 FROM [dbo].[Member] WHERE Id = 42)
+
 SET IDENTITY_INSERT [dbo].[Member] OFF
 
 -- Insert project types

@@ -14,7 +14,7 @@ on:
 
 env:
   DEFAULT_BRANCH: branch0
-  VERSION: 0.3.12
+  VERSION: 0.3.13
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:

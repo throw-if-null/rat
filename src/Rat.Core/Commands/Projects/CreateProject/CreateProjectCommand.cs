@@ -26,6 +26,8 @@ namespace Rat.Commands.Projects.CreateProject
 				throw new ResourceNotFoundException($"ProjectType: {request.ProjectTypeId} does not exist");
 
 			var project = await connection.ProjectInsert(request.Name, request.ProjectTypeId, request.CreatedBy, cancellationToken);
+			int projectId = project.Id;
+			await connection.MemberProjectInsert(request.CreatedBy, projectId, request.CreatedBy, cancellationToken);
 
 			return new()
 			{
