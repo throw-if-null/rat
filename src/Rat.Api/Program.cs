@@ -157,12 +157,12 @@ namespace Rat.Api
 			// https://docs.microsoft.com/en-us/aspnet/core/security/cors
 			static void BuildCorsPolicy(CorsPolicyBuilder builder)
 			{
-				string[] CORS_ALLOW_ALL = new string[1] { "*" };
-
 				builder
-					.WithOrigins(CORS_ALLOW_ALL)
-					.WithMethods(CORS_ALLOW_ALL)
-					.WithHeaders(CORS_ALLOW_ALL)
+					.SetIsOriginAllowed(x => true)
+					.AllowCredentials()
+					.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyMethod()
 					.Build();
 			}
 		}
