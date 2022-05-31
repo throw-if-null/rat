@@ -1,8 +1,11 @@
 name: Build docs
 on:
-  workflow_run:
-    workflows: ["page-build-deployment"]
-    types: [requested]
+  push:
+    branches: [ branch0 ]
+    paths:
+      - '.github/workflows/redoc.yml'
+      - index.html
+      - 'images/**'
 
 jobs:
   build:
@@ -15,8 +18,18 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Build docs
-      run: ./make.sh
+    - name: Build index.html
+      id: redoc-build
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "Getting started"
+
+        npx redoc-cli build https://rattus.azurewebsites.net/swagger/v1/swagger.yaml && \
+        mv redoc-static.html index.html && \
+        echo "Changed name from redoc-static.html to index.html" && \
+        sed -i '7 i \ \ <link rel="icon" type="image/x-icon" href="images/favicon.ico">' index.html && \
+        echo -e "\nDone!"
 
     - name: Deploy to GitHub Pages
       # https://github.com/peaceiris/actions-gh-pages
