@@ -6,11 +6,18 @@ on:
     paths-ignore:
       - 'src/Rat.Database/**'
       - '.github/workflows/sqlserver.yml'
+      - '.github/workflows/redoc.yml'
+      - make.sh
+      - index.html
+
   pull_request:
     branches: [ branch0 ]
     paths:
       - 'src/Rat.Database/**'
       - '.github/workflows/sqlserver.yml'
+      - '.github/workflows/redoc.yml'
+      - make.sh
+      - index.html
 
 env:
   DEFAULT_BRANCH: branch0
