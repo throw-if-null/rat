@@ -1,16 +1,15 @@
-﻿using MediatR;
-using Rat.Api.Routes.Data;
+﻿using System.Net.Mime;
+using MediatR;
 using Rat.Api.Routes.GetConfiguration.Data;
 using Rat.Core.Queries.Configurations.GetConfiguration;
-using Rat.Queries.Projects.GetProjectById;
-using System.Net.Mime;
 
 namespace Rat.Api.Routes.GetConfiguration
 {
 	public static class GetConfigurationRoute
 	{
-		private const string ROUTE_NAME = "GetConfigurationById";
+		private const string ROUTE_NAME = "Get Configuration by Id";
 		private const string ROUTE_PATH = "/api/configuration/{id:int}";
+		private const string TAG = "Configurations";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -19,6 +18,7 @@ namespace Rat.Api.Routes.GetConfiguration
 					.MapGet(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Produces(StatusCodes.Status200OK, typeof(GetConfigurationRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesValidationProblem()
 					.ProducesProblem(StatusCodes.Status403Forbidden)

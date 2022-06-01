@@ -1,15 +1,15 @@
 ﻿using System.Net.Mime;
 using MediatR;
 using Rat.Api.Routes.Data;
-using Rat.Core;
 using Rat.Queries.Projects.GetProjectById;
 
 namespace Rat.Api.Routes
 {
 	internal static class GetProjectRoute
 	{
-		private const string ROUTE_NAME = "GetProjectById";
+		private const string ROUTE_NAME = "Get Project by Id";
 		private const string ROUTE_PATH = "/api/projects/{id:int}";
+		private const string TAG = "Projects";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -18,6 +18,7 @@ namespace Rat.Api.Routes
 					.MapGet(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Produces(StatusCodes.Status200OK, typeof(GetProjectRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesValidationProblem()
 					.ProducesProblem(StatusCodes.Status403Forbidden)

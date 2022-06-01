@@ -15,6 +15,8 @@ namespace Rat.Api.Routes.Empty
 				endpoints
 					.MapGet(ROUTE_PATH, ProcessInput)
 					.WithName(ROUTE_NAME)
+					.AllowAnonymous()
+					.ExcludeFromDescription()
 					.Produces(StatusCodes.Status200OK);
 
 			return builder;

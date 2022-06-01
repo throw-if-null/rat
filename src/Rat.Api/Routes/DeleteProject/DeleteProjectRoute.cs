@@ -6,8 +6,9 @@ namespace Rat.Api.Routes
 {
 	internal static class DeleteProjectRoute
 	{
-		private const string ROUTE_NAME = "DeleteProject";
+		private const string ROUTE_NAME = "Delete Project";
 		private const string ROUTE_PATH = "/api/projects/{id:int}";
+		private const string TAG = "Projects";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -16,6 +17,7 @@ namespace Rat.Api.Routes
 					.MapDelete(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Produces(StatusCodes.Status204NoContent)
 					.ProducesValidationProblem()
 					.ProducesProblem(StatusCodes.Status403Forbidden)

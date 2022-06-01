@@ -8,8 +8,9 @@ namespace Rat.Api.Routes
 {
 	internal static class PatchProjectRoute
 	{
-		private const string ROUTE_NAME = "PatchProject";
+		private const string ROUTE_NAME = "Patch Project";
 		private const string ROUTE_PATH = "/api/projects/{id:int}";
+		private const string TAG = "Projects";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -18,6 +19,7 @@ namespace Rat.Api.Routes
 					.MapMethods(ROUTE_PATH, new [] { HttpMethod.Patch.Method }, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Accepts<PatchProjectRouteInput>(MediaTypeNames.Application.Json)
 					.Produces(StatusCodes.Status200OK, typeof(PatchProjectRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesValidationProblem()

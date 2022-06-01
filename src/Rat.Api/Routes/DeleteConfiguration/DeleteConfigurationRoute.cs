@@ -1,15 +1,14 @@
 ﻿using MediatR;
 using Rat.Api.Auth;
-using Rat.Commands.Projects.DeleteProject;
 using Rat.Core.Commands.Configurations.DeleteConfiguration;
 
 namespace Rat.Api.Routes.DeleteConfiguration
 {
 	public static class DeleteConfigurationRoute
 	{
-		private const string ROUTE_NAME = "DeleteConfiguration";
+		private const string ROUTE_NAME = "Delete Configuration";
 		private const string ROUTE_PATH = "/api/projects/{projectId:int}/configurations/{id:int}";
-
+		private const string TAG = "Configurations";
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
@@ -17,6 +16,7 @@ namespace Rat.Api.Routes.DeleteConfiguration
 					.MapDelete(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Produces(StatusCodes.Status204NoContent)
 					.ProducesValidationProblem()
 					.ProducesProblem(StatusCodes.Status403Forbidden)

@@ -8,12 +8,14 @@ namespace Rat.Api.Routes.Health
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
 			var builder =
-				endpoints.MapHealthChecks("/health/live", new HealthCheckOptions()
-				{
-					AllowCachingResponses = false,
-					Predicate = (check) => check.Tags.Contains("live"),
-					ResponseWriter = HealthReportWriter.WriteResponse
-				});
+				endpoints
+					.MapHealthChecks("/health/live", new HealthCheckOptions()
+					{
+						AllowCachingResponses = false,
+						Predicate = (check) => check.Tags.Contains("live"),
+						ResponseWriter = HealthReportWriter.WriteResponse
+					})
+					.AllowAnonymous();
 
 			return builder;
 		}

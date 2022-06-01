@@ -1,17 +1,16 @@
-﻿using MediatR;
+﻿using System.Net.Mime;
+using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.CreateConfiguration.Data;
-using Rat.Api.Routes.Data;
-using Rat.Commands.Projects.CreateProject;
 using Rat.Core.Commands.Configurations.CreateConfiguration;
-using System.Net.Mime;
 
 namespace Rat.Api.Routes.CreateConfiguration
 {
 	public static class CreateConfigurationRoute
 	{
-		private const string ROUTE_NAME = "CreateConfiguration";
+		private const string ROUTE_NAME = "Create Configuration";
 		private const string ROUTE_PATH = @"/api/projects/{projectId:int}/configurations";
+		private const string TAG = "Configurations";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -20,6 +19,7 @@ namespace Rat.Api.Routes.CreateConfiguration
 					.MapPost(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Accepts<CreateConfigurationRouteInput>(MediaTypeNames.Application.Json)
 					.Produces(StatusCodes.Status201Created, typeof(CreateConfigurationRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesValidationProblem()

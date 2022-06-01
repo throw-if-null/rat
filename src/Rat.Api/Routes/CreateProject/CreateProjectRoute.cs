@@ -3,14 +3,14 @@ using MediatR;
 using Rat.Api.Auth;
 using Rat.Api.Routes.Data;
 using Rat.Commands.Projects.CreateProject;
-using Rat.Core;
 
 namespace Rat.Api.Routes
 {
 	public static class CreateProjectRoute
 	{
-		private const string ROUTE_NAME = "CreateProject";
+		private const string ROUTE_NAME = "Create Project";
 		private const string ROUTE_PATH = @"/api/projects";
+		private const string TAG = "Projects";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -19,6 +19,7 @@ namespace Rat.Api.Routes
 					.MapPost(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Accepts<CreateProjectRouteInput>(MediaTypeNames.Application.Json)
 					.Produces(StatusCodes.Status201Created, typeof(CreateProjectRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesValidationProblem()

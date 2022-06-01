@@ -6,8 +6,9 @@ namespace Rat.Api.Routes.DeleteConfigurationEntry
 {
 	public static class DeleteConfigurationEntryRoute
 	{
-		private const string ROUTE_NAME = "DeleteConfigurationEntry";
+		private const string ROUTE_NAME = "Delete Configuration Entry";
 		private const string ROUTE_PATH = "/api/configurations/{configurationId:int}/entries/{id:int}";
+		private const string TAG = "Entries";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -16,6 +17,7 @@ namespace Rat.Api.Routes.DeleteConfigurationEntry
 					.MapDelete(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.Produces(StatusCodes.Status204NoContent)
 					.ProducesValidationProblem()
 					.ProducesProblem(StatusCodes.Status403Forbidden)

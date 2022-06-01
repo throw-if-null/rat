@@ -9,8 +9,9 @@ namespace Rat.Api.Routes
 {
 	internal static class GetProjectsForUserRoute
 	{
-		private const string ROUTE_NAME = "GetUserProject";
+		private const string ROUTE_NAME = "Get User Project";
 		private const string ROUTE_PATH = "/api/projects";
+		private const string TAG = "Projects";
 
 		public static IEndpointConventionBuilder Map(IEndpointRouteBuilder endpoints)
 		{
@@ -19,6 +20,7 @@ namespace Rat.Api.Routes
 					.MapGet(ROUTE_PATH, ProcessInput)
 					.RequireAuthorization()
 					.WithName(ROUTE_NAME)
+					.WithTags(TAG)
 					.ProducesValidationProblem()
 					.Produces(StatusCodes.Status200OK, typeof(GetProjectForUserRouteOutput), MediaTypeNames.Application.Json)
 					.ProducesProblem(StatusCodes.Status403Forbidden);
