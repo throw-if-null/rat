@@ -1,10 +1,10 @@
-name: Build docs
+name: Rat API - Documentation
 on:
   push:
     branches: [ branch0 ]
     paths:
       - '.github/workflows/redoc.yml'
-      - index.html
+      - openapi.json
       - 'images/**'
 
 jobs:
@@ -23,13 +23,11 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
-        echo "Getting started"
-
-        npx redoc-cli build swagger.json && \
+        echo "Building index.html started" && \
+        npx redoc-cli build openapi.json --title "Rat API" && \
         mv redoc-static.html index.html && \
-        echo "Changed name from redoc-static.html to index.html" && \
-        sed -i '7 i \ \ <link rel="icon" type="image/x-icon" href="images/favicon.ico">' index.html && \
-        echo -e "\nDone!"
+        sed -i '/<title>/a \ \ <link rel="icon" type="image/x-icon" href="images/favicon.ico">' index.html && \
+        echo "Building index.html finished"
 
     - name: Deploy to GitHub Pages
       # https://github.com/peaceiris/actions-gh-pages

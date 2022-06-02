@@ -1,4 +1,4 @@
-name: SQL SERVER
+name: Rat DB - Golden Image
 
 on:
   push:
