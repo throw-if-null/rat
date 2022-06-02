@@ -4,7 +4,7 @@ on:
     branches: [ branch0 ]
     paths:
       - '.github/workflows/redoc.yml'
-      - openapi.json
+      - src/Rat.Api/openapi.yml
       - 'images/**'
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       continue-on-error: true
       run: |
         echo "Building index.html started" && \
-        npx redoc-cli build openapi.json --title "Rat API" && \
+        npx redoc-cli build src/Rat.Api/openapi.yml --title "Rat API" && \
         mv redoc-static.html index.html && \
         sed -i '/<title>/a \ \ <link rel="icon" type="image/x-icon" href="images/favicon.ico">' index.html && \
         echo "Building index.html finished"
