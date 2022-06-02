@@ -1,5 +1,6 @@
 # Rat
-[![CI](https://github.com/throw-if-null/rat/actions/workflows/ci.yml/badge.svg)](https://github.com/throw-if-null/rat/actions/workflows/ci.yml) 
+[![Rat API - CI/CD](https://github.com/throw-if-null/rat/actions/workflows/ci.yml/badge.svg)](https://github.com/throw-if-null/rat/actions/workflows/ci.yml)[![Rat API - Documentation](https://github.com/throw-if-null/rat/actions/workflows/redoc.yml/badge.svg)](https://github.com/throw-if-null/rat/actions/workflows/redoc.yml)
+[![Rat DB - Golden Image](https://github.com/throw-if-null/rat/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/throw-if-null/rat/actions/workflows/sqlserver.yml)
 
 # :rat: Rat
 
@@ -74,99 +75,3 @@ Swagger can be accessed at `/swagger`.
 ## Authentication
 
 Rat uses [Auth0](https://auth0.com/) as an authentication provided and each request excluding healthchecks expects an Authorization header with a Bearer token.
-
-## Data Model
-Projects:
-```json
- [
-  {
-    "id": 1,
-    "name": "Rat App",
-    "entries": 2,
-    "configs": 1
-  },
-  {
-    "id": 2,
-    "name": "Cat",
-    "entries": 123,
-    "configs": 6
-  },
-  {
-    "id": 3,
-    "name": "Discord Bot",
-    "entries": 35,
-    "configs": 2
-  }
-]
-```
-A project:
-```json
-{
-  "id": 2,
-  "name": "Catus",
-  "typeId": 1,
-  "configurations": [
-    {
-      "id": 1,
-      "name": "Base",
-      "type": "angular",
-      "entries": 12
-    },
-    {
-      "id": 2,
-      "name": "Sandbox",
-      "type": "angular",
-      "entries": 2
-    },
-    {
-      "id": 3,
-      "name": "Production",
-      "type": "angular",
-      "entries": 7
-    },
-    {
-      "id": 4,
-      "name": "Base.Env",
-      "type": ".env",
-      "entries": 12
-    }
-  ]
-}
-```
-A configuration:
-```json
-{
-  "id": 1,
-  "name": "base",
-  "typeId": 1,
-  "entries": [
-    {
-      "id": 1,
-      "key": "environment",
-      "value": "dev"
-    },
-    {
-      "id": 2,
-      "key": "AUTH_REQUIRED",
-      "value": true,
-      "disabled": true,
-      "expire": 6901232123
-    },
-    {
-      "id": 3,
-      "key": "sentry.secret",
-      "value": "secretsecret"
-    },
-    {
-      "id": 4,
-      "key": "sentry.clientId",
-      "value": "asdas12132asdasd123"
-    },
-    {
-      "id": 5,
-      "key": "auth0.callbackURL",
-      "value": "http://localhost:3000"
-    }
-  ]
-}
-```
