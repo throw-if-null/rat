@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rat.Api.Auth;
+using Rat.Api.CreateConfigurationEntries;
 using Rat.Api.Observability.Health;
 using Rat.Api.Routes;
 using Rat.Api.Routes.CreateConfiguration;
@@ -150,6 +151,7 @@ namespace Rat.Api
 			PatchConfigurationRoute.Map(app);
 			DeleteConfigurationRoute.Map(app);
 			CreateConfigurationEntryRoute.Map(app);
+			CreateConfigurationEntriesRoute.Map(app);
 			PatchConfigurationEntryRoute.Map(app);
 			DeleteConfigurationEntryRoute.Map(app);
 
