@@ -1,0 +1,17 @@
+﻿{
+  "Status": "Unhealthy",
+  "HealthChecks": [
+    {
+      "Name": "Liveness probe",
+      "Report": {
+        "Status": "Unhealthy",
+        "Description": "Dead",
+        "ElapsedMilliseconds": 0.2151,
+        "Tags": [
+          "live"
+        ],
+        "Data": {}
+      }
+    }
+  ]
+}

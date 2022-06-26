@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Rat.Database", "Rat.Database\Rat.Database.sqlproj", "{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6BC2725E-D4C0-43BE-8BA8-AABE24082B3A}"
+	ProjectSection(SolutionItems) = preProject
+		Rat.Database_Create.sql = Rat.Database_Create.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E69DB5-AEED-4CC8-BF9D-860D8C3AB50C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1fc0228f-7271-471f-8946-67a1608594f2}
+	EndGlobalSection
+EndGlobal

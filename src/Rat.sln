@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Api.Test", "Rat.Api.Test\Rat.Api.Test.csproj", "{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".docker", ".docker", "{CADA4485-4CDC-439E-AE75-B55AF7C92362}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Core", "Rat.Core\Rat.Core.csproj", "{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{92DB56B1-D07E-44E8-BAD9-153B504BDE9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AC202AF0-DDDA-4F3C-B0F5-7FBAF621BD5F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{E7B8EEAC-B9D1-402E-92DE-8409CD84B00C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Api", "Rat.Api\Rat.Api.csproj", "{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rat.Sql", "Rat.Sql\Rat.Sql.csproj", "{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{066705FA-C46B-4D3B-AEA4-6E512DBA4BCB} = {AC202AF0-DDDA-4F3C-B0F5-7FBAF621BD5F}
+		{1F11DB7B-A82B-4DFE-9FE2-7A92DDF25ED7} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
+		{AA9B2E23-0F38-4A2E-8F4C-BD2A0240D701} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
+		{7A83CF6C-3118-4508-89A3-28B9A2DCBEEA} = {92DB56B1-D07E-44E8-BAD9-153B504BDE9D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1fc0228f-7271-471f-8946-67a1608594f2}
+	EndGlobalSection
+EndGlobal
