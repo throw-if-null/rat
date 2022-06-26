@@ -201,6 +201,43 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/configurations/{configurationId}/entries/batch':
+    post:
+      tags:
+        - Entries
+      operationId: Create Configuration Entries
+      parameters:
+        - name: configurationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConfigurationEntriesRouteInput'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateConfigurationEntriesRouteOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpValidationProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   '/api/configurations/{configurationId}/entries/{id}':
     patch:
       tags:
@@ -487,6 +524,25 @@ components:
         entriesCount:
           type: integer
           format: int32
+      additionalProperties: false
+    CreateConfigurationEntriesRouteInput:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateConfigurationEntryRouteInput'
+          nullable: true
+      additionalProperties: false
+    CreateConfigurationEntriesRouteOutput:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+            format: int32
+          nullable: true
       additionalProperties: false
     CreateConfigurationEntryRouteInput:
       type: object
